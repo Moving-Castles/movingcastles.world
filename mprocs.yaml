@@ -1,0 +1,7 @@
+procs:
+  sveltekit:
+    cwd: packages/client
+    shell: pnpm dev
+  cms:
+    cwd: packages/cms
+    shell: pnpm dev
