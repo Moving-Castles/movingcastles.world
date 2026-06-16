@@ -3,3 +3,5 @@ packages:
 allowBuilds:
   esbuild: true
   '@parcel/watcher': true
+minimumReleaseAgeExclude:
+  - prettier-plugin-svelte@4.1.1

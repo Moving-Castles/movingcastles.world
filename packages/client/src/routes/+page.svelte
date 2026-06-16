@@ -1,5 +1,5 @@
 <script>
-  import Logo from "$lib/components/graphics/Logo.svelte"
+  import Logo from '$lib/components/graphics/Logo.svelte'
 </script>
 
 <main>

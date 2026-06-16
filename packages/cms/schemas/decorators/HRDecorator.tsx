@@ -1,3 +1,1 @@
-export const HRDecorator = (props: any) => (
-    <hr />
-)
+export const HRDecorator = (props: any) => <hr />

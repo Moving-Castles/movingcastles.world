@@ -1,8 +1,8 @@
-import { defineConfig } from 'sanity'
-import { deskTool } from 'sanity/desk'
-import { visionTool } from '@sanity/vision'
-import { muxInput } from 'sanity-plugin-mux-input'
-import { schemaTypes } from './schemas'
+import {defineConfig} from 'sanity'
+import {deskTool} from 'sanity/desk'
+import {visionTool} from '@sanity/vision'
+import {muxInput} from 'sanity-plugin-mux-input'
+import {schemaTypes} from './schemas'
 import deskStructure from './deskStructure'
 
 export default defineConfig({
@@ -12,9 +12,13 @@ export default defineConfig({
   projectId: '610gfr7y',
   dataset: 'production',
 
-  plugins: [deskTool({
-    structure: deskStructure
-  }), visionTool(), muxInput()],
+  plugins: [
+    deskTool({
+      structure: deskStructure,
+    }),
+    visionTool(),
+    muxInput(),
+  ],
 
   schema: {
     types: schemaTypes,

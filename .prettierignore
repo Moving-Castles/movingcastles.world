@@ -1,0 +1,11 @@
+node_modules
+pnpm-lock.yaml
+
+# Generated / build output
+**/.svelte-kit
+**/build
+**/dist
+**/.sanity
+
+# Binary assets
+**/static

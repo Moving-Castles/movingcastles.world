@@ -30,11 +30,5 @@
     "@types/styled-components": "^5.1.34",
     "eslint": "^9.29.0",
     "prettier": "^3.5.2"
-  },
-  "prettier": {
-    "semi": false,
-    "printWidth": 100,
-    "bracketSpacing": false,
-    "singleQuote": true
   }
 }
