@@ -20,5 +20,11 @@
     "svelte": "^5.34.6",
     "svelte-check": "^4.2.2",
     "vite": "^6.3.5"
+  },
+  "dependencies": {
+    "@portabletext/to-html": "^5.0.2",
+    "@portabletext/types": "^4.0.2",
+    "@sanity/client": "^7.22.0",
+    "@sanity/image-url": "^2.1.1"
   }
 }

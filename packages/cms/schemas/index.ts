@@ -1,6 +1,5 @@
 import ContentEditor from './ContentEditor'
-import Project from './Project'
-import About from './About'
 import Post from './Post'
+import Frontpage from './Frontpage'
 
-export const schemaTypes = [About, Project, Post, ContentEditor]
+export const schemaTypes = [Frontpage, Post, ContentEditor]
