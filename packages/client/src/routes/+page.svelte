@@ -40,7 +40,7 @@
     width: 100dvw;
     box-sizing: border-box;
     padding: 3rem 1.25rem;
-    background-color: grey;
+    background-color: var(--background);
   }
 
   .lockup-container {
