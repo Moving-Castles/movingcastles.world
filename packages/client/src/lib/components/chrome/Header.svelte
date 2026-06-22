@@ -5,7 +5,7 @@
 </script>
 
 <header>
-  <a class="brand" href="/">Moving Castles</a>
+  <a class="brand" href="/">[MC]</a>
 
   {#if links.length > 0}
     <nav class="links">
@@ -22,13 +22,15 @@
     display: flex;
     justify-content: space-between;
     align-items: baseline;
-    gap: 1em;
+    gap: 1rem;
     width: 100%;
     max-width: var(--content-width);
     margin: 0 auto;
-    padding: 1em 1em;
+    padding: 1rem 1rem;
     box-sizing: border-box;
-    color: var(--foreground-dimmed);
+    font-family: var(--font-stack-mono);
+    font-size: var(--font-size-small);
+    color: var(--foreground-darkest);
     user-select: none;
   }
 
@@ -37,9 +39,9 @@
   header::after {
     content: '';
     position: absolute;
-    inset-inline: 1em;
+    inset-inline: 1rem;
     bottom: 0;
-    border-bottom: 1px solid var(--foreground-dimmed);
+    border-bottom: 1px solid var(--foreground-darkest);
   }
 
   .brand {

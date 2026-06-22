@@ -1,34 +1,25 @@
 <script lang="ts">
   import {renderBlockText} from '$lib/modules/sanity'
+  import {formatDate} from '$lib/format'
   import type {Post} from '$lib/types'
 
   let {post}: {post: Post} = $props()
-
-  const year = (date?: string) => (date ? new Date(date).getFullYear() : '')
 </script>
 
 <article>
-  {#if post.featuredImage?.asset?.url}
+  <header>
+    <h1>{post.title}</h1>
+    <div class="meta">
+      {#if post.date}<span class="date">{formatDate(post.date)}</span>{/if}
+    </div>
+  </header>
+
+  <!-- {#if post.featuredImage?.asset?.url}
     <figure class="featured">
       <img src={post.featuredImage.asset.url} alt={post.featuredImage.caption ?? post.title} />
       {#if post.featuredImage.caption}<figcaption>{post.featuredImage.caption}</figcaption>{/if}
     </figure>
-  {/if}
-
-  <header>
-    <!-- <div class="meta">
-      {#if post.authors && post.authors.length > 0}
-        <span class="authors">
-          {#each post.authors as author, i (author._key)}
-            {#if author.url}<a href={author.url} target="_blank" rel="noreferrer">{author.name}</a
-              >{:else}{author.name}{/if}{i < post.authors.length - 1 ? ', ' : ''}
-          {/each}
-        </span>
-      {/if}
-      {#if post.date}<span class="date">{year(post.date)}</span>{/if}
-    </div> -->
-    <h1>{post.title}</h1>
-  </header>
+  {/if} -->
 
   {#if post.content}
     <div class="content">{@html renderBlockText(post.content)}</div>
@@ -62,13 +53,18 @@
   }
 
   h1 {
-    margin-top: 0.75rem;
+    margin-top: 0.5rem;
+    margin-bottom: 0;
+    // padding-bottom: 0.5em;
+    // border-bottom: 1px solid var(--foreground);
   }
 
   .meta {
     display: flex;
-    gap: 1rem;
-    color: var(--foreground-dimmed);
+    // gap: 1rem;
+    color: var(--foreground-dark);
+    // font-size: var(--font-size-small);
+    // font-family: var(--font-stack-mono);
   }
 
   .authors a {
@@ -87,7 +83,7 @@
 
     figcaption {
       margin-top: 0.5rem;
-      color: var(--foreground-dimmed);
+      color: var(--foreground-dark);
     }
   }
 </style>

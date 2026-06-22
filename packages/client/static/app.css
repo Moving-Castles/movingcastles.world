@@ -1,10 +1,160 @@
+/* Die Grotesk (cut A) — Klim trial web fonts, regular + medium + bold. */
+@font-face {
+    font-family: 'Die Grotesk';
+    src: url('/fonts/test-die-grotesk-a-regular.woff2') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Die Grotesk';
+    src: url('/fonts/test-die-grotesk-a-medium.woff2') format('woff2');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Die Grotesk';
+    src: url('/fonts/test-die-grotesk-a-bold.woff2') format('woff2');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* Berkeley Mono — licensed; regular + bold, upright + italic. */
+@font-face {
+    font-family: 'Berkeley Mono';
+    src:
+        url('/fonts/BerkeleyMono-Regular.woff2') format('woff2'),
+        url('/fonts/BerkeleyMono-Regular.woff') format('woff');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Berkeley Mono';
+    src:
+        url('/fonts/BerkeleyMono-Italic.woff2') format('woff2'),
+        url('/fonts/BerkeleyMono-Italic.woff') format('woff');
+    font-weight: 400;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Berkeley Mono';
+    src:
+        url('/fonts/BerkeleyMono-Bold.woff2') format('woff2'),
+        url('/fonts/BerkeleyMono-Bold.woff') format('woff');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Berkeley Mono';
+    src:
+        url('/fonts/BerkeleyMono-BoldItalic.woff2') format('woff2'),
+        url('/fonts/BerkeleyMono-BoldItalic.woff') format('woff');
+    font-weight: 700;
+    font-style: italic;
+    font-display: swap;
+}
+
+/* American Grotesk (base width) — Klim trial web fonts, regular + bold. */
+@font-face {
+    font-family: 'American Grotesk';
+    src: url('/fonts/test-american-grotesk-regular.woff2') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'American Grotesk';
+    src: url('/fonts/test-american-grotesk-bold.woff2') format('woff2');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
+/*
+ * Valentine LL (Lineto) — self-hosted web fonts. Light / Regular / Bold + italics.
+ * Legal: licensed exclusively for use on after.berlin (and subdomains), <50K monthly
+ * pageviews. Renaming the font or using it in other media is prohibited. The family
+ * name "ValentineLLWeb" is kept verbatim per the licence.
+ */
+@font-face {
+    font-family: 'ValentineLLWeb';
+    src: url('/fonts/ValentineLLWeb-Light.woff') format('woff');
+    font-weight: 200;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'ValentineLLWeb';
+    src:
+        url('/fonts/ValentineLLWeb-LightItalic.woff2') format('woff2'),
+        url('/fonts/ValentineLLWeb-LightItalic.woff') format('woff');
+    font-weight: 200;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'ValentineLLWeb';
+    src:
+        url('/fonts/ValentineLLWeb-Regular.woff2') format('woff2'),
+        url('/fonts/ValentineLLWeb-Regular.woff') format('woff');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'ValentineLLWeb';
+    src:
+        url('/fonts/ValentineLLWeb-Italic.woff2') format('woff2'),
+        url('/fonts/ValentineLLWeb-Italic.woff') format('woff');
+    font-weight: 400;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'ValentineLLWeb';
+    src:
+        url('/fonts/ValentineLLWeb-Bold.woff2') format('woff2'),
+        url('/fonts/ValentineLLWeb-Bold.woff') format('woff');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'ValentineLLWeb';
+    src:
+        url('/fonts/ValentineLLWeb-BoldItalic.woff2') format('woff2'),
+        url('/fonts/ValentineLLWeb-BoldItalic.woff') format('woff');
+    font-weight: 700;
+    font-style: italic;
+    font-display: swap;
+}
+
 :root {
     --background: rgba(128, 128, 128, 1);
-    --foreground: rgba(30, 30, 30, 1);
-    --foreground-dimmed: rgba(30, 30, 30, 0.5);
-    --font-stack-base: 'Berkeley Mono', 'Valentine Trial TT';
-    --font-size-base: 16px;
-    --line-height-base: 1.2em;
+    --foreground: rgb(30, 30, 30);
+    --foreground-dark: rgba(45, 45, 45, 1);
+    --foreground-darkest: rgba(65, 65, 65, 1);
+    --font-stack-mono: 'Berkeley Mono', 'Valentine Trial TT';
+    --font-stack-sans: 'Die Grotesk', helvetica;
+    --font-size-base: 18px;
+    --font-size-small: 14px;
+    --line-height-base: 1.4em;
     /* Width of the centred reading column on content pages (post article + header/footer). */
     --content-width: 720px;
 }
@@ -14,7 +164,7 @@ body, html {
     padding: 0;
     width: 100%;
     height: 100%;
-    font-family: var(--font-stack-base);
+    font-family: var(--font-stack-sans);
     font-size: var(--font-size-base);
     line-height: var(--line-height-base);
     background: var(--background);
@@ -33,7 +183,7 @@ h1, h2, h3 {
 
 a {
     color: var(--foreground);
-    text-decoration-color: var(--foreground-dimmed);
+    text-decoration-color: var(--foreground-dark);
 }
 
 a:hover {
@@ -60,7 +210,7 @@ figure, img {
     margin: 1.5rem 0;
     padding-left: 1rem;
     border-left: 2px solid currentColor;
-    color: var(--foreground-dimmed);
+    color: var(--foreground-dark);
 }
 
 .content hr {
@@ -83,5 +233,5 @@ figure, img {
 
 .content figure.content-image figcaption {
     margin-top: 0.5rem;
-    color: var(--foreground-dimmed);
+    color: var(--foreground-dark);
 }

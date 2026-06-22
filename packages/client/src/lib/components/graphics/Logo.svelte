@@ -38,6 +38,6 @@
     height: auto;
   }
   path {
-    fill: var(--foreground);
+    fill: var(--foreground-dark);
   }
 </style>

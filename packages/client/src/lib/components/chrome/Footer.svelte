@@ -5,7 +5,7 @@
 </script>
 
 <footer>
-  <a class="brand" href="/">Moving Castles</a>
+  <a class="brand" href="/">[MC]</a>
 
   {#if links.length > 0}
     <nav class="links">
@@ -22,14 +22,16 @@
     display: flex;
     justify-content: space-between;
     align-items: baseline;
-    gap: 1em;
+    gap: 1rem;
     width: 100%;
+    font-family: var(--font-stack-mono);
+    font-size: var(--font-size-small);
     max-width: var(--content-width);
     margin: 0 auto;
-    padding: 1em 1em;
-    padding-bottom: 2em;
+    padding: 1rem 1rem;
+    padding-bottom: 2rem;
     box-sizing: border-box;
-    color: var(--foreground-dimmed);
+    color: var(--foreground-darkest);
     user-select: none;
   }
 
@@ -38,9 +40,9 @@
   footer::after {
     content: '';
     position: absolute;
-    inset-inline: 1em;
+    inset-inline: 1rem;
     top: 0;
-    border-top: 1px solid var(--foreground-dimmed);
+    border-top: 1px solid var(--foreground-darkest);
   }
 
   .brand {
