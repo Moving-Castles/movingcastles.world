@@ -6,7 +6,7 @@
     --font-size-base: 16px;
     --line-height-base: 1.2em;
     /* Width of the centred reading column on content pages (post article + header/footer). */
-    --content-width: 680px;
+    --content-width: 720px;
 }
 
 body, html {
@@ -21,6 +21,12 @@ body, html {
     color: var(--foreground);
 }
 
+/* Inverted text selection: foreground fill, background text. */
+::selection {
+    background: var(--foreground);
+    color: var(--background);
+}
+
 h1, h2, h3 {
     font-size: var(--font-size-base);
 }
@@ -32,6 +38,10 @@ a {
 
 a:hover {
     text-decoration-color: var(--foreground);
+}
+
+figure, img {
+    user-select: none;
 }
 
 /* Portable Text output (rendered via {@html} into `.content`) */

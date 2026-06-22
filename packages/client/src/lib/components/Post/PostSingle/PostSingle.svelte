@@ -40,6 +40,7 @@
     width: 100%;
     max-width: var(--content-width);
     margin: 0 auto;
+    padding-inline: 1em;
     padding-top: 1em;
     padding-bottom: 2em;
     box-sizing: border-box;
@@ -76,8 +77,6 @@
 
   .featured {
     margin: 0 0 2rem;
-    height: 400px;
-    overflow: hidden;
 
     img {
       display: block;

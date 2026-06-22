@@ -18,6 +18,7 @@
 
 <style lang="scss">
   header {
+    position: relative;
     display: flex;
     justify-content: space-between;
     align-items: baseline;
@@ -25,10 +26,20 @@
     width: 100%;
     max-width: var(--content-width);
     margin: 0 auto;
-    padding: 1em 0em;
+    padding: 1em 1em;
     box-sizing: border-box;
-    border-bottom: 1px solid var(--foreground-dimmed);
     color: var(--foreground-dimmed);
+    user-select: none;
+  }
+
+  // Inset the divider by the 1em gutter so it lines up with the article's
+  // text column instead of spanning the full content-width box.
+  header::after {
+    content: '';
+    position: absolute;
+    inset-inline: 1em;
+    bottom: 0;
+    border-bottom: 1px solid var(--foreground-dimmed);
   }
 
   .brand {

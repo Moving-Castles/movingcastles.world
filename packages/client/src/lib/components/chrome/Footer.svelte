@@ -18,6 +18,7 @@
 
 <style lang="scss">
   footer {
+    position: relative;
     display: flex;
     justify-content: space-between;
     align-items: baseline;
@@ -25,10 +26,21 @@
     width: 100%;
     max-width: var(--content-width);
     margin: 0 auto;
-    padding: 1em 0em;
+    padding: 1em 1em;
+    padding-bottom: 2em;
     box-sizing: border-box;
-    border-top: 1px solid var(--foreground-dimmed);
     color: var(--foreground-dimmed);
+    user-select: none;
+  }
+
+  // Inset the divider by the 1em gutter so it lines up with the article's
+  // text column instead of spanning the full content-width box.
+  footer::after {
+    content: '';
+    position: absolute;
+    inset-inline: 1em;
+    top: 0;
+    border-top: 1px solid var(--foreground-dimmed);
   }
 
   .brand {
