@@ -146,10 +146,10 @@
 }
 
 :root {
-    --background: rgba(128, 128, 128, 1);
-    --foreground: rgb(30, 30, 30);
+    --background: rgb(100, 100, 100);
+    --foreground: rgb(20, 20, 20);
     --foreground-dark: rgba(45, 45, 45, 1);
-    --foreground-darkest: rgba(65, 65, 65, 1);
+    --foreground-darkest: rgb(45, 45, 45);
     --font-stack-mono: 'Berkeley Mono', 'Valentine Trial TT';
     --font-stack-sans: 'Die Grotesk', helvetica;
     --font-size-base: 18px;
