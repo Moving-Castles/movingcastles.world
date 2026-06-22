@@ -37,17 +37,6 @@
     box-sizing: border-box;
   }
 
-  .back {
-    display: inline-block;
-    margin-bottom: 2rem;
-    color: inherit;
-    text-decoration: none;
-
-    &:hover {
-      text-decoration: underline;
-    }
-  }
-
   header {
     margin-bottom: 2rem;
   }
@@ -67,12 +56,8 @@
     // font-family: var(--font-stack-mono);
   }
 
-  .authors a {
-    color: inherit;
-  }
-
   .featured {
-    margin: 0 0 2rem;
+    margin: 0 0 1rem;
 
     img {
       display: block;

@@ -30,7 +30,7 @@
     box-sizing: border-box;
     font-family: var(--font-stack-mono);
     font-size: var(--font-size-small);
-    color: var(--foreground-darkest);
+    color: var(--foreground-dark);
     user-select: none;
   }
 
@@ -41,7 +41,7 @@
     position: absolute;
     inset-inline: 1rem;
     bottom: 0;
-    border-bottom: 1px solid var(--foreground-darkest);
+    border-bottom: 1px solid var(--foreground-dark);
   }
 
   .brand {
@@ -49,7 +49,7 @@
     text-decoration: none;
 
     &:hover {
-      color: var(--foreground);
+      color: var(--foreground-darkest);
     }
   }
 
@@ -62,7 +62,7 @@
       text-decoration: none;
 
       &:hover {
-        color: var(--foreground);
+        color: var(--foreground-darkest);
       }
     }
   }

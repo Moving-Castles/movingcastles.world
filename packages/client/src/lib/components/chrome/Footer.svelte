@@ -31,7 +31,7 @@
     padding: 1rem 1rem;
     padding-bottom: 2rem;
     box-sizing: border-box;
-    color: var(--foreground-darkest);
+    color: var(--foreground-dark);
     user-select: none;
   }
 
@@ -42,7 +42,7 @@
     position: absolute;
     inset-inline: 1rem;
     top: 0;
-    border-top: 1px solid var(--foreground-darkest);
+    border-top: 1px solid var(--foreground-dark);
   }
 
   .brand {
@@ -50,7 +50,7 @@
     text-decoration: none;
 
     &:hover {
-      color: var(--foreground);
+      color: var(--foreground-darkest);
     }
   }
 
@@ -63,7 +63,7 @@
       text-decoration: none;
 
       &:hover {
-        color: var(--foreground);
+        color: var(--foreground-darkest);
       }
     }
   }
