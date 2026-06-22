@@ -7,6 +7,12 @@ export default {
   type: 'document',
   fields: [
     {
+      name: 'title',
+      title: 'Title',
+      type: 'string',
+      validation: (Rule: any) => Rule.required(),
+    },
+    {
       name: 'posts',
       title: 'Posts',
       description: 'Posts to feature on the front page, in order.',
