@@ -15,6 +15,13 @@
 export declare const internalGroqTypeReferenceTo: unique symbol
 
 // Source: schema.json
+export type PostReference = {
+  _ref: string
+  _type: 'reference'
+  _weak?: boolean
+  [internalGroqTypeReferenceTo]?: 'post'
+}
+
 export type SanityImageAssetReference = {
   _ref: string
   _type: 'reference'
@@ -34,11 +41,18 @@ export type ContentEditor = {
         }>
         style?: 'normal' | 'blockquote' | 'hr' | 'h1' | 'h2' | 'h3'
         listItem?: 'bullet' | 'number'
-        markDefs?: Array<{
-          href?: string
-          _type: 'link'
-          _key: string
-        }>
+        markDefs?: Array<
+          | {
+              href?: string
+              _type: 'link'
+              _key: string
+            }
+          | {
+              reference?: PostReference
+              _type: 'internalLink'
+              _key: string
+            }
+        >
         level?: number
         _type: 'block'
         _key: string
@@ -53,6 +67,21 @@ export type ContentEditor = {
         _key: string
       }
   >
+}
+
+export type SiteSettings = {
+  _id: string
+  _type: 'siteSettings'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  title: string
+  links?: Array<{
+    label: string
+    url: string
+    _type: 'navLink'
+    _key: string
+  }>
 }
 
 export type Post = {
@@ -102,13 +131,6 @@ export type SanityImageHotspot = {
   y: number
   height: number
   width: number
-}
-
-export type PostReference = {
-  _ref: string
-  _type: 'reference'
-  _weak?: boolean
-  [internalGroqTypeReferenceTo]?: 'post'
 }
 
 export type Frontpage = {
@@ -326,13 +348,14 @@ export type Geopoint = {
 }
 
 export type AllSanitySchemaTypes =
+  | PostReference
   | SanityImageAssetReference
   | ContentEditor
+  | SiteSettings
   | Post
   | Slug
   | SanityImageCrop
   | SanityImageHotspot
-  | PostReference
   | Frontpage
   | MuxVideoAssetReference
   | MuxVideo

@@ -1,5 +1,5 @@
 // ICONS
-import {MdArticle, MdHome} from 'react-icons/md'
+import {MdArticle, MdHome, MdSettings} from 'react-icons/md'
 
 export default (S) =>
   S.list()
@@ -24,5 +24,15 @@ export default (S) =>
             .showIcons(true)
             .filter('_type == $type')
             .params({type: 'post'}),
+        ),
+      S.listItem()
+        .title('Site Settings')
+        .icon(MdSettings)
+        .child(
+          S.editor()
+            .id('siteSettings')
+            .title('Site Settings')
+            .schemaType('siteSettings')
+            .documentId('siteSettings'),
         ),
     ])

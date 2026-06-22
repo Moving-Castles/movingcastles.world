@@ -19,3 +19,10 @@ export interface PostListItem extends Pick<PostDocument, '_id' | 'title' | 'date
 export interface Post extends PostListItem {
   content?: ContentEditor
 }
+
+// A single header/footer link, as projected by `siteSettingsQuery`.
+export interface NavLink {
+  _key: string
+  label: string
+  url: string
+}

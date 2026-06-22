@@ -1,5 +1,7 @@
 // Reusable GROQ projection for contentEditor fields.
-// Expands the asset reference on inline images so the renderer has a url.
+// Expands the asset reference on inline images so the renderer has a url,
+// and resolves the slug of any `internalLink` annotation so the renderer can
+// build an href without a second round-trip.
 // The leading `...` keeps every other key on the block intact.
 const contentEditorProjection = `{
 	...,
@@ -8,6 +10,13 @@ const contentEditorProjection = `{
 		_type == "image" => {
 			...,
 			asset->
+		},
+		markDefs[] {
+			...,
+			_type == "internalLink" => {
+				...,
+				"slug": reference->slug.current
+			}
 		}
 	}
 }`
@@ -42,6 +51,19 @@ export const postsQuery = `
 		authors,
 		featuredImage ${imageProjection}
 	}
+`
+
+// Header/footer links live on the `siteSettings` singleton.
+// Coalesce to an empty array so a missing singleton resolves cleanly.
+export const siteSettingsQuery = `
+	coalesce(
+		*[_type == "siteSettings"][0].links[] {
+			_key,
+			label,
+			url
+		},
+		[]
+	)
 `
 
 export const postBySlugQuery = `

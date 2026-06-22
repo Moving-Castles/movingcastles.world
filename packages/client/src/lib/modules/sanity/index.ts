@@ -14,8 +14,8 @@ import type {TypedObject, PortableTextBlock} from '@portabletext/types'
 export const client = createClient({
   projectId: SANITY_ID,
   dataset: SANITY_DATASET,
-  apiVersion: '2024-01-01',
-  useCdn: true,
+  apiVersion: '2026-01-01',
+  useCdn: false,
 })
 
 const builder = createImageUrlBuilder(client)
@@ -35,6 +35,14 @@ const components: PortableTextComponents = {
         return `<a href="${href}" target="_blank" rel="noreferrer">${children}</a>`
       }
       return `<a href="${href}">${children}</a>`
+    },
+    // Internal link: the `internalLink` annotation references a post; GROQ
+    // resolves its slug into `value.slug`. Fall back to the plain text if the
+    // referenced post is missing (e.g. deleted or no slug yet).
+    internalLink: ({children, value}) => {
+      const slug = value?.slug
+      if (!slug) return children
+      return `<a href="/posts/${slug}">${children}</a>`
     },
   },
   block: {

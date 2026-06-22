@@ -61,7 +61,7 @@
       align-items: baseline;
       gap: 1rem;
       padding: 0.6rem 0;
-      border-top: 1px solid rgba(0, 0, 0, 0.3);
+      border-top: 1px solid var(--foreground-dimmed);
       color: inherit;
       text-decoration: none;
 
@@ -72,8 +72,7 @@
 
     .year {
       flex-shrink: 0;
-      font-size: 0.85rem;
-      opacity: 0.7;
+      color: var(--foreground-dimmed);
     }
   }
 </style>

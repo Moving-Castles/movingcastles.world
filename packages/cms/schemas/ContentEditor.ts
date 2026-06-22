@@ -1,4 +1,4 @@
-import {MdImage} from 'react-icons/md'
+import {MdImage, MdLink, MdInsertLink} from 'react-icons/md'
 import {HRDecorator} from './decorators/HRDecorator'
 
 export default {
@@ -38,10 +38,25 @@ export default {
                 name: 'link',
                 type: 'object',
                 title: 'Link',
+                icon: MdLink,
                 fields: [
                   {
                     name: 'href',
                     type: 'string',
+                  },
+                ],
+              },
+              {
+                name: 'internalLink',
+                type: 'object',
+                title: 'Internal link',
+                icon: MdInsertLink,
+                fields: [
+                  {
+                    name: 'reference',
+                    type: 'reference',
+                    title: 'Reference',
+                    to: [{type: 'post'}],
                   },
                 ],
               },
