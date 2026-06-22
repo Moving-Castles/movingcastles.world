@@ -14,12 +14,12 @@
     </div>
   </header>
 
-  <!-- {#if post.featuredImage?.asset?.url}
+  {#if post.featuredImage?.asset?.url}
     <figure class="featured">
       <img src={post.featuredImage.asset.url} alt={post.featuredImage.caption ?? post.title} />
       {#if post.featuredImage.caption}<figcaption>{post.featuredImage.caption}</figcaption>{/if}
     </figure>
-  {/if} -->
+  {/if}
 
   {#if post.content}
     <div class="content">{@html renderBlockText(post.content)}</div>
