@@ -73,6 +73,7 @@
         color: inherit;
         text-decoration: none;
         font-weight: bold;
+        
         &:hover .title {
           text-decoration: underline;
         }
