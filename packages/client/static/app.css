@@ -123,11 +123,11 @@ h1, h2, h3 {
 
 a {
     color: var(--foreground);
-    text-decoration-color: var(--foreground);
 }
 
 a:hover {
-    text-decoration-color: var(--foreground);
+    color: var(--foreground-emphasis);
+    text-decoration: none;
 }
 
 figure, img {
