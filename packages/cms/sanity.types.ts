@@ -98,6 +98,7 @@ export type Post = {
     _key: string
   }>
   date?: string
+  metaDescription?: string
   content?: ContentEditor
   featuredImage?: {
     asset?: SanityImageAssetReference

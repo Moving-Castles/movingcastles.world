@@ -6,35 +6,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="stylesheet" href="%sveltekit.assets%/app.css" />
 
-    <!-- Primary Meta Tags (title + description rendered per-page via Metadata.svelte) -->
+    <!--
+      Brand-level, page-invariant tags only. Everything that varies per page
+      (title, description, canonical, og:url/type/image, twitter:image,
+      article:*, JSON-LD) is rendered by Metadata.svelte via <svelte:head>.
+    -->
     <meta name="author" content="MOVING CASTLES" />
     <meta name="robots" content="index, follow" />
     <meta name="theme-color" content="#000000" />
 
     <!-- Open Graph / Facebook -->
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://movingcastles.world/" />
-    <meta property="og:image" content="https://movingcastles.world/images/og-image.jpg" />
-    <meta property="og:image:alt" content="MOVING CASTLES" />
     <meta property="og:site_name" content="MOVING CASTLES" />
 
-    <!-- Twitter -->
+    <!-- Twitter / X (handles via TWITTER_USER in Metadata.svelte) -->
     <meta property="twitter:card" content="summary_large_image" />
-    <meta property="twitter:url" content="https://movingcastles.world/" />
-    <meta property="twitter:image" content="https://movingcastles.world/images/twitter-image.jpg" />
-    <meta property="twitter:image:alt" content="MOVING CASTLES" />
-    <meta property="twitter:creator" content="@movingcastles_" />
-    <meta property="twitter:site" content="@movingcastles_" />
 
-    <!-- Additional SEO Meta Tags -->
+    <!-- PWA / platform chrome -->
     <meta name="application-name" content="MOVING CASTLES" />
     <meta name="apple-mobile-web-app-title" content="MOVING CASTLES" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="msapplication-TileColor" content="#000000" />
-
-    <!-- Canonical URL -->
-    <link rel="canonical" href="https://movingcastles.world/" />
 
     %sveltekit.head%
   </head>

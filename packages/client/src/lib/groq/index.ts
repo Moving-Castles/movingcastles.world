@@ -72,6 +72,7 @@ export const postBySlugQuery = `
 		title,
 		"slug": slug.current,
 		date,
+		metaDescription,
 		authors,
 		content ${contentEditorProjection},
 		featuredImage ${imageProjection}

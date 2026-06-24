@@ -45,6 +45,18 @@ export default {
       type: 'date',
     },
     {
+      title: 'Meta description',
+      name: 'metaDescription',
+      type: 'text',
+      rows: 3,
+      description:
+        'Short summary used for search-engine results and social-media share previews. If left empty, the start of the post body is used.',
+      validation: (Rule: any) =>
+        Rule.max(160).warning(
+          'Keep under ~160 characters so it is not truncated in search results.',
+        ),
+    },
+    {
       name: 'content',
       title: 'Content',
       type: 'contentEditor',

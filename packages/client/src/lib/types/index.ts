@@ -18,6 +18,9 @@ export interface PostListItem extends Pick<PostDocument, '_id' | 'title' | 'date
 // Shape returned by `postBySlugQuery` (single).
 export interface Post extends PostListItem {
   content?: ContentEditor
+  // Optional editor-authored meta/social description; falls back to truncated
+  // body text in Metadata.svelte when empty.
+  metaDescription?: string
 }
 
 // A single header/footer link, as projected by `siteSettingsQuery`.
