@@ -9,7 +9,11 @@ const contentEditorProjection = `{
 		...,
 		_type == "image" => {
 			...,
-			asset->
+			asset->,
+			dayImage {
+				...,
+				asset->
+			}
 		},
 		markDefs[] {
 			...,

@@ -15,18 +15,26 @@
 export declare const internalGroqTypeReferenceTo: unique symbol
 
 // Source: schema.json
-export type PostReference = {
-  _ref: string
-  _type: 'reference'
-  _weak?: boolean
-  [internalGroqTypeReferenceTo]?: 'post'
-}
-
 export type SanityImageAssetReference = {
   _ref: string
   _type: 'reference'
   _weak?: boolean
   [internalGroqTypeReferenceTo]?: 'sanity.imageAsset'
+}
+
+export type DayImage = {
+  asset?: SanityImageAssetReference
+  media?: unknown // Unable to locate the referenced type "dayImage.media" in schema
+  hotspot?: SanityImageHotspot
+  crop?: SanityImageCrop
+  _type: 'image'
+}
+
+export type PostReference = {
+  _ref: string
+  _type: 'reference'
+  _weak?: boolean
+  [internalGroqTypeReferenceTo]?: 'post'
 }
 
 export type ContentEditor = {
@@ -63,6 +71,7 @@ export type ContentEditor = {
         hotspot?: SanityImageHotspot
         crop?: SanityImageCrop
         caption?: string
+        dayImage?: DayImage
         _type: 'image'
         _key: string
       }
@@ -349,8 +358,9 @@ export type Geopoint = {
 }
 
 export type AllSanitySchemaTypes =
-  | PostReference
   | SanityImageAssetReference
+  | DayImage
+  | PostReference
   | ContentEditor
   | SiteSettings
   | Post

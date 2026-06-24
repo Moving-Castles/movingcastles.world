@@ -72,6 +72,13 @@ export default {
               name: 'caption',
               type: 'text',
             },
+            {
+              title: 'Day version',
+              name: 'dayImage',
+              type: 'image',
+              description:
+                'Optional. Shown when the site is in light/day mode. If omitted, the image above is used in both themes.',
+            },
           ],
         },
       ],

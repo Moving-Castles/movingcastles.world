@@ -81,9 +81,9 @@
 /* Day theme — applied when the toggle sets data-theme="day" on <html>. The grey
    is tuned to roughly match night's foreground contrast, inverted onto white. */
 :root[data-theme='day'] {
-    --background: rgb(255, 255, 255);
-    --foreground: rgb(100, 100, 100);
-    --foreground-emphasis: rgb(0, 0, 0);
+    --background: rgb(140, 140, 140);
+    --foreground: rgb(30, 30, 30);
+    --foreground-emphasis: rgb(255, 255, 255);
 }
 
 /* Ease the colour swap on theme change. The pre-paint inline script sets the
@@ -169,6 +169,22 @@ figure, img {
     display: block;
     width: 100%;
     height: auto;
+}
+
+/* Night/day image pairs (inline content images with an optional day variant).
+   Night is shown by default and as the no-theme fallback; the day variant is
+   swapped in when the toggle sets data-theme="day". Single images have neither
+   class and are unaffected. */
+.content figure.content-image img.img-day {
+    display: none;
+}
+
+:root[data-theme='day'] .content figure.content-image img.img-night {
+    display: none;
+}
+
+:root[data-theme='day'] .content figure.content-image img.img-day {
+    display: block;
 }
 
 .content figure.content-image figcaption {

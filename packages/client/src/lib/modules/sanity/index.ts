@@ -55,11 +55,19 @@ const components: PortableTextComponents = {
   },
   types: {
     image: ({value}) => {
-      const url = value.asset?.url
-      if (!url) return ''
+      const nightUrl = value.asset?.url
+      if (!nightUrl) return ''
+      const dayUrl = value.dayImage?.asset?.url
       const caption = value.caption ? `<figcaption>${value.caption}</figcaption>` : ''
       const alt = value.caption || ''
-      return `<figure class="content-image"><img src="${url}" alt="${alt}" />${caption}</figure>`
+      // With a day variant, emit both images and let CSS swap them on
+      // [data-theme]; the day image is lazy-loaded since it's hidden at night.
+      // Without one, a single image that shows in both themes.
+      const imgs = dayUrl
+        ? `<img class="img-night" src="${nightUrl}" alt="${alt}" />` +
+          `<img class="img-day" src="${dayUrl}" alt="${alt}" loading="lazy" />`
+        : `<img src="${nightUrl}" alt="${alt}" />`
+      return `<figure class="content-image">${imgs}${caption}</figure>`
     },
   },
 }
