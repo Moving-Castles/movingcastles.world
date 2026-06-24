@@ -68,7 +68,7 @@
     /* Night is the default theme — also the no-JS / no-attribute fallback. */
     --background: rgb(0, 0, 0);
     --foreground: rgba(140, 140, 140, 1);
-    --foreground-emphasis: rgb(255, 255, 255);
+    --foreground-emphasis: rgb(210, 210, 210);
     --font-stack-mono: 'Berkeley Mono', courier, monospace;
     --font-stack-sans: 'Die Grotesk', helvetica, arial, sans-serif;
     --font-size-base: 18px;
@@ -83,7 +83,7 @@
 :root[data-theme='day'] {
     --background: rgb(140, 140, 140);
     --foreground: rgb(30, 30, 30);
-    --foreground-emphasis: rgb(255, 255, 255);
+    --foreground-emphasis: rgb(210, 210, 210);
 }
 
 /* Ease the colour swap on theme change. The pre-paint inline script sets the
