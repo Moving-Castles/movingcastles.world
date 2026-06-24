@@ -1,5 +1,6 @@
 <script lang="ts">
   import type {NavLink} from '$lib/types'
+  import ThemeToggle from './ThemeToggle.svelte'
 
   let {links = []}: {links?: NavLink[]} = $props()
 </script>
@@ -7,13 +8,16 @@
 <header>
   <a class="brand" href="/">[MC]</a>
 
-  {#if links.length > 0}
-    <nav class="links">
-      {#each links as link (link._key)}
-        <a href={link.url} target="_blank" rel="noreferrer">[{link.label}]</a>
-      {/each}
-    </nav>
-  {/if}
+  <div class="actions">
+    {#if links.length > 0}
+      <nav class="links">
+        {#each links as link (link._key)}
+          <a href={link.url} target="_blank" rel="noreferrer">[{link.label}]</a>
+        {/each}
+      </nav>
+    {/if}
+    <ThemeToggle />
+  </div>
 </header>
 
 <style lang="scss">
@@ -51,6 +55,12 @@
     &:hover {
       color: var(--foreground-emphasis);
     }
+  }
+
+  .actions {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
   }
 
   .links {

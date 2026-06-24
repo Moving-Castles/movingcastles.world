@@ -65,6 +65,7 @@
 }
 
 :root {
+    /* Night is the default theme — also the no-JS / no-attribute fallback. */
     --background: rgb(0, 0, 0);
     --foreground: rgba(140, 140, 140, 1);
     --foreground-emphasis: rgb(255, 255, 255);
@@ -75,6 +76,27 @@
     --line-height-base: 1.4em;
     /* Width of the centred reading column on content pages (post article + header/footer). */
     --content-width: 720px;
+}
+
+/* Day theme — applied when the toggle sets data-theme="day" on <html>. The grey
+   is tuned to roughly match night's foreground contrast, inverted onto white. */
+:root[data-theme='day'] {
+    --background: rgb(255, 255, 255);
+    --foreground: rgb(100, 100, 100);
+    --foreground-emphasis: rgb(0, 0, 0);
+}
+
+/* Ease the colour swap on theme change. The pre-paint inline script sets the
+   theme before first render, so this never animates on initial load. */
+body,
+header,
+footer,
+a {
+    transition:
+        background-color 0.2s ease,
+        color 0.2s ease,
+        border-color 0.2s ease,
+        text-decoration-color 0.2s ease;
 }
 
 body, html {
