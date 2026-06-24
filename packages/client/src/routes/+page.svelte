@@ -54,8 +54,8 @@
     // padding-top: 0.5em;
     width: 100%;
     max-width: 420px;
-    color: var(--foreground-dark);
-    border-top: 1px solid var(--foreground-dark);
+    color: var(--foreground);
+    border-top: 1px solid var(--foreground);
 
     li {
       display: flex;
@@ -66,7 +66,7 @@
       color: inherit;
 
       &:last-child {
-        border-bottom: 1px solid var(--foreground-dark);
+        border-bottom: 1px solid var(--foreground);
       }
 
       a {
@@ -82,7 +82,7 @@
 
     .year {
       flex-shrink: 0;
-      color: var(--foreground-dark);
+      color: var(--foreground);
     }
   }
 </style>

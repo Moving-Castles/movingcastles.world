@@ -39,7 +39,7 @@
   }
 
   path {
-    fill: var(--foreground-dark);
+    fill: var(--foreground);
     /* fill: rgb(255, 38, 0); */
   }
 </style>

@@ -14,13 +14,6 @@
     </div>
   </header>
 
-  <!-- {#if post.featuredImage?.asset?.url}
-    <figure class="featured">
-      <img src={post.featuredImage.asset.url} alt={post.featuredImage.caption ?? post.title} />
-      {#if post.featuredImage.caption}<figcaption>{post.featuredImage.caption}</figcaption>{/if}
-    </figure>
-  {/if} -->
-
   {#if post.content}
     <div class="content">{@html renderBlockText(post.content)}</div>
   {/if}
@@ -51,24 +44,24 @@
   .meta {
     display: flex;
     // gap: 1rem;
-    color: var(--foreground-dark);
+    color: var(--foreground);
     // font-size: var(--font-size-small);
     // font-family: var(--font-stack-mono);
   }
 
-  .featured {
-    margin: 0 0 1rem;
+  // .featured {
+  //   margin: 0 0 1rem;
 
-    img {
-      display: block;
-      width: 100%;
-      height: auto;
-      object-fit: cover;
-    }
+  //   img {
+  //     display: block;
+  //     width: 100%;
+  //     height: auto;
+  //     object-fit: cover;
+  //   }
 
-    figcaption {
-      margin-top: 0.5rem;
-      color: var(--foreground-dark);
-    }
-  }
+  //   figcaption {
+  //     margin-top: 0.5rem;
+  //     color: var(--foreground);
+  //   }
+  // }
 </style>
