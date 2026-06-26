@@ -1,5 +1,5 @@
 import {defineConfig} from 'sanity'
-import {deskTool} from 'sanity/desk'
+import {structureTool} from 'sanity/structure'
 import {visionTool} from '@sanity/vision'
 import {muxInput} from 'sanity-plugin-mux-input'
 import {schemaTypes} from './schemas'
@@ -13,7 +13,7 @@ export default defineConfig({
   dataset: 'production',
 
   plugins: [
-    deskTool({
+    structureTool({
       structure: deskStructure,
     }),
     visionTool(),
