@@ -57,14 +57,21 @@ export const postsQuery = `
 	}
 `
 
-// Header/footer links live on the `siteSettings` singleton.
+// Header/footer links live on the `siteSettings` singleton. Each link is either
+// an external `navLink` (url) or an internal `navPostLink` (reference to a post,
+// projected down to its slug). The filter drops internal links whose referenced
+// post is missing/unpublished, so the client never builds a dead /posts/ href.
 // Coalesce to an empty array so a missing singleton resolves cleanly.
 export const siteSettingsQuery = `
 	coalesce(
-		*[_type == "siteSettings"][0].links[] {
+		*[_type == "siteSettings"][0].links[
+			_type == "navLink" || defined(reference->slug.current)
+		] {
 			_key,
+			_type,
 			label,
-			url
+			_type == "navLink" => {url},
+			_type == "navPostLink" => {"slug": reference->slug.current}
 		},
 		[]
 	)

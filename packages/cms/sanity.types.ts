@@ -85,12 +85,20 @@ export type SiteSettings = {
   _updatedAt: string
   _rev: string
   title: string
-  links?: Array<{
-    label: string
-    url: string
-    _type: 'navLink'
-    _key: string
-  }>
+  links?: Array<
+    | {
+        label: string
+        url: string
+        _type: 'navLink'
+        _key: string
+      }
+    | {
+        label: string
+        reference: PostReference
+        _type: 'navPostLink'
+        _key: string
+      }
+  >
 }
 
 export type Post = {

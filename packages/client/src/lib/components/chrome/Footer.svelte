@@ -1,5 +1,6 @@
 <script lang="ts">
   import type {NavLink} from '$lib/types'
+  import {resolveNavLink} from '$lib/nav'
   import ThemeToggle from './ThemeToggle.svelte'
 
   let {links = []}: {links?: NavLink[]} = $props()
@@ -12,7 +13,11 @@
     {#if links.length > 0}
       <nav class="links">
         {#each links as link (link._key)}
-          <a href={link.url} target="_blank" rel="noreferrer">[{link.label}]</a>
+          {@const {href, external} = resolveNavLink(link)}
+          <a
+            {href}
+            target={external ? '_blank' : undefined}
+            rel={external ? 'noreferrer' : undefined}>[{link.label}]</a>
         {/each}
       </nav>
     {/if}
