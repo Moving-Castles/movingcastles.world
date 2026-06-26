@@ -17,7 +17,8 @@
           <a
             {href}
             target={external ? '_blank' : undefined}
-            rel={external ? 'noreferrer' : undefined}>[{link.label}]</a>
+            rel={external ? 'noreferrer' : undefined}>[{link.label}]</a
+          >
         {/each}
       </nav>
     {/if}
