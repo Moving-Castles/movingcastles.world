@@ -23,6 +23,7 @@
   article {
     width: 100%;
     max-width: var(--content-width);
+    min-height: 80dvh;
     margin: 0 auto;
     padding-inline: 1em;
     padding-top: 1em;
