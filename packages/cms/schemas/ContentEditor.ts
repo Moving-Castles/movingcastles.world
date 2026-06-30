@@ -79,6 +79,20 @@ export default {
               description:
                 'Optional. Shown when the site is in light/day mode. If omitted, the image above is used in both themes.',
             },
+            {
+              title: 'Small vertical margin',
+              name: 'smallMargin',
+              type: 'boolean',
+              description: 'Tighten the space above and below the image.',
+              initialValue: false,
+            },
+            {
+              title: 'Duotone',
+              name: 'duotone',
+              type: 'boolean',
+              description: 'Render the image as a duotone on a tinted background.',
+              initialValue: false,
+            },
           ],
         },
       ],

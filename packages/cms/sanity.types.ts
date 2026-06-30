@@ -72,6 +72,8 @@ export type ContentEditor = {
         crop?: SanityImageCrop
         caption?: string
         dayImage?: DayImage
+        smallMargin?: boolean
+        duotone?: boolean
         _type: 'image'
         _key: string
       }

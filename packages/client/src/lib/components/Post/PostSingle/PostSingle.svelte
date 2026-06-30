@@ -9,9 +9,23 @@
 <article>
   <header>
     <h1>{post.title}</h1>
-    <div class="meta">
-      {#if post.date}<span class="date">{formatDate(post.date)}</span>{/if}
-    </div>
+    {#if post.authors?.length}
+      <div class="authors">
+        {#each post.authors as author, i (author._key)}
+          {#if i > 0}<span class="sep">, </span>{/if}
+          {#if author.url}
+            <a href={author.url} target="_blank" rel="noreferrer">{author.name}</a>
+          {:else}
+            <span>{author.name}</span>
+          {/if}
+        {/each}
+      </div>
+    {/if}
+    {#if post.date}
+      <div class="meta">
+        <span class="date">{formatDate(post.date)}</span>
+      </div>
+    {/if}
   </header>
 
   {#if post.content}
@@ -38,31 +52,19 @@
   h1 {
     margin-top: 0.5rem;
     margin-bottom: 0;
-    // padding-bottom: 0.5em;
-    // border-bottom: 1px solid var(--foreground);
+  }
+
+  .authors {
+    color: var(--foreground);
   }
 
   .meta {
     display: flex;
-    // gap: 1rem;
     color: var(--foreground);
-    // font-size: var(--font-size-small);
-    // font-family: var(--font-stack-mono);
   }
 
-  // .featured {
-  //   margin: 0 0 1rem;
-
-  //   img {
-  //     display: block;
-  //     width: 100%;
-  //     height: auto;
-  //     object-fit: cover;
-  //   }
-
-  //   figcaption {
-  //     margin-top: 0.5rem;
-  //     color: var(--foreground);
-  //   }
-  // }
+  .authors {
+    font-style: italic;
+    // background: red;
+  }
 </style>

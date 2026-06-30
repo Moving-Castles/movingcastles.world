@@ -376,6 +376,20 @@
                       },
                       "optional": true
                     },
+                    "smallMargin": {
+                      "type": "objectAttribute",
+                      "value": {
+                        "type": "boolean"
+                      },
+                      "optional": true
+                    },
+                    "duotone": {
+                      "type": "objectAttribute",
+                      "value": {
+                        "type": "boolean"
+                      },
+                      "optional": true
+                    },
                     "_type": {
                       "type": "objectAttribute",
                       "value": {

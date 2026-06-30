@@ -158,7 +158,7 @@ figure, img {
 .content blockquote {
     margin: 1.5rem 0;
     padding-left: 1rem;
-    border-left: 1px solid currentColor;
+    border-left: 1px dashed currentColor;
     color: var(--foreground);
 }
 
@@ -170,14 +170,40 @@ figure, img {
 
 .content figure.content-image {
     margin: 0;
+    margin-top: 2em;
+    margin-bottom: 2em; 
+}
+
+.content figure.content-image.small-vertical-margin {
+    margin: 0;
     margin-top: 1em;
     margin-bottom: 0.5em; 
 }
 
 .content figure.content-image img {
     display: block;
-    width: 100%;
+    max-width: 100%;
     height: auto;
+    margin-inline: auto;
+    max-height: 800px;
+}
+
+/* Duotone: a luminance grayscale remapped onto the two theme greys via an SVG
+   filter (defined in app.html). Highlights take the light tone, shadows the
+   dark tone, so full-colour images sit inside the monochrome palette. The
+   filter is theme-specific because night and day swap which grey is light. */
+.content figure.content-image.duotone img {
+    filter: url(#duotone-night);
+}
+
+:root[data-theme='day'] .content figure.content-image.duotone img {
+    filter: url(#duotone-day);
+}
+
+@media (max-width: 600px) {
+    .content figure.content-image img {
+        max-height: 600px;
+    }
 }
 
 /* Night/day image pairs (inline content images with an optional day variant).

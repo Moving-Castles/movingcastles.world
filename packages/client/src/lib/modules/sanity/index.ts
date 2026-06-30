@@ -15,7 +15,7 @@ export const client = createClient({
   projectId: SANITY_ID,
   dataset: SANITY_DATASET,
   apiVersion: '2026-01-01',
-  useCdn: true,
+  useCdn: false,
 })
 
 const builder = createImageUrlBuilder(client)
@@ -67,7 +67,11 @@ const components: PortableTextComponents = {
         ? `<img class="img-night" src="${nightUrl}" alt="${alt}" />` +
           `<img class="img-day" src="${dayUrl}" alt="${alt}" loading="lazy" />`
         : `<img src="${nightUrl}" alt="${alt}" />`
-      return `<figure class="content-image">${imgs}${caption}</figure>`
+      // Optional layout modifiers set on the cms image block.
+      const classes = ['content-image']
+      if (value.smallMargin) classes.push('small-vertical-margin')
+      if (value.duotone) classes.push('duotone')
+      return `<figure class="${classes.join(' ')}">${imgs}${caption}</figure>`
     },
   },
 }
