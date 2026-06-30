@@ -192,9 +192,9 @@ figure, img {
 }
 
 /* Duotone: a luminance grayscale remapped onto the two theme greys via an SVG
-   filter (defined in app.html). Highlights take the light tone, shadows the
-   dark tone, so full-colour images sit inside the monochrome palette. The
-   filter is theme-specific because night and day swap which grey is light. */
+   filter (defined in DuotoneFilters.svelte). Highlights take the light tone,
+   shadows the dark tone, so full-colour images sit inside the monochrome
+   palette. Theme-specific because night and day swap which grey is light. */
 .content figure.content-image.duotone img {
     filter: url(#duotone-night);
 }

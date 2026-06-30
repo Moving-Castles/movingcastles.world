@@ -1,6 +1,7 @@
 <script lang="ts">
   import {renderBlockText} from '$lib/modules/sanity'
   import {formatDate} from '$lib/format'
+  import DuotoneFilters from '$lib/components/graphics/DuotoneFilters.svelte'
   import type {Post} from '$lib/types'
 
   let {post}: {post: Post} = $props()
@@ -32,6 +33,9 @@
     <div class="content">{@html renderBlockText(post.content)}</div>
   {/if}
 </article>
+
+<!-- SVG filter defs referenced by .content figure.content-image.duotone img -->
+<DuotoneFilters />
 
 <style lang="scss">
   article {
