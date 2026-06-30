@@ -158,14 +158,17 @@ figure, img {
 .content blockquote {
     margin: 1.5rem 0;
     padding-left: 1rem;
-    border-left: 1px dashed currentColor;
+    border-left: 1px dashed var(--foreground);
     color: var(--foreground);
 }
 
+/* Use --foreground directly, not currentColor: the UA stylesheet sets
+   `color: gray` on <hr>, which would otherwise win over the inherited
+   foreground and keep the rule grey in both themes. */
 .content hr {
     margin: 2rem 0;
     border: none;
-    border-top: 1px solid currentColor;
+    border-top: 1px solid var(--foreground);
 }
 
 .content figure.content-image {
