@@ -7,5 +7,9 @@ pnpm-lock.yaml
 **/dist
 **/.sanity
 
+# Sanity TypeGen output
+**/sanity.types.ts
+**/schema.json
+
 # Binary assets
 **/static

@@ -1,4 +1,4 @@
-import {MdImage} from 'react-icons/md'
+import {MdImage, MdLink, MdInsertLink} from 'react-icons/md'
 import {HRDecorator} from './decorators/HRDecorator'
 
 export default {
@@ -38,10 +38,25 @@ export default {
                 name: 'link',
                 type: 'object',
                 title: 'Link',
+                icon: MdLink,
                 fields: [
                   {
                     name: 'href',
                     type: 'string',
+                  },
+                ],
+              },
+              {
+                name: 'internalLink',
+                type: 'object',
+                title: 'Internal link',
+                icon: MdInsertLink,
+                fields: [
+                  {
+                    name: 'reference',
+                    type: 'reference',
+                    title: 'Reference',
+                    to: [{type: 'post'}],
                   },
                 ],
               },
@@ -56,6 +71,27 @@ export default {
               title: 'Caption',
               name: 'caption',
               type: 'text',
+            },
+            {
+              title: 'Day version',
+              name: 'dayImage',
+              type: 'image',
+              description:
+                'Optional. Shown when the site is in light/day mode. If omitted, the image above is used in both themes.',
+            },
+            {
+              title: 'Small vertical margin',
+              name: 'smallMargin',
+              type: 'boolean',
+              description: 'Tighten the space above and below the image.',
+              initialValue: false,
+            },
+            {
+              title: 'Duotone',
+              name: 'duotone',
+              type: 'boolean',
+              description: 'Render the image as a duotone on a tinted background.',
+              initialValue: false,
             },
           ],
         },

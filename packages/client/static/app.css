@@ -1,7 +1,236 @@
+/* Die Grotesk (cut A — optical size for ~18px text) — Klim licensed web fonts;
+   regular + bold, upright + italic. */
+@font-face {
+    font-family: 'Die Grotesk';
+    src: url('/fonts/die-grotesk/die-grotesk-a-regular.woff2') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Die Grotesk';
+    src: url('/fonts/die-grotesk/die-grotesk-a-italic.woff2') format('woff2');
+    font-weight: 400;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Die Grotesk';
+    src: url('/fonts/die-grotesk/die-grotesk-a-bold.woff2') format('woff2');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Die Grotesk';
+    src: url('/fonts/die-grotesk/die-grotesk-a-bold-italic.woff2') format('woff2');
+    font-weight: 700;
+    font-style: italic;
+    font-display: swap;
+}
+
+/* Berkeley Mono — licensed; regular + bold, upright + italic. */
+@font-face {
+    font-family: 'Berkeley Mono';
+    src:
+        url('/fonts/berkeley-mono/BerkeleyMono-Regular.woff2') format('woff2'),
+        url('/fonts/berkeley-mono/BerkeleyMono-Regular.woff') format('woff');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Berkeley Mono';
+    src:
+        url('/fonts/berkeley-mono/BerkeleyMono-Italic.woff2') format('woff2'),
+        url('/fonts/berkeley-mono/BerkeleyMono-Italic.woff') format('woff');
+    font-weight: 400;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Berkeley Mono';
+    src:
+        url('/fonts/berkeley-mono/BerkeleyMono-Bold.woff2') format('woff2'),
+        url('/fonts/berkeley-mono/BerkeleyMono-Bold.woff') format('woff');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Berkeley Mono';
+    src:
+        url('/fonts/berkeley-mono/BerkeleyMono-BoldItalic.woff2') format('woff2'),
+        url('/fonts/berkeley-mono/BerkeleyMono-BoldItalic.woff') format('woff');
+    font-weight: 700;
+    font-style: italic;
+    font-display: swap;
+}
+
+:root {
+    /* Night is the default theme — also the no-JS / no-attribute fallback. */
+    --background: rgb(0, 0, 0);
+    --foreground: rgba(140, 140, 140, 1);
+    --foreground-emphasis: rgb(210, 210, 210);
+    --font-stack-mono: 'Berkeley Mono', courier, monospace;
+    --font-stack-sans: 'Die Grotesk', helvetica, arial, sans-serif;
+    --font-size-base: 18px;
+    --font-size-small: 14px;
+    --line-height-base: 1.4em;
+    /* Width of the centred reading column on content pages (post article + header/footer). */
+    --content-width: 720px;
+}
+
+/* Day theme — applied when the toggle sets data-theme="day" on <html>. The grey
+   is tuned to roughly match night's foreground contrast, inverted onto white. */
+:root[data-theme='day'] {
+    --background: rgb(140, 140, 140);
+    --foreground: rgb(30, 30, 30);
+    --foreground-emphasis: rgb(210, 210, 210);
+}
+
+/* Ease the colour swap on theme change. The pre-paint inline script sets the
+   theme before first render, so this never animates on initial load. */
+/* body,
+header,
+footer,
+a {
+    transition:
+        background-color 0.2s ease,
+        color 0.2s ease,
+        border-color 0.2s ease,
+        text-decoration-color 0.2s ease;
+} */
+
 body, html {
     margin: 0;
     padding: 0;
     width: 100%;
     height: 100%;
-    background: grey;
+    font-family: var(--font-stack-sans);
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-base);
+    background: var(--background);
+    color: var(--foreground);
+}
+
+/* Inverted text selection: foreground fill, background text. */
+::selection {
+    background: var(--foreground);
+    color: var(--background);
+}
+
+h1, h2, h3 {
+    font-size: var(--font-size-base);
+}
+
+a {
+    color: var(--foreground);
+}
+
+a:hover {
+    color: var(--foreground-emphasis);
+    text-decoration: none;
+}
+
+figure, img {
+    user-select: none;
+}
+
+/* Portable Text output (rendered via {@html} into `.content`) */
+.content p {
+    margin: 0;
+    margin-bottom: 1em;
+}
+
+.content h1,
+.content h2,
+.content h3 {
+    margin: 2rem 0 0.75rem;
+}
+
+.content blockquote {
+    margin: 1.5rem 0;
+    padding-left: 1rem;
+    border-left: 1px dashed var(--foreground);
+    color: var(--foreground);
+    max-width: calc(100% - 2rem);
+}
+
+/* Use --foreground directly, not currentColor: the UA stylesheet sets
+   `color: gray` on <hr>, which would otherwise win over the inherited
+   foreground and keep the rule grey in both themes. */
+.content hr {
+    margin: 2rem 0;
+    border: none;
+    border-top: 1px solid var(--foreground);
+}
+
+.content figure.content-image {
+    margin: 0;
+    margin-top: 2em;
+    margin-bottom: 2em; 
+}
+
+.content figure.content-image.small-vertical-margin {
+    margin: 0;
+    margin-top: 1em;
+    margin-bottom: 0.5em; 
+}
+
+.content figure.content-image img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    margin-inline: auto;
+    max-height: 800px;
+}
+
+/* Duotone: a luminance grayscale remapped onto the two theme greys via an SVG
+   filter (defined in DuotoneFilters.svelte). Highlights take the light tone,
+   shadows the dark tone, so full-colour images sit inside the monochrome
+   palette. Theme-specific because night and day swap which grey is light. */
+.content figure.content-image.duotone img {
+    filter: url(#duotone-night);
+}
+
+:root[data-theme='day'] .content figure.content-image.duotone img {
+    filter: url(#duotone-day);
+}
+
+@media (max-width: 600px) {
+    .content figure.content-image img {
+        max-height: 600px;
+    }
+}
+
+/* Night/day image pairs (inline content images with an optional day variant).
+   Night is shown by default and as the no-theme fallback; the day variant is
+   swapped in when the toggle sets data-theme="day". Single images have neither
+   class and are unaffected. */
+.content figure.content-image img.img-day {
+    display: none;
+}
+
+:root[data-theme='day'] .content figure.content-image img.img-night {
+    display: none;
+}
+
+:root[data-theme='day'] .content figure.content-image img.img-day {
+    display: block;
+}
+
+.content figure.content-image figcaption {
+    margin-top: 0.5rem;
+    margin-bottom: 1rem;
+    color: var(--foreground);
+    font-family: var(--font-stack-mono);
+    font-size: var(--font-size-small);
+    line-height: var(--line-height-base);
 }

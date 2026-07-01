@@ -6,48 +6,43 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="stylesheet" href="%sveltekit.assets%/app.css" />
 
-    <!-- Primary Meta Tags -->
-    <title>MOVING CASTLES</title>
-    <meta name="title" content="MOVING CASTLES" />
-    <meta name="description" content="Moving Castles is a game design studio based in Berlin." />
+    <!--
+      Brand-level, page-invariant tags only. Everything that varies per page
+      (title, description, canonical, og:url/type/image, twitter:image,
+      article:*, JSON-LD) is rendered by Metadata.svelte via <svelte:head>.
+    -->
     <meta name="author" content="MOVING CASTLES" />
     <meta name="robots" content="index, follow" />
     <meta name="theme-color" content="#000000" />
 
     <!-- Open Graph / Facebook -->
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://movingcastles.world/" />
-    <meta property="og:title" content="MOVING CASTLES" />
-    <meta
-      property="og:description"
-      content="Moving Castles is a game design studio based in Berlin."
-    />
-    <meta property="og:image" content="https://movingcastles.world/images/og-image.jpg" />
-    <meta property="og:image:alt" content="MOVING CASTLES" />
     <meta property="og:site_name" content="MOVING CASTLES" />
 
-    <!-- Twitter -->
+    <!-- Twitter / X (handles via TWITTER_USER in Metadata.svelte) -->
     <meta property="twitter:card" content="summary_large_image" />
-    <meta property="twitter:url" content="https://movingcastles.world/" />
-    <meta property="twitter:title" content="MOVING CASTLES" />
-    <meta
-      property="twitter:description"
-      content="Moving Castles is a game design studio based in Berlin."
-    />
-    <meta property="twitter:image" content="https://movingcastles.world/images/twitter-image.jpg" />
-    <meta property="twitter:image:alt" content="MOVING CASTLES" />
-    <meta property="twitter:creator" content="@movingcastles_" />
-    <meta property="twitter:site" content="@movingcastles_" />
 
-    <!-- Additional SEO Meta Tags -->
+    <!-- PWA / platform chrome -->
     <meta name="application-name" content="MOVING CASTLES" />
     <meta name="apple-mobile-web-app-title" content="MOVING CASTLES" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="msapplication-TileColor" content="#000000" />
 
-    <!-- Canonical URL -->
-    <link rel="canonical" href="https://movingcastles.world/" />
+    <!--
+      Apply the saved theme before first paint so there's no flash. Night is the
+      default; only an explicit "day" preference overrides it. Runs during head
+      parse, before <body> renders. Kept in sync with $lib/theme.svelte.ts.
+    -->
+    <script>
+      ;(function () {
+        try {
+          var theme = localStorage.getItem('theme') === 'day' ? 'day' : 'night'
+          document.documentElement.dataset.theme = theme
+          var meta = document.querySelector('meta[name="theme-color"]')
+          if (meta) meta.setAttribute('content', theme === 'day' ? '#ffffff' : '#000000')
+        } catch (e) {}
+      })()
+    </script>
 
     %sveltekit.head%
   </head>

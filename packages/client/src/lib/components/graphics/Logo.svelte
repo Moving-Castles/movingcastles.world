@@ -37,7 +37,9 @@
     width: 100%;
     height: auto;
   }
+
   path {
-    fill: rgb(40, 40, 40);
+    fill: var(--foreground);
+    /* fill: rgb(255, 38, 0); */
   }
 </style>
