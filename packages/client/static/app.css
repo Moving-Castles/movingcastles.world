@@ -160,6 +160,7 @@ figure, img {
     padding-left: 1rem;
     border-left: 1px dashed var(--foreground);
     color: var(--foreground);
+    max-width: calc(100% - 2rem);
 }
 
 /* Use --foreground directly, not currentColor: the UA stylesheet sets
