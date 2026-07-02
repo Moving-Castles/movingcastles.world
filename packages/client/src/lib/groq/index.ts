@@ -1,7 +1,7 @@
 // Reusable GROQ projection for contentEditor fields.
-// Expands the asset reference on inline images so the renderer has a url,
-// and resolves the slug of any `internalLink` annotation so the renderer can
-// build an href without a second round-trip.
+// Expands the asset reference on inline images and videos so the renderer has
+// a url, and resolves the slug of any `internalLink` annotation so the
+// renderer can build an href without a second round-trip.
 // The leading `...` keeps every other key on the block intact.
 const contentEditorProjection = `{
 	...,
@@ -14,6 +14,10 @@ const contentEditorProjection = `{
 				...,
 				asset->
 			}
+		},
+		_type == "video" => {
+			...,
+			asset->
 		},
 		markDefs[] {
 			...,

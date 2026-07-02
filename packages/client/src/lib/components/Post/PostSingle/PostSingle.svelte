@@ -1,5 +1,6 @@
 <script lang="ts">
   import {renderBlockText} from '$lib/modules/sanity'
+  import {enhanceMedia} from '$lib/modules/media'
   import {formatDate} from '$lib/format'
   import DuotoneFilters from '$lib/components/graphics/DuotoneFilters.svelte'
   import type {Post} from '$lib/types'
@@ -30,7 +31,11 @@
   </header>
 
   {#if post.content}
-    <div class="content">{@html renderBlockText(post.content)}</div>
+    <!-- Keyed on the post so client-side navigation between posts remounts
+         the container and reruns the media enhancement action. -->
+    {#key post._id}
+      <div class="content" use:enhanceMedia>{@html renderBlockText(post.content)}</div>
+    {/key}
   {/if}
 </article>
 
