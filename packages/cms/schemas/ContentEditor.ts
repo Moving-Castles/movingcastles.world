@@ -1,4 +1,4 @@
-import {MdImage, MdLink, MdInsertLink} from 'react-icons/md'
+import {MdImage, MdLink, MdInsertLink, MdWeb, MdOndemandVideo} from 'react-icons/md'
 import {HRDecorator} from './decorators/HRDecorator'
 
 export default {
@@ -91,6 +91,110 @@ export default {
               name: 'duotone',
               type: 'boolean',
               description: 'Render the image as a duotone on a tinted background.',
+              initialValue: false,
+            },
+            {
+              title: 'Allow large view',
+              name: 'largeView',
+              type: 'boolean',
+              description: 'Show a + button that opens the image in a viewport-sized lightbox.',
+              initialValue: false,
+            },
+          ],
+        },
+        {
+          type: 'object',
+          name: 'iframe',
+          title: 'Embed (iframe)',
+          icon: MdWeb,
+          fields: [
+            {
+              title: 'URL',
+              name: 'url',
+              type: 'url',
+              description: 'Address of the page to embed.',
+              validation: (Rule: any) => Rule.required().uri({scheme: ['https', 'http']}),
+            },
+            {
+              title: 'Aspect ratio',
+              name: 'aspectRatio',
+              type: 'string',
+              options: {
+                list: [
+                  {title: 'Landscape (16:9)', value: '16/9'},
+                  {title: 'Standard (4:3)', value: '4/3'},
+                  {title: 'Square (1:1)', value: '1/1'},
+                  {title: 'Portrait (9:16)', value: '9/16'},
+                ],
+              },
+              initialValue: '16/9',
+            },
+            {
+              title: 'Caption',
+              name: 'caption',
+              type: 'text',
+            },
+            {
+              title: 'Small vertical margin',
+              name: 'smallMargin',
+              type: 'boolean',
+              description: 'Tighten the space above and below the embed.',
+              initialValue: false,
+            },
+            {
+              title: 'Allow large view',
+              name: 'largeView',
+              type: 'boolean',
+              description: 'Show a + button that opens the embed in a viewport-sized lightbox.',
+              initialValue: false,
+            },
+          ],
+          preview: {
+            select: {title: 'caption', subtitle: 'url'},
+            prepare({title, subtitle}: {title?: string; subtitle?: string}) {
+              return {title: title || subtitle || 'Embed', subtitle: title ? subtitle : undefined}
+            },
+          },
+        },
+        {
+          type: 'file',
+          name: 'video',
+          title: 'Video (mp4)',
+          icon: MdOndemandVideo,
+          options: {accept: 'video/mp4'},
+          fields: [
+            {
+              title: 'Caption',
+              name: 'caption',
+              type: 'text',
+            },
+            {
+              title: 'Autoplay',
+              name: 'autoplay',
+              type: 'boolean',
+              description: 'Play automatically, muted and looping, without controls.',
+              initialValue: false,
+            },
+            {
+              title: 'Light sensitivity warning',
+              name: 'flashWarning',
+              type: 'boolean',
+              description:
+                'Cover the video with a "may include flashing lights" notice until the reader chooses to play it.',
+              initialValue: false,
+            },
+            {
+              title: 'Small vertical margin',
+              name: 'smallMargin',
+              type: 'boolean',
+              description: 'Tighten the space above and below the video.',
+              initialValue: false,
+            },
+            {
+              title: 'Allow large view',
+              name: 'largeView',
+              type: 'boolean',
+              description: 'Show a + button that opens the video in a viewport-sized lightbox.',
               initialValue: false,
             },
           ],
