@@ -37,6 +37,13 @@ export type PostReference = {
   [internalGroqTypeReferenceTo]?: 'post'
 }
 
+export type SanityFileAssetReference = {
+  _ref: string
+  _type: 'reference'
+  _weak?: boolean
+  [internalGroqTypeReferenceTo]?: 'sanity.fileAsset'
+}
+
 export type ContentEditor = {
   _type: 'contentEditor'
   content?: Array<
@@ -74,7 +81,28 @@ export type ContentEditor = {
         dayImage?: DayImage
         smallMargin?: boolean
         duotone?: boolean
+        largeView?: boolean
         _type: 'image'
+        _key: string
+      }
+    | {
+        url: string
+        aspectRatio?: '16/9' | '4/3' | '1/1' | '9/16'
+        caption?: string
+        smallMargin?: boolean
+        largeView?: boolean
+        _type: 'iframe'
+        _key: string
+      }
+    | {
+        asset?: SanityFileAssetReference
+        media?: unknown
+        caption?: string
+        autoplay?: boolean
+        flashWarning?: boolean
+        smallMargin?: boolean
+        largeView?: boolean
+        _type: 'video'
         _key: string
       }
   >
@@ -371,6 +399,7 @@ export type AllSanitySchemaTypes =
   | SanityImageAssetReference
   | DayImage
   | PostReference
+  | SanityFileAssetReference
   | ContentEditor
   | SiteSettings
   | Post
