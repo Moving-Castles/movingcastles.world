@@ -1,5 +1,5 @@
 <!--
-  Duotone filters for .content figure.content-image.duotone img (see app.css).
+  Duotone filters referenced by ImageBlock's duotone styles.
   feColorMatrix collapses each pixel to its Rec. 709 luminance, then
   feComponentTransfer remaps that grey ramp onto two theme tones: shadows to the
   first tableValues entry, highlights to the second. Night maps black to grey;
