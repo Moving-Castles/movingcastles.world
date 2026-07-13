@@ -54,7 +54,7 @@ export type ContentEditor = {
           _type: 'span'
           _key: string
         }>
-        style?: 'normal' | 'blockquote' | 'hr' | 'h1' | 'h2' | 'h3'
+        style?: 'normal' | 'blockquote' | 'hr' | 'h1' | 'h2' | 'h3' | 'h4'
         listItem?: 'bullet' | 'number'
         markDefs?: Array<
           | {
@@ -113,6 +113,26 @@ export type ContentEditor = {
           _key: string
         }>
         _type: 'transcript'
+        _key: string
+      }
+    | {
+        header?: Array<string>
+        rows?: Array<{
+          cells?: Array<string>
+          _type: 'row'
+          _key: string
+        }>
+        caption?: string
+        _type: 'table'
+        _key: string
+      }
+    | {
+        chartType: 'line' | 'histogram'
+        data: string
+        xLabel?: string
+        yLabel?: string
+        caption?: string
+        _type: 'chart'
         _key: string
       }
   >

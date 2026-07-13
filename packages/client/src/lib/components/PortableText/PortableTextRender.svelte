@@ -6,6 +6,8 @@
   import IframeBlock from './blocks/IframeBlock.svelte'
   import VideoBlock from './blocks/VideoBlock.svelte'
   import TranscriptBlock from './blocks/TranscriptBlock.svelte'
+  import TableBlock from './blocks/TableBlock.svelte'
+  import ChartBlock from './blocks/ChartBlock.svelte'
 
   // Custom Portable Text block types rendered as dedicated Svelte components.
   // Everything else (text blocks with their styles/marks, lists) falls through
@@ -16,6 +18,8 @@
     iframe: IframeBlock,
     video: VideoBlock,
     transcript: TranscriptBlock,
+    table: TableBlock,
+    chart: ChartBlock,
   }
 
   let {content}: {content: ContentEditorInput} = $props()

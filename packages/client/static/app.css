@@ -126,7 +126,7 @@ body, html {
     color: var(--background);
 }
 
-h1, h2, h3 {
+h1, h2, h3, h4 {
     font-size: var(--font-size-base);
 }
 
@@ -139,7 +139,7 @@ a:hover {
     text-decoration: none;
 }
 
-figure, img {
+img {
     user-select: none;
 }
 
@@ -153,8 +153,21 @@ figure, img {
 
 .content h1,
 .content h2,
-.content h3 {
+.content h3,
+.content h4 {
     margin: 2rem 0 0.75rem;
+}
+
+.content ul,
+.content ol {
+    margin: 0 0 1em;
+    padding-left: 1.5em;
+}
+
+/* Inline code spans (the `code` decorator). */
+.content code {
+    font-family: var(--font-stack-mono);
+    font-size: 0.85em;
 }
 
 .content blockquote {

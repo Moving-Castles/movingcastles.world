@@ -1,4 +1,13 @@
-import {MdImage, MdLink, MdOutlineFlare, MdWeb, MdOndemandVideo, MdForum} from 'react-icons/md'
+import {
+  MdImage,
+  MdLink,
+  MdOutlineFlare,
+  MdWeb,
+  MdOndemandVideo,
+  MdForum,
+  MdTableChart,
+  MdShowChart,
+} from 'react-icons/md'
 
 export default {
   title: 'Content editor',
@@ -20,6 +29,7 @@ export default {
             {title: 'H1', value: 'h1'},
             {title: 'H2', value: 'h2'},
             {title: 'H3', value: 'h3'},
+            {title: 'H4', value: 'h4'},
           ],
           marks: {
             decorators: [
@@ -30,6 +40,10 @@ export default {
               {
                 title: 'Emphasis',
                 value: 'em',
+              },
+              {
+                title: 'Code',
+                value: 'code',
               },
             ],
             annotations: [
@@ -243,6 +257,128 @@ export default {
                 title: first ? [first.label, first.value].filter(Boolean).join(': ') : 'Transcript',
                 subtitle: `Transcript — ${count} line${count === 1 ? '' : 's'}`,
               }
+            },
+          },
+        },
+        {
+          type: 'object',
+          name: 'table',
+          title: 'Table',
+          icon: MdTableChart,
+          fields: [
+            {
+              title: 'Header row',
+              name: 'header',
+              type: 'array',
+              of: [{type: 'string'}],
+            },
+            {
+              title: 'Rows',
+              name: 'rows',
+              type: 'array',
+              of: [
+                {
+                  type: 'object',
+                  name: 'row',
+                  title: 'Row',
+                  fields: [
+                    {
+                      title: 'Cells',
+                      name: 'cells',
+                      type: 'array',
+                      of: [{type: 'string'}],
+                    },
+                  ],
+                  preview: {
+                    select: {cells: 'cells'},
+                    prepare({cells}: {cells?: string[]}) {
+                      return {title: (cells ?? []).join(' | ') || 'Row'}
+                    },
+                  },
+                },
+              ],
+            },
+            {
+              title: 'Caption',
+              name: 'caption',
+              type: 'text',
+            },
+          ],
+          preview: {
+            select: {header: 'header', rows: 'rows', caption: 'caption'},
+            prepare({
+              header,
+              rows,
+              caption,
+            }: {
+              header?: string[]
+              rows?: unknown[]
+              caption?: string
+            }) {
+              const count = rows?.length ?? 0
+              return {
+                title: caption || (header ?? []).join(' | ') || 'Table',
+                subtitle: `Table — ${count} row${count === 1 ? '' : 's'}`,
+              }
+            },
+          },
+        },
+        {
+          type: 'object',
+          name: 'chart',
+          title: 'Chart',
+          icon: MdShowChart,
+          fields: [
+            {
+              title: 'Chart type',
+              name: 'chartType',
+              type: 'string',
+              options: {
+                list: [
+                  {title: 'Line', value: 'line'},
+                  {title: 'Histogram', value: 'histogram'},
+                ],
+              },
+              validation: (Rule: any) => Rule.required(),
+            },
+            {
+              title: 'Data (JSON)',
+              name: 'data',
+              type: 'text',
+              rows: 8,
+              description:
+                'Plot-ready JSON, normally written by the report publishing script rather than by hand.',
+              validation: (Rule: any) =>
+                Rule.required().custom((value: string | undefined) => {
+                  if (!value) return true
+                  try {
+                    JSON.parse(value)
+                    return true
+                  } catch {
+                    return 'Must be valid JSON'
+                  }
+                }),
+            },
+            {
+              title: 'X axis label',
+              name: 'xLabel',
+              type: 'string',
+            },
+            {
+              title: 'Y axis label',
+              name: 'yLabel',
+              type: 'string',
+            },
+            {
+              title: 'Caption',
+              name: 'caption',
+              type: 'text',
+            },
+          ],
+          preview: {
+            select: {title: 'caption', subtitle: 'chartType'},
+            prepare({title, subtitle}: {title?: string; subtitle?: string}) {
+              return {title: title || 'Chart', subtitle: `Chart — ${subtitle ?? 'unknown type'}`}
             },
           },
         },

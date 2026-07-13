@@ -9,7 +9,8 @@
     "format": "prettier --write .",
     "check": "pnpm --filter client check",
     "deploy:sanity": "pnpm --filter cms deploy",
-    "typegen:sanity": "pnpm --filter cms typegen"
+    "typegen:sanity": "pnpm --filter cms typegen",
+    "publish:report": "node packages/scripts/publish-report.mjs"
   },
   "keywords": [],
   "author": "",

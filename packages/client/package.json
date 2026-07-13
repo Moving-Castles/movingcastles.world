@@ -12,12 +12,15 @@
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch"
   },
   "devDependencies": {
+    "@portabletext/types": "^4.0.2",
     "@sveltejs/adapter-auto": "^7.0.1",
     "@sveltejs/adapter-netlify": "^6.0.4",
     "@sveltejs/kit": "^2.68.0",
     "@sveltejs/vite-plugin-svelte": "^7.1.2",
+    "@types/d3-array": "^3.2.2",
+    "@types/d3-scale": "^4.0.9",
+    "@types/d3-shape": "^3.1.8",
     "@types/node": "^26.0.1",
-    "@portabletext/types": "^4.0.2",
     "sass-embedded": "^1.100.0",
     "svelte": "^5.56.4",
     "svelte-check": "^4.7.1",
@@ -26,6 +29,9 @@
   "dependencies": {
     "@portabletext/to-html": "^5.0.2",
     "@sanity/client": "^7.23.0",
-    "@sanity/image-url": "^2.1.1"
+    "@sanity/image-url": "^2.1.1",
+    "d3-array": "^3.2.4",
+    "d3-scale": "^4.0.2",
+    "d3-shape": "^3.2.0"
   }
 }

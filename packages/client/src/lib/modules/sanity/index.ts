@@ -15,7 +15,7 @@ export const client = createClient({
   projectId: SANITY_ID,
   dataset: SANITY_DATASET,
   apiVersion: '2026-01-01',
-  useCdn: true,
+  useCdn: false,
 })
 
 const builder = createImageUrlBuilder(client)
@@ -54,6 +54,7 @@ const components: PortableTextComponents = {
     h1: ({children}) => `<h1>${children}</h1>`,
     h2: ({children}) => `<h2>${children}</h2>`,
     h3: ({children}) => `<h3>${children}</h3>`,
+    h4: ({children}) => `<h4>${children}</h4>`,
   },
 }
 
