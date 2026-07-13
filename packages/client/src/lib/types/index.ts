@@ -15,9 +15,14 @@ export interface PostListItem extends Pick<PostDocument, '_id' | 'title' | 'date
   featuredImage?: ExpandedImage
 }
 
+// A bibliography entry on a post; the text cites it via `cite` annotations
+// that anchor-link to #ref-{id} in the rendered end notes.
+export type BibReference = NonNullable<PostDocument['references']>[number]
+
 // Shape returned by `postBySlugQuery` (single).
 export interface Post extends PostListItem {
   content?: ContentEditor
+  references?: BibReference[]
   // Optional editor-authored meta/social description; falls back to truncated
   // body text in Metadata.svelte when empty.
   metaDescription?: string

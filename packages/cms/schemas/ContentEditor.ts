@@ -7,6 +7,7 @@ import {
   MdForum,
   MdTableChart,
   MdShowChart,
+  MdFormatQuote,
 } from 'react-icons/md'
 
 export default {
@@ -70,6 +71,20 @@ export default {
                     type: 'reference',
                     title: 'Reference',
                     to: [{type: 'post'}],
+                  },
+                ],
+              },
+              {
+                name: 'cite',
+                type: 'object',
+                title: 'Citation',
+                icon: MdFormatQuote,
+                fields: [
+                  {
+                    name: 'refId',
+                    type: 'string',
+                    title: 'Reference id',
+                    description: 'Citation key of an entry in the post’s references list.',
                   },
                 ],
               },

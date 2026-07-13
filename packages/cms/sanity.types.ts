@@ -67,6 +67,11 @@ export type ContentEditor = {
               _type: 'internalLink'
               _key: string
             }
+          | {
+              refId?: string
+              _type: 'cite'
+              _key: string
+            }
         >
         level?: number
         _type: 'block'
@@ -177,6 +182,15 @@ export type Post = {
   date?: string
   metaDescription?: string
   content?: ContentEditor
+  references?: Array<{
+    id: string
+    label: string
+    year: string
+    text: string
+    url?: string
+    _type: 'refItem'
+    _key: string
+  }>
   featuredImage?: {
     asset?: SanityImageAssetReference
     media?: unknown

@@ -62,6 +62,58 @@ export default {
       type: 'contentEditor',
     },
     {
+      title: 'References',
+      name: 'references',
+      type: 'array',
+      description:
+        'End notes rendered after the content. Cited from the text via the Citation annotation (or [@id] markers in a markdown source).',
+      of: [
+        {
+          type: 'object',
+          name: 'refItem',
+          title: 'Reference',
+          fields: [
+            {
+              title: 'Citation key',
+              name: 'id',
+              type: 'string',
+              description: 'Stable key the text cites, e.g. "askell2021".',
+              validation: (Rule: any) => Rule.required(),
+            },
+            {
+              title: 'In-text label',
+              name: 'label',
+              type: 'string',
+              description: 'How the citation reads in the text, e.g. "Askell et al."',
+              validation: (Rule: any) => Rule.required(),
+            },
+            {
+              title: 'Year',
+              name: 'year',
+              type: 'string',
+              validation: (Rule: any) => Rule.required(),
+            },
+            {
+              title: 'Reference text',
+              name: 'text',
+              type: 'text',
+              rows: 2,
+              description: 'The full end-note line, without the URL.',
+              validation: (Rule: any) => Rule.required(),
+            },
+            {
+              title: 'URL',
+              name: 'url',
+              type: 'url',
+            },
+          ],
+          preview: {
+            select: {title: 'text', subtitle: 'id'},
+          },
+        },
+      ],
+    },
+    {
       title: 'Featured Image',
       name: 'featuredImage',
       type: 'image',

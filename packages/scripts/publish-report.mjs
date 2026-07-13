@@ -51,6 +51,16 @@
 //                            xLabel / yLabel / caption
 //   ```transcript fence -> transcript block ("Label: value" per line;
 //                          lines without a colon continue the previous value)
+//   ```references fence -> the post `references` field (end notes). YAML list:
+//                            - id: askell2021      (citation key)
+//                              label: Askell et al. (in-text label)
+//                              year: 2021
+//                              text: Askell et al (2021), A General Language …
+//                              url: https://…       (optional)
+//   [@id] / @id         -> citations linking to the end note: [@id] renders
+//                          the parenthetical "(Label, Year)", bare @id the
+//                          narrative "Label (Year)". Unknown [@id] keys fail
+//                          the run; uncited references are warned about.
 //   anything else       -> warned about and skipped
 
 import fs from 'node:fs'
@@ -178,12 +188,59 @@ const collectDefinitions = (node) => {
   node.children?.forEach(collectDefinitions)
 }
 
+// In-text citations: [@id] renders the parenthetical "(Label, Year)", bare
+// @id the narrative "Label (Year)". Both carry a `cite` mark anchor-linking
+// to the end note rendered from the post's references field.
+const citeSpans = (id, narrative, marks, spans, markDefs) => {
+  const ref = refsById.get(id)
+  const markKey = makeKey(`cite:${id}`)
+  markDefs.push({_type: 'cite', _key: markKey, refId: id})
+  citedIds.add(id)
+  const text = narrative ? `${ref.label} (${ref.year})` : `(${ref.label}, ${ref.year})`
+  spans.push(span(text, [...marks, markKey]))
+}
+
+// Citations inside table cells flatten to their plain-text form (cells are
+// plain strings, so no link).
+const expandCitationsPlain = (text) =>
+  text
+    .replace(/\[@([A-Za-z0-9][A-Za-z0-9_-]*)\]/g, (match, id) => {
+      const ref = refsById.get(id)
+      if (!ref) return match
+      citedIds.add(id)
+      return `(${ref.label}, ${ref.year})`
+    })
+    .replace(/@([A-Za-z0-9][A-Za-z0-9_-]*)/g, (match, id) => {
+      const ref = refsById.get(id)
+      if (!ref) return match
+      citedIds.add(id)
+      return `${ref.label} (${ref.year})`
+    })
+
 const phrasingToSpans = (nodes, marks, spans, markDefs) => {
   for (const node of nodes) {
     switch (node.type) {
-      case 'text':
-        spans.push(span(node.value, marks))
+      case 'text': {
+        // Citation markers: [@id] renders the parenthetical form, bare @id
+        // the narrative one. Bare ids only count when they name a known
+        // reference — any other "@…" text passes through untouched — while
+        // an unknown bracketed [@id] is treated as a typo and fails the run.
+        const pattern = /\[@([A-Za-z0-9][A-Za-z0-9_-]*)\]|@([A-Za-z0-9][A-Za-z0-9_-]*)/g
+        let last = 0
+        for (const match of node.value.matchAll(pattern)) {
+          const bracketed = match[1] !== undefined
+          const id = match[1] ?? match[2]
+          if (!refsById.has(id)) {
+            if (bracketed) citationErrors.push(`unknown citation key "[@${id}]"`)
+            continue
+          }
+          if (match.index > last) spans.push(span(node.value.slice(last, match.index), marks))
+          citeSpans(id, !bracketed, marks, spans, markDefs)
+          last = match.index + match[0].length
+        }
+        if (last < node.value.length) spans.push(span(node.value.slice(last), marks))
         break
+      }
       case 'strong':
         phrasingToSpans(node.children, [...marks, 'strong'], spans, markDefs)
         break
@@ -202,6 +259,18 @@ const phrasingToSpans = (nodes, marks, spans, markDefs) => {
         break
       case 'link':
       case 'linkReference': {
+        // [@id] parses as a shortcut link reference whose label starts with
+        // "@" — that's a parenthetical citation, not a link.
+        if (node.type === 'linkReference' && (node.label ?? node.identifier).startsWith('@')) {
+          const id = (node.label ?? node.identifier).slice(1)
+          if (refsById.has(id)) {
+            citeSpans(id, false, marks, spans, markDefs)
+          } else {
+            citationErrors.push(`unknown citation key "[@${id}]"`)
+            spans.push(span(`[@${id}]`, marks))
+          }
+          break
+        }
         const url = node.type === 'link' ? node.url : definitions.get(node.identifier)?.url
         if (!url) {
           warn(`unresolved link reference "${node.identifier}"`)
@@ -440,6 +509,34 @@ collectDefinitions(tree)
 const frontmatter =
   tree.children[0]?.type === 'yaml' ? (YAML.parse(tree.children[0].value) ?? {}) : {}
 
+// * * * references * * *
+
+// The bibliography is read from ```references fences before the main walk,
+// since citations appear in the text ahead of the fence.
+const references = []
+const refsById = new Map()
+const citedIds = new Set()
+const citationErrors = []
+
+for (const node of tree.children) {
+  if (node.type !== 'code' || node.lang !== 'references') continue
+  for (const entry of YAML.parse(node.value) ?? []) {
+    for (const field of ['id', 'label', 'year', 'text']) {
+      if (!entry?.[field]) {
+        console.error(`references entry missing \`${field}\`: ${JSON.stringify(entry)}`)
+        process.exit(1)
+      }
+    }
+    if (refsById.has(entry.id)) {
+      console.error(`duplicate reference id "${entry.id}"`)
+      process.exit(1)
+    }
+    const ref = {...entry, year: String(entry.year)}
+    references.push(ref)
+    refsById.set(ref.id, ref)
+  }
+}
+
 let title = frontmatter.title
 const blocks = []
 
@@ -516,7 +613,9 @@ for (const node of tree.children) {
       walkList(node, 1)
       break
     case 'table': {
-      const rows = node.children.map((row) => row.children.map((cell) => mdToString(cell)))
+      const rows = node.children.map((row) =>
+        row.children.map((cell) => expandCitationsPlain(mdToString(cell))),
+      )
       const [header, ...rest] = rows
       blocks.push({
         _type: 'table',
@@ -534,6 +633,8 @@ for (const node of tree.children) {
       try {
         if (node.lang === 'chart') blocks.push(chartBlock(node))
         else if (node.lang === 'transcript') blocks.push(transcriptBlock(node))
+        else if (node.lang === 'references')
+          break // extracted in the pre-pass
         else warn(`code fence (lang "${node.lang ?? 'none'}") skipped`)
       } catch (error) {
         console.error(`Error in ${node.lang} fence: ${error.message}`)
@@ -550,6 +651,14 @@ for (const node of tree.children) {
 }
 
 // * * * document * * *
+
+if (citationErrors.length) {
+  for (const message of citationErrors) console.error(`✗ ${message}`)
+  process.exit(1)
+}
+for (const ref of references) {
+  if (!citedIds.has(ref.id)) warn(`reference "${ref.id}" is never cited`)
+}
 
 if (!title) {
   console.error('No title: add frontmatter or a leading # heading.')
@@ -580,6 +689,17 @@ const doc = {
       ...(author.url && {url: author.url}),
     })),
   }),
+  ...(references.length && {
+    references: references.map((ref) => ({
+      _type: 'refItem',
+      _key: makeKey(`ref:${ref.id}`),
+      id: ref.id,
+      label: ref.label,
+      year: ref.year,
+      text: ref.text,
+      ...(ref.url && {url: ref.url}),
+    })),
+  }),
   ...(frontmatter.metaDescription && {metaDescription: frontmatter.metaDescription}),
   content: {_type: 'contentEditor', content: blocks},
 }
@@ -599,6 +719,9 @@ console.error(
     .map(([kind, n]) => `${n} ${kind}`)
     .join(', '),
 )
+if (references.length) {
+  console.error(`${references.length} references, ${citedIds.size} cited`)
+}
 for (const message of warnings) console.error(`⚠ ${message}`)
 
 if (dryRun) {

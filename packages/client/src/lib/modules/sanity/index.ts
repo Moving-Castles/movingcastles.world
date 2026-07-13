@@ -46,6 +46,13 @@ const components: PortableTextComponents = {
       if (!slug) return children
       return `<a href="/posts/${slug}">${children}</a>`
     },
+    // Citation: anchor-link to the matching entry in the post's references
+    // list (rendered by PostSingle after the content).
+    cite: ({children, value}) => {
+      const refId = value?.refId
+      if (!refId) return children
+      return `<a class="cite" href="#ref-${refId}">${children}</a>`
+    },
   },
   block: {
     normal: ({children}) => `<p>${children}</p>`,

@@ -90,6 +90,7 @@ export const postBySlugQuery = `
 		metaDescription,
 		authors,
 		content ${contentEditorProjection},
+		references,
 		featuredImage ${imageProjection}
 	}
 `

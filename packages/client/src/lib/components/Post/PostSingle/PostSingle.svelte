@@ -34,6 +34,24 @@
       <PortableTextRender content={post.content} />
     </div>
   {/if}
+
+  {#if post.references?.length}
+    <!-- End notes. No heading of its own: the content is expected to close
+         with its own "References" heading. `cite` marks in the text
+         anchor-link to #ref-{id} here. -->
+    <section class="references">
+      <ul>
+        {#each post.references as ref (ref._key)}
+          <li id="ref-{ref.id}">
+            {ref.text}
+            {#if ref.url}
+              <a href={ref.url} target="_blank" rel="noreferrer">{ref.url}</a>
+            {/if}
+          </li>
+        {/each}
+      </ul>
+    </section>
+  {/if}
 </article>
 
 <!-- SVG filter defs referenced by ImageBlock's duotone styles -->
@@ -72,5 +90,34 @@
   .authors {
     font-style: italic;
     // background: red;
+  }
+
+  .references {
+    ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    li {
+      margin-bottom: 0.75em;
+      color: var(--foreground);
+      font-family: var(--font-stack-mono);
+      font-size: var(--font-size-small);
+      line-height: var(--line-height-base);
+      // Long DOI/arXiv URLs must wrap instead of widening the column.
+      overflow-wrap: anywhere;
+      // Give the entry a little air when it is jumped to via a citation, and
+      // highlight it as the jump target.
+      scroll-margin-top: 2rem;
+
+      &:target {
+        color: var(--foreground-emphasis);
+      }
+    }
+
+    a {
+      color: inherit;
+    }
   }
 </style>
