@@ -109,7 +109,15 @@ const buildControls = (player: HTMLElement, video: HTMLVideoElement) => {
     if (e.key === 'ArrowLeft') video.currentTime = Math.max(video.currentTime - 5, 0)
   })
 
-  const events = ['play', 'pause', 'ended', 'timeupdate', 'volumechange', 'loadedmetadata', 'durationchange']
+  const events = [
+    'play',
+    'pause',
+    'ended',
+    'timeupdate',
+    'volumechange',
+    'loadedmetadata',
+    'durationchange',
+  ]
   for (const event of events) video.addEventListener(event, sync)
   sync()
 }

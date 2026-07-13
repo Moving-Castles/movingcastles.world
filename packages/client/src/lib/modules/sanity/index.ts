@@ -123,8 +123,7 @@ const components: PortableTextComponents = {
         ? `${value.flashWarning ? '' : 'autoplay '}muted loop playsinline`
         : 'controls playsinline preload="metadata"'
       const flags =
-        (value.autoplay ? ' data-autoplay' : '') +
-        (value.flashWarning ? ' data-flash-warning' : '')
+        (value.autoplay ? ' data-autoplay' : '') + (value.flashWarning ? ' data-flash-warning' : '')
       // The expand button sits before the warning in source order so the
       // warning overlay stacks above it until dismissed.
       const expand = value.largeView ? expandButton : ''
