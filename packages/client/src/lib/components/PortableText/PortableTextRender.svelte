@@ -5,6 +5,7 @@
   import ImageBlock from './blocks/ImageBlock.svelte'
   import IframeBlock from './blocks/IframeBlock.svelte'
   import VideoBlock from './blocks/VideoBlock.svelte'
+  import TranscriptBlock from './blocks/TranscriptBlock.svelte'
 
   // Custom Portable Text block types rendered as dedicated Svelte components.
   // Everything else (text blocks with their styles/marks, lists) falls through
@@ -14,6 +15,7 @@
     image: ImageBlock,
     iframe: IframeBlock,
     video: VideoBlock,
+    transcript: TranscriptBlock,
   }
 
   let {content}: {content: ContentEditorInput} = $props()

@@ -105,6 +105,16 @@ export type ContentEditor = {
         _type: 'video'
         _key: string
       }
+    | {
+        lines?: Array<{
+          label?: string
+          value?: string
+          _type: 'line'
+          _key: string
+        }>
+        _type: 'transcript'
+        _key: string
+      }
   >
 }
 

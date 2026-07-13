@@ -1,5 +1,4 @@
-import {MdImage, MdLink, MdOutlineFlare, MdWeb, MdOndemandVideo} from 'react-icons/md'
-import {HRDecorator} from './decorators/HRDecorator'
+import {MdImage, MdLink, MdOutlineFlare, MdWeb, MdOndemandVideo, MdForum} from 'react-icons/md'
 
 export default {
   title: 'Content editor',
@@ -198,6 +197,54 @@ export default {
               initialValue: false,
             },
           ],
+        },
+        {
+          type: 'object',
+          name: 'transcript',
+          title: 'Transcript',
+          icon: MdForum,
+          fields: [
+            {
+              title: 'Lines',
+              name: 'lines',
+              type: 'array',
+              of: [
+                {
+                  type: 'object',
+                  name: 'line',
+                  title: 'Line',
+                  fields: [
+                    {
+                      title: 'Label',
+                      name: 'label',
+                      type: 'string',
+                      description: 'Speaker or source, shown in bold.',
+                    },
+                    {
+                      title: 'Value',
+                      name: 'value',
+                      type: 'text',
+                      rows: 2,
+                    },
+                  ],
+                  preview: {
+                    select: {title: 'label', subtitle: 'value'},
+                  },
+                },
+              ],
+            },
+          ],
+          preview: {
+            select: {lines: 'lines'},
+            prepare({lines}: {lines?: {label?: string; value?: string}[]}) {
+              const count = lines?.length ?? 0
+              const first = lines?.[0]
+              return {
+                title: first ? [first.label, first.value].filter(Boolean).join(': ') : 'Transcript',
+                subtitle: `Transcript — ${count} line${count === 1 ? '' : 's'}`,
+              }
+            },
+          },
         },
       ],
     },
