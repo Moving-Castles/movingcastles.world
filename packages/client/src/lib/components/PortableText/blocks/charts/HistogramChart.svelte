@@ -7,7 +7,9 @@
   let {data, xLabel, yLabel}: {data: HistogramData; xLabel?: string; yLabel?: string} = $props()
 
   const HEIGHT = 360
-  const MARGIN = {top: 24, right: 24, bottom: 44, left: 56}
+  // The slim right margin only keeps the last x tick label from clipping;
+  // the plot fills the full column width.
+  const MARGIN = {top: 24, right: 16, bottom: 44, left: 56}
 
   let clientWidth: number | undefined = $state()
   const width = $derived(clientWidth ? Math.max(clientWidth, 280) : 640)

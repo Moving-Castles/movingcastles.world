@@ -8,7 +8,9 @@
   let {data, xLabel, yLabel}: {data: LineData; xLabel?: string; yLabel?: string} = $props()
 
   const HEIGHT = 360
-  const MARGIN = {top: 24, right: 64, bottom: 44, left: 56}
+  // The slim right margin only keeps the last x tick label from clipping;
+  // the plot fills the full column width.
+  const MARGIN = {top: 24, right: 16, bottom: 44, left: 56}
 
   // Identity in a monochrome palette: fixed per-series dash patterns
   // (solid, dashed, dotted, dash-dot), assigned by position.
@@ -190,13 +192,6 @@
         <path class="series" d={path(s.points)} stroke-dasharray={DASHES[i % DASHES.length]} />
       {/each}
 
-      <!-- Selective direct label: the endpoint value, single-series only
-           (multi-series identity is carried by the legend + tooltip). -->
-      {#if series.length === 1}
-        {@const last = series[0].points[series[0].points.length - 1]}
-        <text class="end" x={x(last[0]) + 8} y={y(last[1])}>{formatValue(last[1])}</text>
-      {/if}
-
       {#if readout && hoverX !== null}
         <line
           class="crosshair"
@@ -263,8 +258,7 @@
   }
 
   .tick,
-  .axis-label,
-  .end {
+  .axis-label {
     fill: var(--foreground);
   }
 
@@ -295,11 +289,6 @@
   .band {
     fill: var(--foreground);
     opacity: 0.15;
-  }
-
-  .end {
-    dominant-baseline: middle;
-    font-variant-numeric: tabular-nums;
   }
 
   .crosshair {
