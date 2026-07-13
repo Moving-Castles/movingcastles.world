@@ -109,7 +109,17 @@
         <text class="tick x" x={x(tick)} y={HEIGHT - MARGIN.bottom + 18}>{formatTick(tick)}</text>
       {/each}
 
-      {#if yLabel}<text class="axis-label" x="8" y="14">{yLabel}</text>{/if}
+      <!-- Rotated to read bottom-to-top along the axis, centered on the plot. -->
+      {#if yLabel}
+        <text
+          class="axis-label y"
+          transform="rotate(-90)"
+          x={-(MARGIN.top + HEIGHT - MARGIN.bottom) / 2}
+          y="14"
+        >
+          {yLabel}
+        </text>
+      {/if}
       {#if xLabel}
         <text class="axis-label x" x={(MARGIN.left + width - MARGIN.right) / 2} y={HEIGHT - 6}>
           {xLabel}
@@ -170,7 +180,8 @@
   }
 
   .tick.x,
-  .axis-label.x {
+  .axis-label.x,
+  .axis-label.y {
     text-anchor: middle;
   }
 

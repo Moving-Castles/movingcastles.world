@@ -21,6 +21,8 @@
 
   const series = $derived((data.series ?? []).filter((s) => s.points?.length))
   const allPoints = $derived(series.flatMap((s) => s.points))
+  const bands = $derived((data.bands ?? []).filter((b) => b.y1 > b.y0))
+  const labeledBands = $derived(bands.filter((b) => b.label))
 
   const domainOf = (values: number[]): [number, number] => {
     const [min, max] = extent(values)
@@ -31,9 +33,16 @@
   const x = $derived(
     scaleLinear(domainOf(allPoints.map((p) => p[0])), [MARGIN.left, width - MARGIN.right]),
   )
-  const y = $derived(
-    scaleLinear(domainOf(allPoints.map((p) => p[1])), [HEIGHT - MARGIN.bottom, MARGIN.top]).nice(),
-  )
+  // The y domain covers the data and any reference bands; `yMin` pins the
+  // floor (typically 0).
+  const y = $derived.by(() => {
+    const [autoMin, autoMax] = domainOf([
+      ...allPoints.map((p) => p[1]),
+      ...bands.flatMap((b) => [b.y0, b.y1]),
+    ])
+    const min = data.options?.yMin !== undefined ? Math.min(data.options.yMin, autoMin) : autoMin
+    return scaleLinear([min, autoMax], [HEIGHT - MARGIN.bottom, MARGIN.top]).nice()
+  })
 
   const path = $derived(
     lineShape<[number, number]>(
@@ -97,7 +106,7 @@
 
 {#if series.length}
   <div class="chart" bind:clientWidth>
-    {#if series.length > 1}
+    {#if series.length > 1 || labeledBands.length}
       <div class="legend">
         {#each series as s, i (i)}
           <span class="key">
@@ -105,6 +114,14 @@
               <line x1="0" y1="2" x2="20" y2="2" stroke-dasharray={DASHES[i % DASHES.length]} />
             </svg>
             {s.label ?? `Series ${i + 1}`}
+          </span>
+        {/each}
+        {#each labeledBands as band, i (i)}
+          <span class="key">
+            <svg width="14" height="10" aria-hidden="true">
+              <rect class="band" width="14" height="10" />
+            </svg>
+            {band.label}
           </span>
         {/each}
       </div>
@@ -130,6 +147,17 @@
         <text class="tick y" x={MARGIN.left - 8} y={y(tick)}>{formatTick(tick)}</text>
       {/each}
 
+      <!-- Reference bands sit behind the series lines. -->
+      {#each bands as band, i (i)}
+        <rect
+          class="band"
+          x={MARGIN.left}
+          width={width - MARGIN.right - MARGIN.left}
+          y={y(band.y1)}
+          height={Math.max(y(band.y0) - y(band.y1), 0)}
+        />
+      {/each}
+
       <line
         class="axis"
         x1={MARGIN.left}
@@ -141,7 +169,17 @@
         <text class="tick x" x={x(tick)} y={HEIGHT - MARGIN.bottom + 18}>{formatTick(tick)}</text>
       {/each}
 
-      {#if yLabel}<text class="axis-label" x="8" y="14">{yLabel}</text>{/if}
+      <!-- Rotated to read bottom-to-top along the axis, centered on the plot. -->
+      {#if yLabel}
+        <text
+          class="axis-label y"
+          transform="rotate(-90)"
+          x={-(MARGIN.top + HEIGHT - MARGIN.bottom) / 2}
+          y="14"
+        >
+          {yLabel}
+        </text>
+      {/if}
       {#if xLabel}
         <text class="axis-label x" x={(MARGIN.left + width - MARGIN.right) / 2} y={HEIGHT - 6}>
           {xLabel}
@@ -240,7 +278,8 @@
   }
 
   .tick.x,
-  .axis-label.x {
+  .axis-label.x,
+  .axis-label.y {
     text-anchor: middle;
   }
 
@@ -250,6 +289,12 @@
     stroke-width: 2;
     stroke-linecap: round;
     stroke-linejoin: round;
+  }
+
+  /* Reference bands: a wash, never a saturated block. */
+  .band {
+    fill: var(--foreground);
+    opacity: 0.15;
   }
 
   .end {

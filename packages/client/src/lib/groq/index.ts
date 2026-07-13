@@ -1,29 +1,40 @@
-// Reusable GROQ projection for contentEditor fields.
+// Reusable GROQ projection for contentEditor blocks.
 // Expands the asset reference on inline images and videos so the renderer has
 // a url, and resolves the slug of any `internalLink` annotation so the
 // renderer can build an href without a second round-trip.
 // The leading `...` keeps every other key on the block intact.
+const contentBlockProjection = `
+	...,
+	_type == "image" => {
+		...,
+		asset->,
+		dayImage {
+			...,
+			asset->
+		}
+	},
+	_type == "video" => {
+		...,
+		asset->
+	},
+	markDefs[] {
+		...,
+		_type == "internalLink" => {
+			...,
+			"slug": reference->slug.current
+		}
+	}`
+
+// Applied one level deep again for expandable `details` blocks, which nest a
+// content array of their own (a single nesting level, by schema design).
 const contentEditorProjection = `{
 	...,
 	content[] {
-		...,
-		_type == "image" => {
+		${contentBlockProjection},
+		_type == "details" => {
 			...,
-			asset->,
-			dayImage {
-				...,
-				asset->
-			}
-		},
-		_type == "video" => {
-			...,
-			asset->
-		},
-		markDefs[] {
-			...,
-			_type == "internalLink" => {
-				...,
-				"slug": reference->slug.current
+			content[] {
+				${contentBlockProjection}
 			}
 		}
 	}

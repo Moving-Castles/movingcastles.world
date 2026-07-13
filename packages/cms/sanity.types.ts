@@ -140,6 +140,106 @@ export type ContentEditor = {
         _type: 'chart'
         _key: string
       }
+    | {
+        summary: string
+        content?: Array<
+          | {
+              children?: Array<{
+                marks?: Array<string>
+                text?: string
+                _type: 'span'
+                _key: string
+              }>
+              style?: 'normal' | 'blockquote' | 'hr' | 'h1' | 'h2' | 'h3' | 'h4'
+              listItem?: 'bullet' | 'number'
+              markDefs?: Array<
+                | {
+                    href?: string
+                    _type: 'link'
+                    _key: string
+                  }
+                | {
+                    reference?: PostReference
+                    _type: 'internalLink'
+                    _key: string
+                  }
+                | {
+                    refId?: string
+                    _type: 'cite'
+                    _key: string
+                  }
+              >
+              level?: number
+              _type: 'block'
+              _key: string
+            }
+          | {
+              asset?: SanityImageAssetReference
+              media?: unknown
+              hotspot?: SanityImageHotspot
+              crop?: SanityImageCrop
+              caption?: string
+              dayImage?: DayImage
+              smallMargin?: boolean
+              duotone?: boolean
+              largeView?: boolean
+              _type: 'image'
+              _key: string
+            }
+          | {
+              url: string
+              aspectRatio?: '16/9' | '4/3' | '1/1' | '9/16'
+              caption?: string
+              smallMargin?: boolean
+              largeView?: boolean
+              _type: 'iframe'
+              _key: string
+            }
+          | {
+              asset?: SanityFileAssetReference
+              media?: unknown
+              caption?: string
+              autoplay?: boolean
+              flashWarning?: boolean
+              smallMargin?: boolean
+              largeView?: boolean
+              _type: 'video'
+              _key: string
+            }
+          | {
+              lines?: Array<{
+                label?: string
+                value?: string
+                _type: 'line'
+                _key: string
+              }>
+              _type: 'transcript'
+              _key: string
+            }
+          | {
+              header?: Array<string>
+              rows?: Array<{
+                cells?: Array<string>
+                _type: 'row'
+                _key: string
+              }>
+              caption?: string
+              _type: 'table'
+              _key: string
+            }
+          | {
+              chartType: 'line' | 'histogram'
+              data: string
+              xLabel?: string
+              yLabel?: string
+              caption?: string
+              _type: 'chart'
+              _key: string
+            }
+        >
+        _type: 'details'
+        _key: string
+      }
   >
 }
 

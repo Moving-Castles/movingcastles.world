@@ -105,6 +105,9 @@
       font-family: var(--font-stack-mono);
       font-size: var(--font-size-small);
       line-height: var(--line-height-base);
+      // Hanging indent: wrapped lines sit three characters in.
+      padding-left: 3ch;
+      text-indent: -3ch;
       // Long DOI/arXiv URLs must wrap instead of widening the column.
       overflow-wrap: anywhere;
       // Give the entry a little air when it is jumped to via a citation, and

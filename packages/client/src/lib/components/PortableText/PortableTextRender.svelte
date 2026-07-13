@@ -8,6 +8,7 @@
   import TranscriptBlock from './blocks/TranscriptBlock.svelte'
   import TableBlock from './blocks/TableBlock.svelte'
   import ChartBlock from './blocks/ChartBlock.svelte'
+  import DetailsBlock from './blocks/DetailsBlock.svelte'
 
   // Custom Portable Text block types rendered as dedicated Svelte components.
   // Everything else (text blocks with their styles/marks, lists) falls through
@@ -20,6 +21,7 @@
     transcript: TranscriptBlock,
     table: TableBlock,
     chart: ChartBlock,
+    details: DetailsBlock,
   }
 
   let {content}: {content: ContentEditorInput} = $props()

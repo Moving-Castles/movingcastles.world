@@ -44,6 +44,9 @@
 //                            data: data/loss.csv     (path relative to the md)
 //                            x: global_step          (line: x column)
 //                            y: loss | [loss, ...]   (line: y column(s))
+//                            labels: {loss: Loss}    (line: column -> display label)
+//                            bands: [{y0, y1, label}] (line: horizontal reference bands)
+//                            yMin: 0                 (line: pin the y-axis floor)
 //                            value: length           (histogram: value column)
 //                            bins: 20                (histogram: bin count)
 //                            clip: p99 | 150         (histogram: drop values above a
@@ -51,6 +54,11 @@
 //                            xLabel / yLabel / caption
 //   ```transcript fence -> transcript block ("Label: value" per line;
 //                          lines without a colon continue the previous value)
+//   ```csv fence        -> table block (first row is the header); inline data,
+//                          or a file via the fence meta: ```csv data/foo.csv
+//   <details>           -> expandable section: everything up to </details>
+//     <summary>…</summary> compiles into the block's nested content (one
+//                          level deep; the summary is the toggle line)
 //   ```references fence -> the post `references` field (end notes). YAML list:
 //                            - id: askell2021      (citation key)
 //                              label: Askell et al. (in-text label)
@@ -395,7 +403,8 @@ const chartBlock = (node) => {
     const yCols = Array.isArray(config.y) ? config.y : config.y ? [config.y] : undefined
     if (!yCols) throw new Error('line chart needs `y` (a column name or list)')
     const series = yCols.map((column) => ({
-      label: column,
+      // `labels` maps column names to display labels for the legend/tooltip.
+      label: config.labels?.[column] ?? column,
       points: rows
         .map((row) => [numeric(row, xCol), numeric(row, column)])
         .filter((p) => p.every(Number.isFinite))
@@ -404,6 +413,22 @@ const chartBlock = (node) => {
     }))
     if (series.some((s) => !s.points.length)) throw new Error('line chart series came out empty')
     payload = {series}
+    // Horizontal reference bands (e.g. a noise floor): [{y0, y1, label?}].
+    if (config.bands) {
+      payload.bands = config.bands.map((band) => {
+        const y0 = Number(band?.y0)
+        const y1 = Number(band?.y1)
+        if (!Number.isFinite(y0) || !Number.isFinite(y1) || y1 <= y0) {
+          throw new Error(`line chart band needs numeric y0 < y1, got ${JSON.stringify(band)}`)
+        }
+        return {y0: round(y0), y1: round(y1), ...(band.label && {label: band.label})}
+      })
+    }
+    // yMin pins the bottom of the y axis (typically 0).
+    if (config.yMin !== undefined) {
+      if (!Number.isFinite(Number(config.yMin))) throw new Error('`yMin` must be a number')
+      payload.options = {yMin: Number(config.yMin)}
+    }
     xLabel ??= xCol
     yLabel ??= yCols.length === 1 ? yCols[0] : undefined
   } else if (config.type === 'histogram') {
@@ -538,117 +563,180 @@ for (const node of tree.children) {
 }
 
 let title = frontmatter.title
-const blocks = []
 
 const isCallout = (node) =>
   /^\[!(NOTE|IMPORTANT|WARNING|TIP|CAUTION)\]/.test(mdToString(node.children?.[0] ?? {}).trim())
 
-const walkList = (list, level) => {
-  for (const item of list.children) {
-    for (const child of item.children) {
-      if (child.type === 'paragraph') {
-        blocks.push(
-          textBlock(child, 'normal', {listItem: list.ordered ? 'number' : 'bullet', level}),
-        )
-      } else if (child.type === 'list') {
-        walkList(child, level + 1)
-      } else {
-        warn(`unhandled node "${child.type}" inside a list item, skipped`)
-      }
-    }
+// ```csv fences render as table blocks (handy for data appendices inside
+// expandable sections). The fence body holds the data inline, or the fence
+// meta names a file (```csv data/foo.csv) so a chart can share the same csv.
+const csvTableBlock = (node) => {
+  const rows = node.meta?.trim() ? loadCsv(node.meta.trim()) : parseCsv(node.value)
+  const header = Object.keys(rows[0] ?? {})
+  if (!header.length) throw new Error('csv fence is empty')
+  return {
+    _type: 'table',
+    _key: makeKey(`csvtable:${node.value}`),
+    header,
+    rows: rows.map((row) => ({
+      _type: 'row',
+      _key: makeKey(`row:${header.map((h) => row[h]).join('|')}`),
+      cells: header.map((h) => row[h]),
+    })),
   }
 }
 
-for (const node of tree.children) {
-  switch (node.type) {
-    case 'yaml':
-    case 'definition':
-      break
-    case 'heading': {
-      // The leading H1 is the post title (frontmatter `title` wins), not body content.
-      if (node.depth === 1 && (!title || (mdToString(node) === title && !blocks.length))) {
-        title ??= mdToString(node)
-        break
-      }
-      if (node.depth > 4) warn(`h${node.depth} flattened to h4: "${mdToString(node)}"`)
-      blocks.push(textBlock(node, `h${Math.min(Math.max(node.depth, 1), 4)}`))
-      break
-    }
-    case 'paragraph': {
-      const images = node.children.filter((c) => c.type === 'image')
-      const rest = node.children.filter(
-        (c) => c.type !== 'image' && !(c.type === 'text' && !c.value.trim()),
-      )
-      if (images.length && !rest.length) {
-        for (const image of images) {
-          const block = await imageBlock(image)
-          if (block) blocks.push(block)
+// Compiles a run of mdast nodes to Portable Text blocks. `top` marks the
+// document level, where the leading H1 becomes the post title and <details>
+// sections may open (they nest exactly one level).
+const walkNodes = async (nodes, top) => {
+  const out = []
+
+  const walkList = (list, level) => {
+    for (const item of list.children) {
+      for (const child of item.children) {
+        if (child.type === 'paragraph') {
+          out.push(
+            textBlock(child, 'normal', {listItem: list.ordered ? 'number' : 'bullet', level}),
+          )
+        } else if (child.type === 'list') {
+          walkList(child, level + 1)
+        } else {
+          warn(`unhandled node "${child.type}" inside a list item, skipped`)
         }
-      } else {
-        blocks.push(textBlock(node, 'normal'))
       }
-      break
     }
-    case 'blockquote': {
-      if (isCallout(node)) {
-        warn(`callout stripped: "${mdToString(node).slice(0, 60).replace(/\n/g, ' ')}…"`)
+  }
+
+  for (let i = 0; i < nodes.length; i++) {
+    const node = nodes[i]
+    switch (node.type) {
+      case 'yaml':
+      case 'definition':
+        break
+      case 'heading': {
+        // The leading H1 is the post title (frontmatter `title` wins), not body content.
+        if (top && node.depth === 1 && (!title || (mdToString(node) === title && !out.length))) {
+          title ??= mdToString(node)
+          break
+        }
+        if (node.depth > 4) warn(`h${node.depth} flattened to h4: "${mdToString(node)}"`)
+        out.push(textBlock(node, `h${Math.min(Math.max(node.depth, 1), 4)}`))
         break
       }
-      for (const child of node.children) {
-        if (child.type === 'paragraph') blocks.push(textBlock(child, 'blockquote'))
-        else warn(`unhandled node "${child.type}" inside a blockquote, skipped`)
+      case 'paragraph': {
+        const images = node.children.filter((c) => c.type === 'image')
+        const rest = node.children.filter(
+          (c) => c.type !== 'image' && !(c.type === 'text' && !c.value.trim()),
+        )
+        if (images.length && !rest.length) {
+          for (const image of images) {
+            const block = await imageBlock(image)
+            if (block) out.push(block)
+          }
+        } else {
+          out.push(textBlock(node, 'normal'))
+        }
+        break
       }
-      break
-    }
-    case 'thematicBreak':
-      blocks.push({
-        _type: 'block',
-        _key: makeKey('hr'),
-        style: 'hr',
-        markDefs: [],
-        children: [span('', [])],
-      })
-      break
-    case 'list':
-      walkList(node, 1)
-      break
-    case 'table': {
-      const rows = node.children.map((row) =>
-        row.children.map((cell) => expandCitationsPlain(mdToString(cell))),
-      )
-      const [header, ...rest] = rows
-      blocks.push({
-        _type: 'table',
-        _key: makeKey(`table:${JSON.stringify(rows)}`),
-        header,
-        rows: rest.map((cells) => ({
-          _type: 'row',
-          _key: makeKey(`row:${cells.join('|')}`),
-          cells,
-        })),
-      })
-      break
-    }
-    case 'code': {
-      try {
-        if (node.lang === 'chart') blocks.push(chartBlock(node))
-        else if (node.lang === 'transcript') blocks.push(transcriptBlock(node))
-        else if (node.lang === 'references')
-          break // extracted in the pre-pass
-        else warn(`code fence (lang "${node.lang ?? 'none'}") skipped`)
-      } catch (error) {
-        console.error(`Error in ${node.lang} fence: ${error.message}`)
-        process.exit(1)
+      case 'blockquote': {
+        if (isCallout(node)) {
+          warn(`callout stripped: "${mdToString(node).slice(0, 60).replace(/\n/g, ' ')}…"`)
+          break
+        }
+        for (const child of node.children) {
+          if (child.type === 'paragraph') out.push(textBlock(child, 'blockquote'))
+          else warn(`unhandled node "${child.type}" inside a blockquote, skipped`)
+        }
+        break
       }
-      break
+      case 'thematicBreak':
+        out.push({
+          _type: 'block',
+          _key: makeKey('hr'),
+          style: 'hr',
+          markDefs: [],
+          children: [span('', [])],
+        })
+        break
+      case 'list':
+        walkList(node, 1)
+        break
+      case 'table': {
+        const rows = node.children.map((row) =>
+          row.children.map((cell) => expandCitationsPlain(mdToString(cell))),
+        )
+        const [header, ...rest] = rows
+        out.push({
+          _type: 'table',
+          _key: makeKey(`table:${JSON.stringify(rows)}`),
+          header,
+          rows: rest.map((cells) => ({
+            _type: 'row',
+            _key: makeKey(`row:${cells.join('|')}`),
+            cells,
+          })),
+        })
+        break
+      }
+      case 'code': {
+        try {
+          if (node.lang === 'chart') out.push(chartBlock(node))
+          else if (node.lang === 'transcript') out.push(transcriptBlock(node))
+          else if (node.lang === 'csv') out.push(csvTableBlock(node))
+          else if (node.lang === 'references')
+            break // extracted in the pre-pass
+          else warn(`code fence (lang "${node.lang ?? 'none'}") skipped`)
+        } catch (error) {
+          console.error(`Error in ${node.lang} fence: ${error.message}`)
+          process.exit(1)
+        }
+        break
+      }
+      case 'html': {
+        // <details><summary>…</summary> … </details> becomes an expandable
+        // section: the markdown nodes up to the closing tag compile into the
+        // block's nested content.
+        if (/^<details>/i.test(node.value.trim())) {
+          if (!top) {
+            warn('nested <details> not supported, skipped')
+            break
+          }
+          let end = i + 1
+          while (
+            end < nodes.length &&
+            !(nodes[end].type === 'html' && /^<\/details>/i.test(nodes[end].value.trim()))
+          ) {
+            end++
+          }
+          if (end === nodes.length) {
+            warn('<details> without closing tag, skipped')
+            break
+          }
+          const summary =
+            node.value.match(/<summary>([\s\S]*?)<\/summary>/i)?.[1]?.trim() || 'Details'
+          const content = await walkNodes(nodes.slice(i + 1, end), false)
+          out.push({
+            _type: 'details',
+            _key: makeKey(`details:${summary}`),
+            summary,
+            content,
+          })
+          i = end
+          break
+        }
+        warn(`html skipped: ${node.value.trim().slice(0, 50).replace(/\n/g, ' ')}`)
+        break
+      }
+      default:
+        warn(`unhandled ${top ? 'top-level ' : ''}node "${node.type}", skipped`)
     }
-    case 'html':
-      warn(`html skipped: ${node.value.trim().slice(0, 50).replace(/\n/g, ' ')}`)
-      break
-    default:
-      warn(`unhandled top-level node "${node.type}", skipped`)
   }
+
+  return out
 }
+
+const blocks = await walkNodes(tree.children, true)
 
 // * * * document * * *
 

@@ -6,8 +6,21 @@ export interface LineSeries {
   points: [number, number][]
 }
 
+// A horizontal reference band (e.g. a noise floor or confidence interval),
+// drawn as a low-opacity wash across the plot width.
+export interface LineBand {
+  y0: number
+  y1: number
+  label?: string
+}
+
 export interface LineData {
   series: LineSeries[]
+  bands?: LineBand[]
+  options?: {
+    // Pins the bottom of the y domain (e.g. 0 for a zero-based axis).
+    yMin?: number
+  }
 }
 
 export interface HistogramBin {
