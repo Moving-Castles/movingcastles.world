@@ -4,12 +4,12 @@
   "version": "0.0.1",
   "type": "module",
   "dependencies": {
-    "@sanity/client": "^7.23.0",
+    "@sanity/client": "^7.23.1",
     "mdast-util-to-string": "^4.0.0",
     "remark-frontmatter": "^5.0.0",
-    "remark-gfm": "^4.0.0",
+    "remark-gfm": "^4.0.1",
     "remark-parse": "^11.0.0",
-    "unified": "^11.0.0",
-    "yaml": "^2.8.0"
+    "unified": "^11.0.5",
+    "yaml": "^2.9.0"
   }
 }

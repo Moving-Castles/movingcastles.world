@@ -8,4 +8,7 @@ export default defineCliConfig({
   deployment: {
     appId: '0202da74e1dd324cff7d4430',
   },
+  typegen: {
+    generates: './sanity.types.ts',
+  },
 })
