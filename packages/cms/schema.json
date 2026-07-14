@@ -1822,6 +1822,13 @@
         },
         "optional": true
       },
+      "showToc": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "boolean"
+        },
+        "optional": true
+      },
       "references": {
         "type": "objectAttribute",
         "value": {

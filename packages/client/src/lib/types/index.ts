@@ -26,6 +26,8 @@ export interface Post extends PostListItem {
   // Optional editor-authored meta/social description; falls back to truncated
   // body text in Metadata.svelte when empty.
   metaDescription?: string
+  // Opt-in: show the fixed table of contents beside the text on wide screens.
+  showToc?: boolean
 }
 
 // A single header/footer link, as projected by `siteSettingsQuery`. Either an

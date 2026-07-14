@@ -24,6 +24,23 @@ export function urlFor(source: SanityImageSource) {
   return builder.image(source)
 }
 
+// Plain text of a single text block (its children concatenated, marks dropped).
+const blockText = (block: PortableTextBlock) =>
+  (block.children ?? []).map((child) => ('text' in child ? child.text : '')).join('')
+
+const slugify = (text: string) =>
+  text
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+
+// Anchor id for a heading block: the slugified heading text, falling back to
+// the block key for empty/symbol-only headings. A pure function of the block
+// so the h2 renderer and `extractH2Headings` (the ToC) derive identical ids.
+// Two identical h2 texts in one post would collide; links then go to the
+// first, which is acceptable.
+const headingId = (block: PortableTextBlock) => slugify(blockText(block)) || block._key || ''
+
 // Renders regular Portable Text (block styles and marks mirroring the cms
 // `contentEditor` schema) to an HTML string. Custom block types (image,
 // iframe, video, ...) are rendered as Svelte components by PortableTextRender
@@ -65,7 +82,8 @@ const components: PortableTextComponents = {
     blockquote: ({children}) => `<blockquote>${children}</blockquote>`,
     hr: () => `<hr />`,
     h1: ({children}) => `<h1>${children}</h1>`,
-    h2: ({children}) => `<h2>${children}</h2>`,
+    // h2s carry an anchor id so the table of contents can link to them.
+    h2: ({children, value}) => `<h2 id="${headingId(value)}">${children}</h2>`,
     h3: ({children}) => `<h3>${children}</h3>`,
     h4: ({children}) => `<h4>${children}</h4>`,
   },
@@ -81,13 +99,25 @@ export const toPlainText = (input: ContentEditorInput) => {
   const blocks = Array.isArray(input) ? input : input?.content
   if (!blocks) return ''
   return blocks
-    .map((block) => {
-      if (block._type !== 'block') return ''
-      const children = (block as PortableTextBlock).children
-      if (!children) return ''
-      return children.map((child) => ('text' in child ? child.text : '')).join('')
-    })
+    .map((block) => (block._type === 'block' ? blockText(block as PortableTextBlock) : ''))
     .join('\n\n')
+}
+
+export interface TocHeading {
+  id: string
+  text: string
+}
+
+// The h2 headings of a post body, for the table of contents. Only top-level
+// blocks are considered (headings nested inside `details` blocks are hidden
+// while collapsed). Ids match the anchors the h2 block renderer emits.
+export const extractH2Headings = (input: ContentEditorInput): TocHeading[] => {
+  const blocks = Array.isArray(input) ? input : input?.content
+  if (!blocks) return []
+  return (blocks as PortableTextBlock[])
+    .filter((block) => block._type === 'block' && block.style === 'h2')
+    .map((block) => ({id: headingId(block), text: blockText(block)}))
+    .filter((heading) => heading.id !== '' && heading.text.trim() !== '')
 }
 
 export const loadData = async <T>(

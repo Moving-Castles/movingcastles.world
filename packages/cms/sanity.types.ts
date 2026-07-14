@@ -282,6 +282,7 @@ export type Post = {
   date?: string
   metaDescription?: string
   content?: ContentEditor
+  showToc?: boolean
   references?: Array<{
     id: string
     label: string

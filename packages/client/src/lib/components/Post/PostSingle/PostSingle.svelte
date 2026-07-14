@@ -1,5 +1,6 @@
 <script lang="ts">
   import PortableTextRender from '$lib/components/PortableText/PortableTextRender.svelte'
+  import Toc from './Toc.svelte'
   import {formatDate} from '$lib/format'
   import DuotoneFilters from '$lib/components/graphics/DuotoneFilters.svelte'
   import type {Post} from '$lib/types'
@@ -28,6 +29,12 @@
       </div>
     {/if}
   </header>
+
+  {#if post.showToc && post.content}
+    <!-- Opt-in per post via the cms `showToc` toggle. Fixed beside the text
+         column; hides itself below 1100px viewport width. -->
+    <Toc content={post.content} />
+  {/if}
 
   {#if post.content}
     <div class="content">

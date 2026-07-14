@@ -62,6 +62,14 @@ export default {
       type: 'contentEditor',
     },
     {
+      title: 'Table of contents',
+      name: 'showToc',
+      type: 'boolean',
+      description:
+        'Show a fixed table of contents (the H2 headings of the text) beside the text column on wide screens.',
+      initialValue: false,
+    },
+    {
       title: 'References',
       name: 'references',
       type: 'array',
