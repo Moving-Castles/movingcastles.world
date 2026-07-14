@@ -45,6 +45,9 @@
 //                            x: global_step          (line: x column)
 //                            y: loss | [loss, ...]   (line: y column(s))
 //                            labels: {loss: Loss}    (line: column -> display label)
+//                            colors: {loss: a}       (line: column -> entity color a–e;
+//                                                     multi-line charts otherwise take
+//                                                     entity colors in order)
 //                            bands: [{y0, y1, label}] (line: horizontal reference bands)
 //                            yMin: 0                 (line: pin the y-axis floor)
 //                            value: length           (histogram: value column)
@@ -402,15 +405,38 @@ const chartBlock = (node) => {
     if (!xCol) throw new Error('line chart needs data with columns')
     const yCols = Array.isArray(config.y) ? config.y : config.y ? [config.y] : undefined
     if (!yCols) throw new Error('line chart needs `y` (a column name or list)')
-    const series = yCols.map((column) => ({
-      // `labels` maps column names to display labels for the legend/tooltip.
-      label: config.labels?.[column] ?? column,
-      points: rows
-        .map((row) => [numeric(row, xCol), numeric(row, column)])
-        .filter((p) => p.every(Number.isFinite))
-        .sort((a, b) => a[0] - b[0])
-        .map((p) => [round(p[0]), round(p[1])]),
-    }))
+    // `colors` pins series to the site's entity colors (--entity-color-a…e);
+    // unpinned series in multi-line charts take the letters in order client-side.
+    for (const column of Object.keys(config.colors ?? {})) {
+      if (!yCols.includes(column)) {
+        throw new Error(
+          `line chart \`colors\` names unknown column "${column}" — ` +
+            `keys must be y columns (${yCols.join(', ')})`,
+        )
+      }
+    }
+    if (yCols.length > 5) {
+      warn(`line chart has ${yCols.length} series but only 5 entity colors — colors repeat`)
+    }
+    const series = yCols.map((column) => {
+      const rawColor = config.colors?.[column]
+      const color = rawColor === undefined ? undefined : String(rawColor).trim().toLowerCase()
+      if (color !== undefined && !/^[a-e]$/.test(color)) {
+        throw new Error(
+          `line chart color for "${column}" must be an entity letter a–e, got "${rawColor}"`,
+        )
+      }
+      return {
+        // `labels` maps column names to display labels for the legend/tooltip.
+        label: config.labels?.[column] ?? column,
+        ...(color && {color}),
+        points: rows
+          .map((row) => [numeric(row, xCol), numeric(row, column)])
+          .filter((p) => p.every(Number.isFinite))
+          .sort((a, b) => a[0] - b[0])
+          .map((p) => [round(p[0]), round(p[1])]),
+      }
+    })
     if (series.some((s) => !s.points.length)) throw new Error('line chart series came out empty')
     payload = {series}
     // Horizontal reference bands (e.g. a noise floor): [{y0, y1, label?}].

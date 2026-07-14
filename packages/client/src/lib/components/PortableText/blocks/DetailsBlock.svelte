@@ -30,6 +30,7 @@
 
   summary {
     cursor: pointer;
+    display: inline-block;
     user-select: none;
     color: var(--foreground);
     font-family: var(--font-stack-mono);

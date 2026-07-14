@@ -2,19 +2,33 @@
   import {bisectCenter, extent} from 'd3-array'
   import {scaleLinear} from 'd3-scale'
   import {line as lineShape} from 'd3-shape'
-  import {formatTick, formatValue} from './format'
+  import {formatValue} from './format'
   import type {LineData} from './types'
 
   let {data, xLabel, yLabel}: {data: LineData; xLabel?: string; yLabel?: string} = $props()
 
   const HEIGHT = 360
   // The slim right margin only keeps the last x tick label from clipping;
-  // the plot fills the full column width.
-  const MARGIN = {top: 24, right: 16, bottom: 44, left: 56}
+  // the plot fills the full column width. The left margin is computed from
+  // the y tick labels below.
+  const MARGIN = {top: 24, right: 16, bottom: 44}
 
-  // Identity in a monochrome palette: fixed per-series dash patterns
-  // (solid, dashed, dotted, dash-dot), assigned by position.
-  const DASHES = ['', '6 4', '2 4', '8 4 2 4']
+  // Left-margin anatomy: a fixed gutter for the rotated axis label, then the
+  // widest y tick label (monospace ticks, so width is chars × advance), then
+  // the gap between tick labels and the plot edge.
+  const LABEL_GUTTER = 24
+  const TICK_CHAR_WIDTH = 7.2 // Berkeley Mono advance at the 12px tick size
+  const TICK_GAP = 8
+
+  // Nice the y domain to the same count the ticks use, so the top gridline
+  // always sits at (not below) the domain ceiling and lines never overshoot
+  // the last labelled tick.
+  const Y_TICK_COUNT = 5
+
+  // Series identity: the entity colors (app.css --entity-color-a…e), assigned
+  // in fixed order, or pinned per series via `color`. A single unassigned
+  // series stays monochrome foreground (the CSS fallback).
+  const ENTITY_LETTERS = 'abcde'
 
   // The rendered width tracks the container so axis text keeps a constant
   // on-screen size; the server renders the 640 default and hydration adjusts.
@@ -22,6 +36,13 @@
   const width = $derived(clientWidth ? Math.max(clientWidth, 280) : 640)
 
   const series = $derived((data.series ?? []).filter((s) => s.points?.length))
+  const strokes = $derived(
+    series.map((s, i) => {
+      const letter =
+        s.color ?? (series.length > 1 ? ENTITY_LETTERS[i % ENTITY_LETTERS.length] : undefined)
+      return letter ? `var(--entity-color-${letter})` : undefined
+    }),
+  )
   const allPoints = $derived(series.flatMap((s) => s.points))
   const bands = $derived((data.bands ?? []).filter((b) => b.y1 > b.y0))
   const labeledBands = $derived(bands.filter((b) => b.label))
@@ -32,9 +53,6 @@
     return min === max ? [min - 1, max + 1] : [min, max]
   }
 
-  const x = $derived(
-    scaleLinear(domainOf(allPoints.map((p) => p[0])), [MARGIN.left, width - MARGIN.right]),
-  )
   // The y domain covers the data and any reference bands; `yMin` pins the
   // floor (typically 0).
   const y = $derived.by(() => {
@@ -43,8 +61,26 @@
       ...bands.flatMap((b) => [b.y0, b.y1]),
     ])
     const min = data.options?.yMin !== undefined ? Math.min(data.options.yMin, autoMin) : autoMin
-    return scaleLinear([min, autoMax], [HEIGHT - MARGIN.bottom, MARGIN.top]).nice()
+    return scaleLinear([min, autoMax], [HEIGHT - MARGIN.bottom, MARGIN.top]).nice(Y_TICK_COUNT)
   })
+
+  // Scale-derived tick formatters keep a uniform number of decimals across
+  // the whole axis (0.15, 0.20 — never a mix of 0.15 and 0.2).
+  const yTicks = $derived(y.ticks(Y_TICK_COUNT))
+  const formatYTick = $derived(y.tickFormat(Y_TICK_COUNT))
+
+  const marginLeft = $derived(
+    LABEL_GUTTER +
+      Math.max(1, ...yTicks.map((tick) => formatYTick(tick).length)) * TICK_CHAR_WIDTH +
+      TICK_GAP,
+  )
+
+  const x = $derived(
+    scaleLinear(domainOf(allPoints.map((p) => p[0])), [marginLeft, width - MARGIN.right]),
+  )
+  const xTickCount = $derived(width < 480 ? 4 : 6)
+  const xTicks = $derived(x.ticks(xTickCount))
+  const formatXTick = $derived(x.tickFormat(xTickCount))
 
   const path = $derived(
     lineShape<[number, number]>(
@@ -52,9 +88,6 @@
       (p) => y(p[1]),
     ),
   )
-
-  const xTicks = $derived(x.ticks(width < 480 ? 4 : 6))
-  const yTicks = $derived(y.ticks(5))
 
   // The crosshair snaps to the union of the series' x positions.
   const hoverXs = $derived([...new Set(allPoints.map((p) => p[0]))].sort((a, b) => a - b))
@@ -66,7 +99,7 @@
     if (hoverX === null) return null
     return series.map((s, i) => ({
       label: s.label,
-      dash: DASHES[i % DASHES.length],
+      stroke: strokes[i],
       point:
         s.points[
           bisectCenter(
@@ -113,7 +146,7 @@
         {#each series as s, i (i)}
           <span class="key">
             <svg width="20" height="4" aria-hidden="true">
-              <line x1="0" y1="2" x2="20" y2="2" stroke-dasharray={DASHES[i % DASHES.length]} />
+              <line x1="0" y1="2" x2="20" y2="2" style:stroke={strokes[i]} />
             </svg>
             {s.label ?? `Series ${i + 1}`}
           </span>
@@ -145,16 +178,16 @@
       onblur={() => (hoverX = null)}
     >
       {#each yTicks as tick (tick)}
-        <line class="grid" x1={MARGIN.left} x2={width - MARGIN.right} y1={y(tick)} y2={y(tick)} />
-        <text class="tick y" x={MARGIN.left - 8} y={y(tick)}>{formatTick(tick)}</text>
+        <line class="grid" x1={marginLeft} x2={width - MARGIN.right} y1={y(tick)} y2={y(tick)} />
+        <text class="tick y" x={marginLeft - TICK_GAP} y={y(tick)}>{formatYTick(tick)}</text>
       {/each}
 
       <!-- Reference bands sit behind the series lines. -->
       {#each bands as band, i (i)}
         <rect
           class="band"
-          x={MARGIN.left}
-          width={width - MARGIN.right - MARGIN.left}
+          x={marginLeft}
+          width={width - MARGIN.right - marginLeft}
           y={y(band.y1)}
           height={Math.max(y(band.y0) - y(band.y1), 0)}
         />
@@ -162,13 +195,13 @@
 
       <line
         class="axis"
-        x1={MARGIN.left}
+        x1={marginLeft}
         x2={width - MARGIN.right}
         y1={HEIGHT - MARGIN.bottom}
         y2={HEIGHT - MARGIN.bottom}
       />
       {#each xTicks as tick (tick)}
-        <text class="tick x" x={x(tick)} y={HEIGHT - MARGIN.bottom + 18}>{formatTick(tick)}</text>
+        <text class="tick x" x={x(tick)} y={HEIGHT - MARGIN.bottom + 18}>{formatXTick(tick)}</text>
       {/each}
 
       <!-- Rotated to read bottom-to-top along the axis, centered on the plot. -->
@@ -183,13 +216,13 @@
         </text>
       {/if}
       {#if xLabel}
-        <text class="axis-label x" x={(MARGIN.left + width - MARGIN.right) / 2} y={HEIGHT - 6}>
+        <text class="axis-label x" x={(marginLeft + width - MARGIN.right) / 2} y={HEIGHT - 6}>
           {xLabel}
         </text>
       {/if}
 
       {#each series as s, i (i)}
-        <path class="series" d={path(s.points)} stroke-dasharray={DASHES[i % DASHES.length]} />
+        <path class="series" d={path(s.points)} style:stroke={strokes[i]} />
       {/each}
 
       {#if readout && hoverX !== null}
@@ -202,7 +235,13 @@
         />
         {#each readout as row, i (i)}
           {#if row.point}
-            <circle class="marker" cx={x(row.point[0])} cy={y(row.point[1])} r="4" />
+            <circle
+              class="marker"
+              style:fill={row.stroke}
+              cx={x(row.point[0])}
+              cy={y(row.point[1])}
+              r="4"
+            />
           {/if}
         {/each}
       {/if}
@@ -216,7 +255,7 @@
             <div class="tooltip-row">
               {#if series.length > 1}
                 <svg width="14" height="4" aria-hidden="true">
-                  <line x1="0" y1="2" x2="14" y2="2" stroke-dasharray={row.dash} />
+                  <line x1="0" y1="2" x2="14" y2="2" style:stroke={row.stroke} />
                 </svg>
               {/if}
               <span class="value">{formatValue(row.point[1])}</span>

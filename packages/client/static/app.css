@@ -85,6 +85,15 @@
     --line-height-base: 1.4em;
     /* Width of the centred reading column on content pages (post article + header/footer). */
     --content-width: 720px;
+    /* Entity colors — categorical identity for graph elements (chart series,
+       graph nodes). Five slots, assigned in fixed A–E order, never cycled.
+       Each theme steps the same five hues for its own surface; both sets are
+       validated for colorblind separation and contrast (dataviz six checks). */
+    --entity-color-a: #0b63a5; /* azure */
+    --entity-color-b: #c98500; /* amber */
+    --entity-color-c: #d55181; /* rose */
+    --entity-color-d: #9085e9; /* violet */
+    --entity-color-e: #e34948; /* red */
 }
 
 /* Day theme — applied when the toggle sets data-theme="day" on <html>. The grey
@@ -93,6 +102,13 @@
     --background: rgb(140, 140, 140);
     --foreground: rgb(30, 30, 30);
     --foreground-emphasis: rgb(210, 210, 210);
+    /* Dark steps of the night hues: on the mid-grey surface only dark colours
+       hold contrast, mirroring the dark day foreground. */
+    --entity-color-a: #0d366b; /* navy */
+    --entity-color-b: #7d3700; /* rust */
+    --entity-color-c: #7a1c46; /* wine */
+    --entity-color-d: #38288c; /* indigo */
+    --entity-color-e: #7e1a19; /* brick */
 }
 
 /* Ease the colour swap on theme change. The pre-paint inline script sets the

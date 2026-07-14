@@ -3,6 +3,9 @@
 
 export interface LineSeries {
   label?: string
+  // Entity color letter ('a'–'e', the site's --entity-color-* vars). Unset
+  // series take entity colors in order when the chart has several lines.
+  color?: string
   points: [number, number][]
 }
 
