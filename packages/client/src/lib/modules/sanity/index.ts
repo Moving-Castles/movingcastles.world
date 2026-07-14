@@ -51,6 +51,12 @@ const components: PortableTextComponents = {
     cite: ({children, value}) => {
       const refId = value?.refId
       if (!refId) return children
+      // Editors mark the citation including its parentheses; keep the parens
+      // outside the anchor so they don't get the link underline.
+      const wrapped = children.match(/^\((.*)\)$/s)
+      if (wrapped) {
+        return `(<a class="cite" href="#ref-${refId}">${wrapped[1]}</a>)`
+      }
       return `<a class="cite" href="#ref-${refId}">${children}</a>`
     },
   },

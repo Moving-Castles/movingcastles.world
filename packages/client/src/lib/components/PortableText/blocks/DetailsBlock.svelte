@@ -32,10 +32,10 @@
     cursor: pointer;
     display: inline-block;
     user-select: none;
+    /* Matches the global link style in static/app.css. */
     color: var(--foreground);
-    font-family: var(--font-stack-mono);
-    font-size: var(--font-size-small);
-    /* The native marker is replaced with the site's +/− affordance. */
+    text-decoration: underline;
+    /* The native marker is replaced with a →/↓ affordance. */
     list-style: none;
   }
 
@@ -44,15 +44,20 @@
   }
 
   summary::before {
-    content: '+ ';
+    content: '\2192';
+    /* inline-block keeps the underline off the marker; the fixed width
+       stops the text shifting when the arrow changes between states. */
+    display: inline-block;
+    width: 1.4em;
   }
 
   details[open] summary::before {
-    content: '− ';
+    content: '\2193';
   }
 
   summary:hover {
     color: var(--foreground-emphasis);
+    text-decoration: none;
   }
 
   .content {
