@@ -27,6 +27,8 @@
        apart from the body text without the dashed quote treatment. */
     border-top: 1px solid var(--foreground);
     border-bottom: 1px solid var(--foreground);
+    font-family: var(--font-stack-mono);
+    font-size: var(--font-size-small);
   }
 
   section :global(p:last-child) {

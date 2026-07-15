@@ -1,12 +1,15 @@
 <script lang="ts">
   // The `table` block from the cms contentEditor schema: an optional header
-  // row and rows of plain-text cells.
+  // row and rows of plain-text cells, with an optional heading/subheading
+  // pair above the table.
   interface TableRow {
     _key: string
     cells?: string[]
   }
 
   interface TableValue {
+    heading?: string
+    subheading?: string
     header?: string[]
     rows?: TableRow[]
     caption?: string
@@ -17,6 +20,12 @@
 
 {#if value.rows?.length}
   <figure>
+    {#if value.heading || value.subheading}
+      <div class="head">
+        {#if value.heading}<div class="heading">{value.heading}</div>{/if}
+        {#if value.subheading}<div class="subheading">{value.subheading}</div>{/if}
+      </div>
+    {/if}
     <!-- Wide tables scroll inside the figure instead of breaking the column. -->
     <div class="scroll">
       <table>
@@ -49,6 +58,17 @@
     margin: 0;
     margin-top: 2em;
     margin-bottom: 2em;
+  }
+
+  .head {
+    margin-bottom: 0.75em;
+    font-family: var(--font-stack-mono);
+    font-size: var(--font-size-small);
+    line-height: var(--line-height-base);
+  }
+
+  .heading {
+    font-weight: 700;
   }
 
   .scroll {

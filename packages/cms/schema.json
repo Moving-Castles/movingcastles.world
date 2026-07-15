@@ -633,6 +633,27 @@
                 {
                   "type": "object",
                   "attributes": {
+                    "heading": {
+                      "type": "objectAttribute",
+                      "value": {
+                        "type": "string"
+                      },
+                      "optional": true
+                    },
+                    "subheading": {
+                      "type": "objectAttribute",
+                      "value": {
+                        "type": "string"
+                      },
+                      "optional": true
+                    },
+                    "collapsed": {
+                      "type": "objectAttribute",
+                      "value": {
+                        "type": "boolean"
+                      },
+                      "optional": true
+                    },
                     "lines": {
                       "type": "objectAttribute",
                       "value": {
@@ -700,6 +721,20 @@
                 {
                   "type": "object",
                   "attributes": {
+                    "heading": {
+                      "type": "objectAttribute",
+                      "value": {
+                        "type": "string"
+                      },
+                      "optional": true
+                    },
+                    "subheading": {
+                      "type": "objectAttribute",
+                      "value": {
+                        "type": "string"
+                      },
+                      "optional": true
+                    },
                     "header": {
                       "type": "objectAttribute",
                       "value": {
@@ -1578,6 +1613,27 @@
                             {
                               "type": "object",
                               "attributes": {
+                                "heading": {
+                                  "type": "objectAttribute",
+                                  "value": {
+                                    "type": "string"
+                                  },
+                                  "optional": true
+                                },
+                                "subheading": {
+                                  "type": "objectAttribute",
+                                  "value": {
+                                    "type": "string"
+                                  },
+                                  "optional": true
+                                },
+                                "collapsed": {
+                                  "type": "objectAttribute",
+                                  "value": {
+                                    "type": "boolean"
+                                  },
+                                  "optional": true
+                                },
                                 "lines": {
                                   "type": "objectAttribute",
                                   "value": {
@@ -1645,6 +1701,20 @@
                             {
                               "type": "object",
                               "attributes": {
+                                "heading": {
+                                  "type": "objectAttribute",
+                                  "value": {
+                                    "type": "string"
+                                  },
+                                  "optional": true
+                                },
+                                "subheading": {
+                                  "type": "objectAttribute",
+                                  "value": {
+                                    "type": "string"
+                                  },
+                                  "optional": true
+                                },
                                 "header": {
                                   "type": "objectAttribute",
                                   "value": {

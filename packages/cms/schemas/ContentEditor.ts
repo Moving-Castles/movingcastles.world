@@ -231,6 +231,26 @@ const objectMembers = [
     icon: MdForum,
     fields: [
       {
+        title: 'Heading',
+        name: 'heading',
+        type: 'string',
+        description: 'Optional title shown above the transcript.',
+      },
+      {
+        title: 'Subheading',
+        name: 'subheading',
+        type: 'string',
+        description: 'Optional smaller line under the heading.',
+      },
+      {
+        title: 'Collapsed',
+        name: 'collapsed',
+        type: 'boolean',
+        description:
+          'Start folded to a fixed height with a "more" toggle that reveals the full transcript.',
+        initialValue: false,
+      },
+      {
         title: 'Lines',
         name: 'lines',
         type: 'array',
@@ -261,12 +281,14 @@ const objectMembers = [
       },
     ],
     preview: {
-      select: {lines: 'lines'},
-      prepare({lines}: {lines?: {label?: string; value?: string}[]}) {
+      select: {heading: 'heading', lines: 'lines'},
+      prepare({heading, lines}: {heading?: string; lines?: {label?: string; value?: string}[]}) {
         const count = lines?.length ?? 0
         const first = lines?.[0]
         return {
-          title: first ? [first.label, first.value].filter(Boolean).join(': ') : 'Transcript',
+          title:
+            heading ||
+            (first ? [first.label, first.value].filter(Boolean).join(': ') : 'Transcript'),
           subtitle: `Transcript — ${count} line${count === 1 ? '' : 's'}`,
         }
       },
@@ -278,6 +300,18 @@ const objectMembers = [
     title: 'Table',
     icon: MdTableChart,
     fields: [
+      {
+        title: 'Heading',
+        name: 'heading',
+        type: 'string',
+        description: 'Optional title shown above the table.',
+      },
+      {
+        title: 'Subheading',
+        name: 'subheading',
+        type: 'string',
+        description: 'Optional smaller line under the heading.',
+      },
       {
         title: 'Header row',
         name: 'header',
@@ -317,11 +351,21 @@ const objectMembers = [
       },
     ],
     preview: {
-      select: {header: 'header', rows: 'rows', caption: 'caption'},
-      prepare({header, rows, caption}: {header?: string[]; rows?: unknown[]; caption?: string}) {
+      select: {heading: 'heading', header: 'header', rows: 'rows', caption: 'caption'},
+      prepare({
+        heading,
+        header,
+        rows,
+        caption,
+      }: {
+        heading?: string
+        header?: string[]
+        rows?: unknown[]
+        caption?: string
+      }) {
         const count = rows?.length ?? 0
         return {
-          title: caption || (header ?? []).join(' | ') || 'Table',
+          title: heading || caption || (header ?? []).join(' | ') || 'Table',
           subtitle: `Table — ${count} row${count === 1 ? '' : 's'}`,
         }
       },

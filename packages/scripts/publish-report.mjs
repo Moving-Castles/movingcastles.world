@@ -87,9 +87,17 @@
 //                                                     percentile or number before binning)
 //                            xLabel / yLabel / caption
 //   ```transcript fence -> transcript block ("Label: value" per line;
-//                          lines without a colon continue the previous value)
+//                          lines without a colon continue the previous value.
+//                          Meta "collapsed" (```transcript collapsed) starts
+//                          the block folded to a fixed height behind a
+//                          more/less toggle. Leading `# Heading` and
+//                          `## Subheading` lines set an optional heading pair
+//                          shown above the block)
 //   ```csv fence        -> table block (first row is the header); inline data,
 //                          or a file via the fence meta: ```csv data/foo.csv
+//                          Leading `# Heading` / `## Subheading` lines work
+//                          like in transcript fences. (GFM tables can't carry
+//                          a heading — use a csv fence when one is needed)
 //   <details>           -> expandable section: everything up to </details>
 //     <summary>…</summary> compiles into the block's nested content (one
 //                          level deep; the summary is the toggle line)
@@ -171,9 +179,8 @@ const makeKey = (seed) => {
 
 // * * * csv * * *
 
-// Minimal quote-aware CSV parser; returns an array of row objects keyed by
-// the header row.
-const parseCsv = (text) => {
+// Minimal quote-aware CSV parser; returns an array of cell arrays.
+const parseCsvRows = (text) => {
   const rows = []
   let row = []
   let field = ''
@@ -207,15 +214,22 @@ const parseCsv = (text) => {
   row.push(field)
   if (row.length > 1 || row[0] !== '') rows.push(row)
 
-  const [header, ...rest] = rows
-  return rest.map((cells) => Object.fromEntries(header.map((name, i) => [name, cells[i] ?? ''])))
+  return rows
 }
 
-const loadCsv = (relPath) => {
+// Rows as objects keyed by the header row (charts address columns by name).
+const parseCsv = (text) => {
+  const [header, ...rest] = parseCsvRows(text)
+  return rest.map((cells) => Object.fromEntries((header ?? []).map((name, i) => [name, cells[i] ?? ''])))
+}
+
+const readCsv = (relPath) => {
   const file = path.resolve(mdDir, relPath)
   if (!fs.existsSync(file)) throw new Error(`data file not found: ${relPath}`)
-  return parseCsv(fs.readFileSync(file, 'utf8'))
+  return fs.readFileSync(file, 'utf8')
 }
+
+const loadCsv = (relPath) => parseCsv(readCsv(relPath))
 
 // Trim floats so chart payloads stay small; five significant digits is more
 // resolution than a 640px-wide plot can show.
@@ -618,9 +632,34 @@ const binValues = (values, targetBins) => {
   return bins
 }
 
+// Transcript and csv fences may open with `# Heading` / `## Subheading`
+// lines that set the block's optional heading pair (rendered above it on the
+// site). The scan stops at the first line that isn't one; the rest is the
+// fence body proper. Extracted before line parsing so a heading containing a
+// colon isn't mistaken for a transcript "Label: value" line.
+const extractFenceHeading = (body) => {
+  const lines = body.split('\n')
+  const head = {}
+  let i = 0
+  for (; i < lines.length; i++) {
+    const match = lines[i].trim().match(/^(##?)\s+(.+)$/)
+    if (!match) break
+    const field = match[1] === '#' ? 'heading' : 'subheading'
+    if (head[field]) break
+    head[field] = match[2].trim()
+  }
+  return {...head, body: lines.slice(i).join('\n')}
+}
+
 const transcriptBlock = (node) => {
+  // Fence meta: ```transcript collapsed starts the block folded client-side.
+  const meta = node.meta?.trim()
+  if (meta && meta !== 'collapsed') {
+    warn(`transcript fence: unknown option "${meta}" ignored`)
+  }
+  const {heading, subheading, body} = extractFenceHeading(node.value)
   const lines = []
-  for (const raw of node.value.split('\n')) {
+  for (const raw of body.split('\n')) {
     if (!raw.trim()) continue
     const match = raw.match(/^([^:]+):\s?(.*)$/)
     if (match) {
@@ -636,7 +675,14 @@ const transcriptBlock = (node) => {
       warn(`transcript line without a label skipped: "${raw}"`)
     }
   }
-  return {_type: 'transcript', _key: makeKey(`t:${node.value}`), lines}
+  return {
+    _type: 'transcript',
+    _key: makeKey(`t:${node.value}`),
+    ...(heading && {heading}),
+    ...(subheading && {subheading}),
+    ...(meta === 'collapsed' && {collapsed: true}),
+    lines,
+  }
 }
 
 // * * * document walk * * *
@@ -719,18 +765,22 @@ const isCallout = (node) =>
 // expandable sections). The fence body holds the data inline, or the fence
 // meta names a file (```csv data/foo.csv) so a chart can share the same csv.
 const csvTableBlock = (node) => {
-  const rows = node.meta?.trim() ? loadCsv(node.meta.trim()) : parseCsv(node.value)
-  const header = Object.keys(rows[0] ?? {})
-  if (!header.length) throw new Error('csv fence is empty')
+  const {heading, subheading, body} = extractFenceHeading(node.value)
+  // Raw rows rather than parseCsv's header-keyed objects: table headers may
+  // legitimately repeat or be empty (a headerless key–value table renders as
+  // an empty header row), which object keys would collapse into one column.
+  const [header, ...rest] = parseCsvRows(node.meta?.trim() ? readCsv(node.meta.trim()) : body)
+  if (!header?.length) throw new Error('csv fence is empty')
   return {
     _type: 'table',
     _key: makeKey(`csvtable:${node.value}`),
+    ...(heading && {heading}),
+    ...(subheading && {subheading}),
     header,
-    rows: rows.map((row) => ({
-      _type: 'row',
-      _key: makeKey(`row:${header.map((h) => row[h]).join('|')}`),
-      cells: header.map((h) => row[h]),
-    })),
+    rows: rest.map((raw) => {
+      const cells = header.map((_, i) => raw[i] ?? '')
+      return {_type: 'row', _key: makeKey(`row:${cells.join('|')}`), cells}
+    }),
   }
 }
 

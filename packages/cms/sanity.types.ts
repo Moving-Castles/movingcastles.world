@@ -111,6 +111,9 @@ export type ContentEditor = {
         _key: string
       }
     | {
+        heading?: string
+        subheading?: string
+        collapsed?: boolean
         lines?: Array<{
           label?: string
           value?: string
@@ -121,6 +124,8 @@ export type ContentEditor = {
         _key: string
       }
     | {
+        heading?: string
+        subheading?: string
         header?: Array<string>
         rows?: Array<{
           cells?: Array<string>
@@ -241,6 +246,9 @@ export type ContentEditor = {
               _key: string
             }
           | {
+              heading?: string
+              subheading?: string
+              collapsed?: boolean
               lines?: Array<{
                 label?: string
                 value?: string
@@ -251,6 +259,8 @@ export type ContentEditor = {
               _key: string
             }
           | {
+              heading?: string
+              subheading?: string
               header?: Array<string>
               rows?: Array<{
                 cells?: Array<string>
