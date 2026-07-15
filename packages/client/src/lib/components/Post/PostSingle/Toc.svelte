@@ -72,29 +72,25 @@
     }
   })
 
-  // Flash the jumped-to heading so the eye lands on the right section. The
-  // class drives a color-fade animation defined globally in app.css (the
-  // heading lives in {@html} output, outside this component's scope).
-  const flashHeading = (el: HTMLElement) => {
-    el.classList.remove('toc-flash')
-    void el.offsetWidth // restart the animation when re-clicked
-    el.classList.add('toc-flash')
-    el.addEventListener('animationend', () => el.classList.remove('toc-flash'), {once: true})
-  }
-
   // Fast smooth scroll (300ms ease-out) — native smooth scrolling has no
   // duration control and feels sluggish over long documents.
+  //
+  // The heading highlight is pure CSS on :target (see app.css), so it also
+  // works for in-text §-links. :target only re-evaluates on a real fragment
+  // navigation — history.replaceState wouldn't trip it — so the hash is set
+  // via location.replace (which, like replaceState, adds no history entry).
+  // Its native jump-to-anchor is what positions the page: immediately under
+  // reduced motion, otherwise after the animation, whose end position it
+  // matches (the 24px offset equals the headings' scroll-margin-top).
   const scrollToHeading = (event: MouseEvent, id: string) => {
     event.preventDefault()
     const el = document.getElementById(id)
     if (!el) return
     const targetY = window.scrollY + el.getBoundingClientRect().top - 24
-    history.replaceState(null, '', `#${id}`)
     activeId = id
     spyPaused = true
-    flashHeading(el)
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      window.scrollTo(0, targetY)
+      location.replace(`#${id}`)
       return
     }
     const startY = window.scrollY
@@ -106,6 +102,7 @@
       const eased = 1 - Math.pow(1 - t, 3)
       window.scrollTo(0, startY + (targetY - startY) * eased)
       if (t < 1) requestAnimationFrame(step)
+      else location.replace(`#${id}`)
     }
     requestAnimationFrame(step)
   }

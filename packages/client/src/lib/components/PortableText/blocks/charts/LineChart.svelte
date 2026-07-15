@@ -279,11 +279,17 @@
     height: auto;
     font-family: var(--font-stack-mono);
     font-size: 12px;
+    /* Touch: a finger tracing the plot drives the readout; only vertical
+       page scrolling passes through. Restricting touch-action here also
+       disables double-tap/pinch zoom over the plot, which otherwise fires
+       erratically while tracing. */
+    touch-action: pan-y;
   }
 
-  .chart > svg:focus-visible {
-    outline: 1px dashed var(--foreground);
-    outline-offset: 4px;
+  /* The svg is focusable for the keyboard readout, but a focus ring boxing
+     the whole plot reads as a glitch — suppress it. */
+  .chart > svg:focus {
+    outline: none;
   }
 
   .grid {

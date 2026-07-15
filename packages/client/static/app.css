@@ -210,18 +210,10 @@ img {
     scroll-margin-top: 1.5rem;
 }
 
-/* Jump highlight: Toc.svelte adds .toc-flash to the heading it scrolled to
-   (and removes it on animationend), so the eye lands on the right section. */
-.content .toc-flash {
-    animation: toc-flash 2s ease-out;
-}
-
-@keyframes toc-flash {
-    0%, 40% {
-        color: var(--foreground-emphasis);
-    }
-    100% {
-        color: var(--foreground);
-    }
+/* The heading the URL hash points at stays highlighted while the hash is
+   active — whether it was reached via the ToC or an in-text §-link. */
+.content h2:target,
+.content h3:target {
+    color: var(--foreground-emphasis);
 }
 
