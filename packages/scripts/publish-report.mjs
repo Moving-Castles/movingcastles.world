@@ -220,7 +220,9 @@ const parseCsvRows = (text) => {
 // Rows as objects keyed by the header row (charts address columns by name).
 const parseCsv = (text) => {
   const [header, ...rest] = parseCsvRows(text)
-  return rest.map((cells) => Object.fromEntries((header ?? []).map((name, i) => [name, cells[i] ?? ''])))
+  return rest.map((cells) =>
+    Object.fromEntries((header ?? []).map((name, i) => [name, cells[i] ?? ''])),
+  )
 }
 
 const readCsv = (relPath) => {
