@@ -26,9 +26,24 @@
 //
 // Frontmatter (optional):
 //   title, slug, date (YYYY-MM-DD), metaDescription,
-//   authors: [{name, url?}, ...]
+//   authors: [{name, url?}, ...],
+//   showToc: true                    (table of contents beside the text)
+//   toc: [...]                       (manual ToC entries replacing the derived
+//                                     H2 list, indexes included. String form
+//                                     "5. Reinforcement learning": the leading
+//                                     number is the displayed index and links
+//                                     the entry to the matching numbered
+//                                     heading. Object form {label, index?,
+//                                     section?, anchor?}: a custom label with
+//                                     either a `section` number resolved the
+//                                     same way or an explicit heading `anchor`;
+//                                     `index` displays verbatim, "" hides it.)
+//   featuredImage: figures/cover.png (uploaded like body images; also takes
+//                                     {src, caption?, attribution?})
 // Without frontmatter the title comes from the first `# H1` and the date
-// defaults to today.
+// defaults to today. The document is replaced wholesale on every run, so a
+// field not set here (or in the mappings below) is unset in Sanity — the
+// markdown file controls everything.
 //
 // Content mapping:
 //   ## .. ####          -> block styles h2..h4
@@ -39,6 +54,22 @@
 //   lists               -> bullet / number list blocks (nested levels kept)
 //   GFM table           -> table block (cells flattened to plain text)
 //   ![alt](figures/..)  -> image block (uploaded to Sanity, alt -> caption)
+//   ```image fence      -> image block with the full field set of the cms
+//                          image type (YAML):
+//                            src: figures/foo.png (required, relative to the md)
+//                            caption: …
+//                            dayImage: figures/foo-day.png (light-mode variant)
+//                            smallMargin: true    (tighten vertical space)
+//                            duotone: true        (duotone on tinted background)
+//                            largeView: true      (+ button opens a lightbox)
+//   §5 / §6.1           -> section references: linked to the heading whose
+//                          text starts with that number ("5. Reinforcement
+//                          learning", "6.1 Method"). Unknown numbers fail
+//                          the run.
+//   <abstract>          -> abstract block (the visually distinct lead
+//                          section): everything up to </abstract> compiles
+//                          into the block's nested content. Like <details>,
+//                          the tags need blank lines around them.
 //   ```chart fence      -> chart block; YAML config, data loaded from CSV:
 //                            type: line | histogram
 //                            data: data/loss.csv     (path relative to the md)
@@ -117,6 +148,14 @@ const source = fs.readFileSync(mdPath, 'utf8')
 
 const warnings = []
 const warn = (message) => warnings.push(message)
+
+// Shared with the client's heading renderer (modules/sanity headingId), so
+// anchors computed here land on the ids the site actually emits.
+const slugify = (text) =>
+  text
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
 
 // * * * stable keys * * *
 
@@ -232,13 +271,28 @@ const phrasingToSpans = (nodes, marks, spans, markDefs) => {
   for (const node of nodes) {
     switch (node.type) {
       case 'text': {
-        // Citation markers: [@id] renders the parenthetical form, bare @id
-        // the narrative one. Bare ids only count when they name a known
-        // reference — any other "@…" text passes through untouched — while
-        // an unknown bracketed [@id] is treated as a typo and fails the run.
-        const pattern = /\[@([A-Za-z0-9][A-Za-z0-9_-]*)\]|@([A-Za-z0-9][A-Za-z0-9_-]*)/g
+        // Citation markers ([@id] parenthetical, bare @id narrative) and
+        // section references (§5, §6.1 -> anchor link to the numbered
+        // heading). Bare ids only count when they name a known reference —
+        // any other "@…" text passes through untouched — while an unknown
+        // bracketed [@id] or § number is treated as a typo and fails the run.
+        const pattern =
+          /\[@([A-Za-z0-9][A-Za-z0-9_-]*)\]|@([A-Za-z0-9][A-Za-z0-9_-]*)|§(\d+(?:\.\d+)*)/g
         let last = 0
         for (const match of node.value.matchAll(pattern)) {
+          if (match[3] !== undefined) {
+            const anchor = sectionAnchors.get(match[3])
+            if (!anchor) {
+              sectionErrors.push(`§${match[3]} does not match any numbered heading`)
+              continue
+            }
+            if (match.index > last) spans.push(span(node.value.slice(last, match.index), marks))
+            const key = makeKey(`link:#${anchor}`)
+            markDefs.push({_type: 'link', _key: key, href: `#${anchor}`})
+            spans.push(span(match[0], [...marks, key]))
+            last = match.index + match[0].length
+            continue
+          }
           const bracketed = match[1] !== undefined
           const id = match[1] ?? match[2]
           if (!refsById.has(id)) {
@@ -349,31 +403,35 @@ const getClient = () => {
   return client
 }
 
+// Uploads an image (path relative to the md) and returns its asset ref, or
+// null if the file doesn't exist. Uploads are cached by content hash.
+const uploadImageAsset = async (relPath) => {
+  const file = path.resolve(mdDir, relPath)
+  if (!fs.existsSync(file)) return null
+  if (dryRun) {
+    // Local placeholder so a dry-run document renders without Sanity.
+    return {url: `/report-assets/${path.basename(file)}`}
+  }
+  const sha = crypto.createHash('sha1').update(fs.readFileSync(file)).digest('hex')
+  if (!uploadCache[sha]) {
+    console.log(`uploading ${relPath}…`)
+    const uploaded = await getClient().assets.upload('image', fs.createReadStream(file), {
+      filename: path.basename(file),
+    })
+    uploadCache[sha] = uploaded._id
+    fs.writeFileSync(uploadCachePath, JSON.stringify(uploadCache, null, 2))
+  }
+  return {_type: 'reference', _ref: uploadCache[sha]}
+}
+
 const imageBlock = async (node) => {
   const rel = node.url.replace(/^\//, '')
-  const file = path.resolve(mdDir, rel)
-  if (!fs.existsSync(file)) {
+  const asset = await uploadImageAsset(rel)
+  if (!asset) {
     warn(`image not found, skipped: ${node.url}`)
     return null
   }
   const caption = node.alt?.trim() || undefined
-
-  let asset
-  if (dryRun) {
-    // Local placeholder so a dry-run document renders without Sanity.
-    asset = {url: `/report-assets/${path.basename(file)}`}
-  } else {
-    const sha = crypto.createHash('sha1').update(fs.readFileSync(file)).digest('hex')
-    if (!uploadCache[sha]) {
-      console.log(`uploading ${rel}…`)
-      const uploaded = await getClient().assets.upload('image', fs.createReadStream(file), {
-        filename: path.basename(file),
-      })
-      uploadCache[sha] = uploaded._id
-      fs.writeFileSync(uploadCachePath, JSON.stringify(uploadCache, null, 2))
-    }
-    asset = {_type: 'reference', _ref: uploadCache[sha]}
-  }
 
   return {
     _type: 'image',
@@ -384,6 +442,35 @@ const imageBlock = async (node) => {
 }
 
 // * * * fences * * *
+
+// ```image fence: an image block with the full field set the cms image type
+// carries — the plain ![alt](src) syntax only sets the caption.
+const imageFenceBlock = async (node) => {
+  const config = YAML.parse(node.value) ?? {}
+  const known = new Set(['src', 'caption', 'dayImage', 'smallMargin', 'duotone', 'largeView'])
+  for (const key of Object.keys(config)) {
+    if (!known.has(key)) warn(`image fence: unknown field "${key}" ignored`)
+  }
+  if (!config.src) throw new Error('image fence needs `src`')
+  const asset = await uploadImageAsset(String(config.src).replace(/^\//, ''))
+  if (!asset) throw new Error(`image not found: ${config.src}`)
+  let dayImage
+  if (config.dayImage) {
+    const dayAsset = await uploadImageAsset(String(config.dayImage).replace(/^\//, ''))
+    if (!dayAsset) throw new Error(`day image not found: ${config.dayImage}`)
+    dayImage = {_type: 'image', asset: dayAsset}
+  }
+  return {
+    _type: 'image',
+    _key: makeKey(`img:${config.src}`),
+    asset,
+    ...(config.caption && {caption: String(config.caption)}),
+    ...(dayImage && {dayImage}),
+    ...(config.smallMargin && {smallMargin: true}),
+    ...(config.duotone && {duotone: true}),
+    ...(config.largeView && {largeView: true}),
+  }
+}
 
 const chartBlock = (node) => {
   const config = YAML.parse(node.value)
@@ -560,6 +647,21 @@ collectDefinitions(tree)
 const frontmatter =
   tree.children[0]?.type === 'yaml' ? (YAML.parse(tree.children[0].value) ?? {}) : {}
 
+// Catch typos ("showToC") before they silently drop a field from the doc.
+const knownFrontmatter = new Set([
+  'title',
+  'slug',
+  'date',
+  'metaDescription',
+  'authors',
+  'showToc',
+  'toc',
+  'featuredImage',
+])
+for (const key of Object.keys(frontmatter)) {
+  if (!knownFrontmatter.has(key)) warn(`unknown frontmatter field "${key}" ignored`)
+}
+
 // * * * references * * *
 
 // The bibliography is read from ```references fences before the main walk,
@@ -587,6 +689,26 @@ for (const node of tree.children) {
     refsById.set(ref.id, ref)
   }
 }
+
+// * * * section anchors * * *
+
+// Numbered headings ("5. Reinforcement learning", "6.1 Method") are
+// addressable from the text as §5 / §6.1 and from frontmatter `toc` entries.
+// Anchor ids mirror the client's h2/h3 renderer (slugified heading text), so
+// the links land on the ids the site emits. Deeper headings get no client
+// ids, hence the depth cap.
+const sectionAnchors = new Map()
+const headingAnchors = new Set()
+for (const node of tree.children) {
+  if (node.type !== 'heading' || node.depth < 2 || node.depth > 3) continue
+  const text = mdToString(node)
+  const anchor = slugify(text)
+  if (!anchor) continue
+  headingAnchors.add(anchor)
+  const number = text.match(/^(\d+(?:\.\d+)*)/)?.[1]
+  if (number && !sectionAnchors.has(number)) sectionAnchors.set(number, anchor)
+}
+const sectionErrors = []
 
 let title = frontmatter.title
 
@@ -710,6 +832,7 @@ const walkNodes = async (nodes, top) => {
           if (node.lang === 'chart') out.push(chartBlock(node))
           else if (node.lang === 'transcript') out.push(transcriptBlock(node))
           else if (node.lang === 'csv') out.push(csvTableBlock(node))
+          else if (node.lang === 'image') out.push(await imageFenceBlock(node))
           else if (node.lang === 'references')
             break // extracted in the pre-pass
           else warn(`code fence (lang "${node.lang ?? 'none'}") skipped`)
@@ -721,33 +844,40 @@ const walkNodes = async (nodes, top) => {
       }
       case 'html': {
         // <details><summary>…</summary> … </details> becomes an expandable
-        // section: the markdown nodes up to the closing tag compile into the
-        // block's nested content.
-        if (/^<details>/i.test(node.value.trim())) {
+        // section and <abstract> … </abstract> the lead abstract block: the
+        // markdown nodes up to the closing tag compile into the block's
+        // nested content.
+        const tag = /^<(details|abstract)>/i.exec(node.value.trim())?.[1]?.toLowerCase()
+        if (tag) {
           if (!top) {
-            warn('nested <details> not supported, skipped')
+            warn(`nested <${tag}> not supported, skipped`)
             break
           }
+          const closing = new RegExp(`^</${tag}>`, 'i')
           let end = i + 1
           while (
             end < nodes.length &&
-            !(nodes[end].type === 'html' && /^<\/details>/i.test(nodes[end].value.trim()))
+            !(nodes[end].type === 'html' && closing.test(nodes[end].value.trim()))
           ) {
             end++
           }
           if (end === nodes.length) {
-            warn('<details> without closing tag, skipped')
+            warn(`<${tag}> without closing tag, skipped`)
             break
           }
-          const summary =
-            node.value.match(/<summary>([\s\S]*?)<\/summary>/i)?.[1]?.trim() || 'Details'
           const content = await walkNodes(nodes.slice(i + 1, end), false)
-          out.push({
-            _type: 'details',
-            _key: makeKey(`details:${summary}`),
-            summary,
-            content,
-          })
+          if (tag === 'details') {
+            const summary =
+              node.value.match(/<summary>([\s\S]*?)<\/summary>/i)?.[1]?.trim() || 'Details'
+            out.push({
+              _type: 'details',
+              _key: makeKey(`details:${summary}`),
+              summary,
+              content,
+            })
+          } else {
+            out.push({_type: 'abstract', _key: makeKey('abstract'), content})
+          }
           i = end
           break
         }
@@ -766,8 +896,8 @@ const blocks = await walkNodes(tree.children, true)
 
 // * * * document * * *
 
-if (citationErrors.length) {
-  for (const message of citationErrors) console.error(`✗ ${message}`)
+if (citationErrors.length || sectionErrors.length) {
+  for (const message of [...citationErrors, ...sectionErrors]) console.error(`✗ ${message}`)
   process.exit(1)
 }
 for (const ref of references) {
@@ -779,13 +909,95 @@ if (!title) {
   process.exit(1)
 }
 
-const slugify = (text) =>
-  text
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-
 const slug = slugArg ?? frontmatter.slug ?? slugify(title)
+
+// `featuredImage: figures/cover.png` or {src, caption?, attribution?}.
+const featuredImage = await (async () => {
+  if (!frontmatter.featuredImage) return undefined
+  const config =
+    typeof frontmatter.featuredImage === 'string'
+      ? {src: frontmatter.featuredImage}
+      : frontmatter.featuredImage
+  if (!config.src) {
+    console.error('frontmatter `featuredImage` needs a path (a string or {src, …})')
+    process.exit(1)
+  }
+  const asset = await uploadImageAsset(config.src.replace(/^\//, ''))
+  if (!asset) {
+    console.error(`featured image not found: ${config.src}`)
+    process.exit(1)
+  }
+  return {
+    _type: 'image',
+    asset,
+    ...(config.caption && {caption: config.caption}),
+    ...(config.attribution && {attribution: config.attribution}),
+  }
+})()
+
+// Manual ToC: frontmatter `toc` entries replace the derived H2 list on the
+// site, indexes included. String entries take index and link target from
+// their leading section number; object entries {label, index?, section?,
+// anchor?} allow custom labels, index-free rows (index: "") and explicit
+// anchors.
+const toc = (() => {
+  if (frontmatter.toc === undefined) return undefined
+  if (!Array.isArray(frontmatter.toc)) {
+    console.error('frontmatter `toc` must be a list')
+    process.exit(1)
+  }
+  return frontmatter.toc.map((entry) => {
+    let label
+    let index
+    let anchor
+    if (typeof entry === 'string' || typeof entry === 'number') {
+      const match = String(entry).match(/^(\d+(?:\.\d+)*)[.):]?\s+(.+)$/)
+      if (!match) {
+        console.error(
+          `toc entry "${entry}" — string entries need a leading section number ` +
+            '(use {label, anchor} for unnumbered entries)',
+        )
+        process.exit(1)
+      }
+      ;[, index, label] = match
+      anchor = sectionAnchors.get(index)
+      if (!anchor) {
+        console.error(`toc entry "${entry}" — no heading numbered ${index}`)
+        process.exit(1)
+      }
+    } else {
+      label = entry?.label
+      if (!label) {
+        console.error(`toc entry needs a \`label\`: ${JSON.stringify(entry)}`)
+        process.exit(1)
+      }
+      index = entry.index !== undefined ? String(entry.index) : undefined
+      if (entry.anchor !== undefined) {
+        anchor = String(entry.anchor).replace(/^#/, '')
+        if (!headingAnchors.has(anchor)) {
+          warn(`toc entry "${label}": anchor #${anchor} matches no h2/h3 heading`)
+        }
+      } else if (entry.section !== undefined) {
+        anchor = sectionAnchors.get(String(entry.section))
+        if (!anchor) {
+          console.error(`toc entry "${label}" — no heading numbered ${entry.section}`)
+          process.exit(1)
+        }
+        index ??= String(entry.section)
+      } else {
+        console.error(`toc entry "${label}" needs a \`section\` number or an \`anchor\``)
+        process.exit(1)
+      }
+    }
+    return {
+      _type: 'tocEntry',
+      _key: makeKey(`toc:${label}`),
+      ...(index !== undefined && {index}),
+      label,
+      anchor,
+    }
+  })
+})()
 
 const doc = {
   _id: publish ? `post-${slug}` : `drafts.post-${slug}`,
@@ -815,6 +1027,9 @@ const doc = {
     })),
   }),
   ...(frontmatter.metaDescription && {metaDescription: frontmatter.metaDescription}),
+  ...(frontmatter.showToc !== undefined && {showToc: Boolean(frontmatter.showToc)}),
+  ...(toc && {toc}),
+  ...(featuredImage && {featuredImage}),
   content: {_type: 'contentEditor', content: blocks},
 }
 

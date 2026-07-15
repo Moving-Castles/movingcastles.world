@@ -82,9 +82,10 @@ const components: PortableTextComponents = {
     blockquote: ({children}) => `<blockquote>${children}</blockquote>`,
     hr: () => `<hr />`,
     h1: ({children}) => `<h1>${children}</h1>`,
-    // h2s carry an anchor id so the table of contents can link to them.
+    // h2s carry an anchor id so the table of contents can link to them; h3s
+    // too, so in-text section references (§6.1) can link to subsections.
     h2: ({children, value}) => `<h2 id="${headingId(value)}">${children}</h2>`,
-    h3: ({children}) => `<h3>${children}</h3>`,
+    h3: ({children, value}) => `<h3 id="${headingId(value)}">${children}</h3>`,
     h4: ({children}) => `<h4>${children}</h4>`,
   },
 }

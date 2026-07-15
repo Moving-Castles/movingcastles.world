@@ -32,8 +32,9 @@
 
   {#if post.showToc && post.content}
     <!-- Opt-in per post via the cms `showToc` toggle. Fixed beside the text
-         column; hides itself below 1100px viewport width. -->
-    <Toc content={post.content} />
+         column; hides itself below 1100px viewport width. Manual `toc`
+         entries (if any) replace the derived H2 list. -->
+    <Toc content={post.content} toc={post.toc} />
   {/if}
 
   {#if post.content}

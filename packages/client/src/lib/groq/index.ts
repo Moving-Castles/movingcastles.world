@@ -25,12 +25,19 @@ const contentBlockProjection = `
 		}
 	}`
 
-// Applied one level deep again for expandable `details` blocks, which nest a
-// content array of their own (a single nesting level, by schema design).
+// Applied one level deep again for `abstract` and expandable `details`
+// blocks, which nest a content array of their own (a single nesting level,
+// by schema design).
 const contentEditorProjection = `{
 	...,
 	content[] {
 		${contentBlockProjection},
+		_type == "abstract" => {
+			...,
+			content[] {
+				${contentBlockProjection}
+			}
+		},
 		_type == "details" => {
 			...,
 			content[] {
@@ -102,6 +109,7 @@ export const postBySlugQuery = `
 		authors,
 		content ${contentEditorProjection},
 		showToc,
+		toc,
 		references,
 		featuredImage ${imageProjection}
 	}

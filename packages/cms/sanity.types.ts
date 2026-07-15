@@ -141,6 +141,40 @@ export type ContentEditor = {
         _key: string
       }
     | {
+        content?: Array<{
+          children?: Array<{
+            marks?: Array<string>
+            text?: string
+            _type: 'span'
+            _key: string
+          }>
+          style?: 'normal'
+          listItem?: 'bullet' | 'number'
+          markDefs?: Array<
+            | {
+                href?: string
+                _type: 'link'
+                _key: string
+              }
+            | {
+                reference?: PostReference
+                _type: 'internalLink'
+                _key: string
+              }
+            | {
+                refId?: string
+                _type: 'cite'
+                _key: string
+              }
+          >
+          level?: number
+          _type: 'block'
+          _key: string
+        }>
+        _type: 'abstract'
+        _key: string
+      }
+    | {
         summary: string
         content?: Array<
           | {
@@ -283,6 +317,13 @@ export type Post = {
   metaDescription?: string
   content?: ContentEditor
   showToc?: boolean
+  toc?: Array<{
+    index?: string
+    label: string
+    anchor: string
+    _type: 'tocEntry'
+    _key: string
+  }>
   references?: Array<{
     id: string
     label: string

@@ -1,13 +1,24 @@
 <script lang="ts">
   import {extractH2Headings, type ContentEditorInput} from '$lib/modules/sanity'
+  import type {TocEntry} from '$lib/types'
 
-  let {content}: {content: ContentEditorInput} = $props()
-
-  const headings = $derived(extractH2Headings(content))
+  let {content, toc}: {content: ContentEditorInput; toc?: TocEntry[]} = $props()
 
   // Headings may carry their own numbering ("3 Data generation"); the ToC
   // renders its own index column, so strip it from the displayed title.
   const tocLabel = (text: string) => text.replace(/^\d+[.):]?\s+/, '')
+
+  // Manual entries (authored in the post's `toc` field, indexes verbatim)
+  // win over the derived H2 list (auto-numbered from 01).
+  const headings = $derived(
+    toc?.length
+      ? toc.map((entry) => ({id: entry.anchor, text: entry.label, index: entry.index ?? ''}))
+      : extractH2Headings(content).map((heading, i) => ({
+          id: heading.id,
+          text: tocLabel(heading.text),
+          index: String(i + 1).padStart(2, '0'),
+        })),
+  )
 
   let activeId = $state('')
 
@@ -61,6 +72,16 @@
     }
   })
 
+  // Flash the jumped-to heading so the eye lands on the right section. The
+  // class drives a color-fade animation defined globally in app.css (the
+  // heading lives in {@html} output, outside this component's scope).
+  const flashHeading = (el: HTMLElement) => {
+    el.classList.remove('toc-flash')
+    void el.offsetWidth // restart the animation when re-clicked
+    el.classList.add('toc-flash')
+    el.addEventListener('animationend', () => el.classList.remove('toc-flash'), {once: true})
+  }
+
   // Fast smooth scroll (300ms ease-out) — native smooth scrolling has no
   // duration control and feels sluggish over long documents.
   const scrollToHeading = (event: MouseEvent, id: string) => {
@@ -71,6 +92,7 @@
     history.replaceState(null, '', `#${id}`)
     activeId = id
     spyPaused = true
+    flashHeading(el)
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       window.scrollTo(0, targetY)
       return
@@ -92,13 +114,13 @@
 {#if headings.length > 0}
   <nav class="toc" aria-label="Table of contents">
     <ul>
-      {#each headings as heading, i (heading.id)}
+      {#each headings as heading, i (`${heading.id}:${i}`)}
         <li>
           <a
             href="#{heading.id}"
             aria-current={activeId === heading.id ? 'location' : undefined}
             onclick={(event) => scrollToHeading(event, heading.id)}
-            ><span class="index">{String(i + 1).padStart(2, '0')}.</span>{tocLabel(heading.text)}</a
+            ><span class="index">{heading.index ? `${heading.index}.` : ''}</span>{heading.text}</a
           >
         </li>
       {/each}

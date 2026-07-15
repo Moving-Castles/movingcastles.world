@@ -9,6 +9,7 @@
   import TableBlock from './blocks/TableBlock.svelte'
   import ChartBlock from './blocks/ChartBlock.svelte'
   import DetailsBlock from './blocks/DetailsBlock.svelte'
+  import AbstractBlock from './blocks/AbstractBlock.svelte'
 
   // Custom Portable Text block types rendered as dedicated Svelte components.
   // Everything else (text blocks with their styles/marks, lists) falls through
@@ -22,6 +23,7 @@
     table: TableBlock,
     chart: ChartBlock,
     details: DetailsBlock,
+    abstract: AbstractBlock,
   }
 
   let {content}: {content: ContentEditorInput} = $props()

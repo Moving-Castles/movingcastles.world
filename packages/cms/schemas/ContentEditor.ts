@@ -9,6 +9,7 @@ import {
   MdShowChart,
   MdFormatQuote,
   MdUnfoldMore,
+  MdNotes,
 } from 'react-icons/md'
 
 // The text block and object members are defined once and shared between the
@@ -387,6 +388,30 @@ const objectMembers = [
   },
 ]
 
+// Abstract: a visually distinct lead section (the paper-style abstract at the
+// top of a report). Plain paragraphs only — no headings or embedded objects.
+const abstractMember = {
+  type: 'object',
+  name: 'abstract',
+  title: 'Abstract',
+  icon: MdNotes,
+  fields: [
+    {
+      title: 'Content',
+      name: 'content',
+      type: 'array',
+      of: [{...blockMember, styles: [{title: 'Normal', value: 'normal'}]}],
+    },
+  ],
+  preview: {
+    select: {content: 'content'},
+    prepare({content}: {content?: {children?: {text?: string}[]}[]}) {
+      const text = content?.[0]?.children?.map((child) => child.text ?? '').join('') ?? ''
+      return {title: text || 'Abstract', subtitle: 'Abstract'}
+    },
+  },
+}
+
 // Expandable section: a native <details>/<summary> on the site. Nests the
 // same members as the top-level content array, minus itself.
 const detailsMember = {
@@ -431,7 +456,7 @@ export default {
       title: 'Content editor',
       name: 'content',
       type: 'array',
-      of: [blockMember, ...objectMembers, detailsMember],
+      of: [blockMember, ...objectMembers, abstractMember, detailsMember],
     },
   ],
 }

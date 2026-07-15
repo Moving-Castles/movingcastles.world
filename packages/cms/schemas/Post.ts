@@ -70,6 +70,48 @@ export default {
       initialValue: false,
     },
     {
+      title: 'Table of contents entries',
+      name: 'toc',
+      type: 'array',
+      description:
+        'Optional manual table of contents. When set, these entries replace the derived H2 list (indexes included, shown verbatim). Normally written by the report publishing script from the markdown frontmatter.',
+      hidden: ({document}: {document?: {showToc?: boolean}}) => !document?.showToc,
+      of: [
+        {
+          type: 'object',
+          name: 'tocEntry',
+          title: 'Entry',
+          fields: [
+            {
+              title: 'Index',
+              name: 'index',
+              type: 'string',
+              description: 'Shown before the label, e.g. "0" or "10". Optional.',
+            },
+            {
+              title: 'Label',
+              name: 'label',
+              type: 'string',
+              validation: (Rule: any) => Rule.required(),
+            },
+            {
+              title: 'Anchor',
+              name: 'anchor',
+              type: 'string',
+              description: 'Heading anchor id the entry links to (without the leading #).',
+              validation: (Rule: any) => Rule.required(),
+            },
+          ],
+          preview: {
+            select: {title: 'label', subtitle: 'anchor', index: 'index'},
+            prepare({title, subtitle, index}: {title?: string; subtitle?: string; index?: string}) {
+              return {title: index ? `${index}. ${title}` : title, subtitle: `#${subtitle}`}
+            },
+          },
+        },
+      ],
+    },
+    {
       title: 'References',
       name: 'references',
       type: 'array',

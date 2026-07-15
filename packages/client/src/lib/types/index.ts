@@ -19,6 +19,16 @@ export interface PostListItem extends Pick<PostDocument, '_id' | 'title' | 'date
 // that anchor-link to #ref-{id} in the rendered end notes.
 export type BibReference = NonNullable<PostDocument['references']>[number]
 
+// A manual table-of-contents entry. When a post carries these, the ToC
+// renders them (index shown verbatim) instead of deriving entries from the
+// H2 headings.
+export interface TocEntry {
+  _key: string
+  index?: string
+  label: string
+  anchor: string
+}
+
 // Shape returned by `postBySlugQuery` (single).
 export interface Post extends PostListItem {
   content?: ContentEditor
@@ -28,6 +38,8 @@ export interface Post extends PostListItem {
   metaDescription?: string
   // Opt-in: show the fixed table of contents beside the text on wide screens.
   showToc?: boolean
+  // Optional manual ToC entries; when present they replace the derived H2 list.
+  toc?: TocEntry[]
 }
 
 // A single header/footer link, as projected by `siteSettingsQuery`. Either an
