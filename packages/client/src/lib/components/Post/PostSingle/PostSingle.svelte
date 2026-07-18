@@ -1,11 +1,21 @@
 <script lang="ts">
   import PortableTextRender from '$lib/components/PortableText/PortableTextRender.svelte'
   import Toc from './Toc.svelte'
+  import ExternalLinks from '../ExternalLinks.svelte'
   import {formatDate} from '$lib/format'
   import DuotoneFilters from '$lib/components/graphics/DuotoneFilters.svelte'
   import type {Post} from '$lib/types'
 
   let {post}: {post: Post} = $props()
+
+  // The external links row belongs under the abstract, but the abstract is a
+  // content block rather than a post field — so the content renders in two
+  // passes with the row between them. Without an abstract the lead is empty
+  // and the row leads the content, i.e. sits directly under the header.
+  const blocks = $derived(post.content?.content ?? [])
+  const abstractEnd = $derived(blocks.findIndex((block) => block._type === 'abstract') + 1)
+  const lead = $derived(blocks.slice(0, abstractEnd))
+  const body = $derived(blocks.slice(abstractEnd))
 </script>
 
 <article>
@@ -23,9 +33,10 @@
         {/each}
       </div>
     {/if}
-    {#if post.date}
+    {#if post.projectCode || post.date}
       <div class="meta">
-        <span class="date">{formatDate(post.date)}</span>
+        {#if post.date}<span class="date">{formatDate(post.date)}</span>{/if}
+        {#if post.projectCode}<span class="project-code">{post.projectCode}</span>{/if}
       </div>
     {/if}
   </header>
@@ -39,7 +50,15 @@
 
   {#if post.content}
     <div class="content">
-      <PortableTextRender content={post.content} />
+      {#if lead.length}
+        <PortableTextRender content={lead} />
+      {/if}
+      {#if post.externalLinks?.length}
+        <ExternalLinks links={post.externalLinks} />
+      {/if}
+      {#if body.length}
+        <PortableTextRender content={body} />
+      {/if}
     </div>
   {/if}
 
@@ -92,7 +111,14 @@
 
   .meta {
     display: flex;
+    gap: 0.5em;
     color: var(--foreground);
+
+    // A middot joins the two, drawn only when the code follows the date.
+    .date + .project-code::before {
+      content: '·';
+      margin-right: 0.5em;
+    }
   }
 
   .authors {

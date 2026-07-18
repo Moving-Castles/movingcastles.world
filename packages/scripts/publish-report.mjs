@@ -38,6 +38,11 @@
 //                                     either a `section` number resolved the
 //                                     same way or an explicit heading `anchor`;
 //                                     `index` displays verbatim, "" hides it.)
+//   projectCode: MC000               (project designation, shown beside the
+//                                     publication date)
+//   externalLinks: [{label, url}, …] (related resources, e.g. a model on
+//                                     Hugging Face; rendered as a link row
+//                                     under the abstract)
 //   featuredImage: figures/cover.png (uploaded like body images; also takes
 //                                     {src, caption?, attribution?})
 // Without frontmatter the title comes from the first `# H1` and the date
@@ -96,8 +101,12 @@
 //   ```csv fence        -> table block (first row is the header); inline data,
 //                          or a file via the fence meta: ```csv data/foo.csv
 //                          Leading `# Heading` / `## Subheading` lines work
-//                          like in transcript fences. (GFM tables can't carry
-//                          a heading — use a csv fence when one is needed)
+//                          like in transcript fences. Trailing `> …` lines set
+//                          the caption shown under the table (e.g. the note a
+//                          `†` in a cell refers to); consecutive lines join
+//                          into one paragraph. (GFM tables can't carry a
+//                          heading or caption — use a csv fence when one is
+//                          needed)
 //   <details>           -> expandable section: everything up to </details>
 //     <summary>…</summary> compiles into the block's nested content (one
 //                          level deep; the summary is the toggle line)
@@ -702,6 +711,8 @@ const knownFrontmatter = new Set([
   'date',
   'metaDescription',
   'authors',
+  'projectCode',
+  'externalLinks',
   'showToc',
   'toc',
   'featuredImage',
@@ -763,11 +774,31 @@ let title = frontmatter.title
 const isCallout = (node) =>
   /^\[!(NOTE|IMPORTANT|WARNING|TIP|CAUTION)\]/.test(mdToString(node.children?.[0] ?? {}).trim())
 
+// A csv fence may close with a run of `> …` lines, which set the table's
+// caption (rendered under the table — typically the note a `†` in a cell
+// points at). Peeled off the end before the data is parsed, so caption prose
+// can't be mistaken for a row; wrapped source lines join into one paragraph,
+// since the figcaption that renders it collapses newlines anyway.
+const extractFenceCaption = (body) => {
+  const lines = body.split('\n')
+  let end = lines.length
+  while (end > 0 && !lines[end - 1].trim()) end--
+  let start = end
+  while (start > 0 && lines[start - 1].trim().startsWith('>')) start--
+  const caption = lines
+    .slice(start, end)
+    .map((line) => line.trim().replace(/^>\s?/, ''))
+    .join(' ')
+    .trim()
+  return {...(caption && {caption}), body: lines.slice(0, start).join('\n')}
+}
+
 // ```csv fences render as table blocks (handy for data appendices inside
 // expandable sections). The fence body holds the data inline, or the fence
 // meta names a file (```csv data/foo.csv) so a chart can share the same csv.
 const csvTableBlock = (node) => {
-  const {heading, subheading, body} = extractFenceHeading(node.value)
+  const {heading, subheading, body: headed} = extractFenceHeading(node.value)
+  const {caption, body} = extractFenceCaption(headed)
   // Raw rows rather than parseCsv's header-keyed objects: table headers may
   // legitimately repeat or be empty (a headerless key–value table renders as
   // an empty header row), which object keys would collapse into one column.
@@ -778,6 +809,7 @@ const csvTableBlock = (node) => {
     _key: makeKey(`csvtable:${node.value}`),
     ...(heading && {heading}),
     ...(subheading && {subheading}),
+    ...(caption && {caption}),
     header,
     rows: rest.map((raw) => {
       const cells = header.map((_, i) => raw[i] ?? '')
@@ -987,6 +1019,28 @@ const featuredImage = await (async () => {
   }
 })()
 
+// Related resources (a model card, a repository), rendered as a link row
+// under the abstract.
+const externalLinks = (() => {
+  if (frontmatter.externalLinks === undefined) return undefined
+  if (!Array.isArray(frontmatter.externalLinks)) {
+    console.error('frontmatter `externalLinks` must be a list')
+    process.exit(1)
+  }
+  return frontmatter.externalLinks.map((entry) => {
+    if (!entry?.label || !entry?.url) {
+      console.error(`externalLinks entry needs a \`label\` and a \`url\`: ${JSON.stringify(entry)}`)
+      process.exit(1)
+    }
+    return {
+      _type: 'externalLink',
+      _key: makeKey(`ext:${entry.url}`),
+      label: String(entry.label),
+      url: String(entry.url),
+    }
+  })
+})()
+
 // Manual ToC: frontmatter `toc` entries replace the derived H2 list on the
 // site, indexes included. String entries take index and link target from
 // their leading section number; object entries {label, index?, section?,
@@ -1059,6 +1113,7 @@ const doc = {
   date: frontmatter.date
     ? String(frontmatter.date).slice(0, 10)
     : new Date().toISOString().slice(0, 10),
+  ...(frontmatter.projectCode && {projectCode: String(frontmatter.projectCode)}),
   ...(frontmatter.authors && {
     authors: frontmatter.authors.map((author) => ({
       _type: 'author',
@@ -1067,6 +1122,7 @@ const doc = {
       ...(author.url && {url: author.url}),
     })),
   }),
+  ...(externalLinks && {externalLinks}),
   ...(references.length && {
     references: references.map((ref) => ({
       _type: 'refItem',

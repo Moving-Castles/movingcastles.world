@@ -19,6 +19,10 @@ export interface PostListItem extends Pick<PostDocument, '_id' | 'title' | 'date
 // that anchor-link to #ref-{id} in the rendered end notes.
 export type BibReference = NonNullable<PostDocument['references']>[number]
 
+// A related resource on a post (a model card, a repository), rendered as a
+// row of links under the abstract.
+export type ExternalLink = NonNullable<PostDocument['externalLinks']>[number]
+
 // A manual table-of-contents entry. When a post carries these, the ToC
 // renders them (index shown verbatim) instead of deriving entries from the
 // H2 headings.
@@ -33,6 +37,10 @@ export interface TocEntry {
 export interface Post extends PostListItem {
   content?: ContentEditor
   references?: BibReference[]
+  // Project designation (e.g. "MC000"), shown beside the publication date.
+  projectCode?: string
+  // Related resources, rendered as a link row under the abstract.
+  externalLinks?: ExternalLink[]
   // Optional editor-authored meta/social description; falls back to truncated
   // body text in Metadata.svelte when empty.
   metaDescription?: string

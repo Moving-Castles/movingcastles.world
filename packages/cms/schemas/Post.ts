@@ -13,6 +13,12 @@ export default {
       validation: (Rule: any) => Rule.required(),
     },
     {
+      title: 'Project code',
+      name: 'projectCode',
+      type: 'string',
+      description: 'Project designation shown beside the publication date, e.g. "MC000".',
+    },
+    {
       name: 'authors',
       title: 'Authors',
       type: 'array',
@@ -55,6 +61,38 @@ export default {
         Rule.max(160).warning(
           'Keep under ~160 characters so it is not truncated in search results.',
         ),
+    },
+    {
+      title: 'External links',
+      name: 'externalLinks',
+      type: 'array',
+      description:
+        'Related resources, e.g. a trained model on Hugging Face or a code repository. Rendered as a row of links under the abstract (or under the title, on a post without one).',
+      of: [
+        {
+          type: 'object',
+          name: 'externalLink',
+          title: 'Link',
+          fields: [
+            {
+              title: 'Label',
+              name: 'label',
+              type: 'string',
+              description: 'How the link reads, e.g. "Model on Hugging Face".',
+              validation: (Rule: any) => Rule.required(),
+            },
+            {
+              title: 'URL',
+              name: 'url',
+              type: 'url',
+              validation: (Rule: any) => Rule.required(),
+            },
+          ],
+          preview: {
+            select: {title: 'label', subtitle: 'url'},
+          },
+        },
+      ],
     },
     {
       name: 'content',

@@ -25,8 +25,8 @@
     padding: 1.25em 0;
     /* Solid rules above and below, echoing the hr style, set the abstract
        apart from the body text without the dashed quote treatment. */
-    border-top: 1px solid var(--foreground);
-    border-bottom: 1px solid var(--foreground);
+    border-top: 1px dashed var(--foreground);
+    border-bottom: 1px dashed var(--foreground);
     font-family: var(--font-stack-mono);
     font-size: var(--font-size-small);
   }

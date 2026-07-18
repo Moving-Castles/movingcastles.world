@@ -30,6 +30,13 @@
   // series stays monochrome foreground (the CSS fallback).
   const ENTITY_LETTERS = 'abcde'
 
+  // The band hatch is declared once in the plot svg but also filled into the
+  // legend swatch, which is a separate svg — so the id has to be unique per
+  // chart instance, and stable across ssr and hydration.
+  const uid = $props.id()
+  const hatchId = `band-hatch-${uid}`
+  const hatchFill = `url(#${hatchId})`
+
   // The rendered width tracks the container so axis text keeps a constant
   // on-screen size; the server renders the 640 default and hydration adjusts.
   let clientWidth: number | undefined = $state()
@@ -154,7 +161,7 @@
         {#each labeledBands as band, i (i)}
           <span class="key">
             <svg width="14" height="10" aria-hidden="true">
-              <rect class="band" width="14" height="10" />
+              <rect class="band" width="14" height="10" fill={hatchFill} />
             </svg>
             {band.label}
           </span>
@@ -177,6 +184,23 @@
       onkeydown={onKeydown}
       onblur={() => (hoverX = null)}
     >
+      <defs>
+        <!-- Diagonal hatch for the reference bands: a texture reads as an
+             annotated region rather than as a plotted quantity, which a solid
+             wash of the foreground color does not. The tile holds one vertical
+             stroke centered in its 6px width (centered so it isn't clipped at
+             the tile edge) and the whole tile is rotated 45°. -->
+        <pattern
+          id={hatchId}
+          width="6"
+          height="6"
+          patternUnits="userSpaceOnUse"
+          patternTransform="rotate(45)"
+        >
+          <line class="hatch" x1="3" y1="0" x2="3" y2="6" />
+        </pattern>
+      </defs>
+
       {#each yTicks as tick (tick)}
         <line class="grid" x1={marginLeft} x2={width - MARGIN.right} y1={y(tick)} y2={y(tick)} />
         <text class="tick y" x={marginLeft - TICK_GAP} y={y(tick)}>{formatYTick(tick)}</text>
@@ -186,6 +210,7 @@
       {#each bands as band, i (i)}
         <rect
           class="band"
+          fill={hatchFill}
           x={marginLeft}
           width={width - MARGIN.right - marginLeft}
           y={y(band.y1)}
@@ -330,10 +355,13 @@
     stroke-linejoin: round;
   }
 
-  /* Reference bands: a wash, never a saturated block. */
-  .band {
-    fill: var(--foreground);
-    opacity: 0.15;
+  /* Reference bands: a diagonal hatch, never a saturated block. The fill is
+     set as an attribute (the pattern id is instance-scoped), so no `fill`
+     here — it would win over the attribute and flatten the hatch. */
+  .hatch {
+    stroke: var(--foreground);
+    stroke-width: 1;
+    opacity: 0.55;
   }
 
   .crosshair {

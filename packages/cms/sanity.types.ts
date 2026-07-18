@@ -317,6 +317,7 @@ export type Post = {
   _updatedAt: string
   _rev: string
   title: string
+  projectCode?: string
   authors?: Array<{
     name: string
     url?: string
@@ -325,6 +326,12 @@ export type Post = {
   }>
   date?: string
   metaDescription?: string
+  externalLinks?: Array<{
+    label: string
+    url: string
+    _type: 'externalLink'
+    _key: string
+  }>
   content?: ContentEditor
   showToc?: boolean
   toc?: Array<{
