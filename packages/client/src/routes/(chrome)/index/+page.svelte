@@ -16,6 +16,12 @@
 <main>
   {#if data.index.posts.length > 0}
     <table>
+      <thead>
+        <tr>
+          <th class="date">date</th>
+          <th class="title">title</th>
+        </tr>
+      </thead>
       <tbody>
         {#each data.index.posts as post (post._id)}
           <tr>
@@ -29,27 +35,31 @@
 </main>
 
 <style lang="scss">
-  // Mirrors PostSingle's article so the index reads as a content page.
+  // Mirrors PostSingle's article so the index reads as a content page. The one
+  // departure is the top padding: 1.5rem is the whole space between the header
+  // and the column headers, landing them where a post title sits (the article's
+  // 1em plus the h1's own 0.5rem).
   main {
     width: 100%;
     max-width: var(--content-width);
     min-height: 80dvh;
     margin: 0 auto;
     padding-inline: 1em;
-    padding-top: 1em;
+    padding-top: 1rem;
     padding-bottom: 2em;
     box-sizing: border-box;
   }
 
   // Hairline rules and a bold title, matching the post list under the logo on
-  // the front page.
+  // the front page. The column headers are unruled above — the first rule on
+  // the page is the one under them.
   table {
     width: 100%;
     border-collapse: collapse;
     color: var(--foreground);
-    border-top: 1px solid var(--foreground);
   }
 
+  th,
   td {
     padding: 0.6rem 0;
     border-bottom: 1px solid var(--foreground);
@@ -57,11 +67,18 @@
     vertical-align: baseline;
   }
 
+  // Column headers take the small mono of the site chrome.
+  th {
+    font-family: var(--font-stack-mono);
+    font-size: var(--font-size-small);
+    font-weight: normal;
+  }
+
   // Shrink the date column to its own content; the title column takes the rest.
   .date {
     width: 1%;
     white-space: nowrap;
-    padding-right: 1.5rem;
+    padding-right: 2.5rem;
   }
 
   .title a {

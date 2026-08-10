@@ -59,9 +59,17 @@ export interface Post extends PostListItem {
   toc?: TocEntry[]
 }
 
-// A single header/footer link, as projected by `siteSettingsQuery`. Either an
-// external link (its `url`) or an internal link to a post (its resolved `slug`,
-// rendered as `/posts/{slug}`). Discriminated by `_type`.
+// Shape returned by `siteSettingsQuery`: the header's and the footer's link
+// rows, each curated and ordered separately in the cms.
+export interface SiteLinks {
+  headerLinks: NavLink[]
+  footerLinks: NavLink[]
+}
+
+// A single header/footer link, as projected by `siteSettingsQuery`: an external
+// link (its `url`), an internal link to a post (its resolved `slug`, rendered
+// as `/posts/{slug}`), or a link to the post index at `/index` (label only).
+// Discriminated by `_type`.
 interface NavLinkBase {
   _key: string
   label: string
@@ -77,4 +85,8 @@ export interface PostNavLink extends NavLinkBase {
   slug: string
 }
 
-export type NavLink = ExternalNavLink | PostNavLink
+export interface IndexNavLink extends NavLinkBase {
+  _type: 'navIndexLink'
+}
+
+export type NavLink = ExternalNavLink | PostNavLink | IndexNavLink

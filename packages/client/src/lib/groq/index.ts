@@ -102,23 +102,31 @@ export const postsQuery = `
 	}
 `
 
-// Header/footer links live on the `siteSettings` singleton. Each link is either
-// an external `navLink` (url) or an internal `navPostLink` (reference to a post,
-// projected down to its slug). The filter drops internal links whose referenced
-// post is missing/unpublished, so the client never builds a dead /posts/ href.
-// Coalesce to an empty array so a missing singleton resolves cleanly.
-export const siteSettingsQuery = `
-	coalesce(
-		*[_type == "siteSettings"][0].links[
-			_type == "navLink" || defined(reference->slug.current)
+// One nav row (the header's or the footer's). A link is an external `navLink`
+// (url), a `navPostLink` (reference to a post, projected down to its slug), or
+// a `navIndexLink` (the post index — label only, no target to resolve). The
+// filter drops post links whose referenced post is missing/unpublished, so the
+// client never builds a dead /posts/ href, and passes every other type through.
+const navLinksProjection = `[
+			_type != "navPostLink" || defined(reference->slug.current)
 		] {
 			_key,
 			_type,
 			label,
 			_type == "navLink" => {url},
 			_type == "navPostLink" => {"slug": reference->slug.current}
+		}`
+
+// Header and footer links live on the `siteSettings` singleton, as two
+// independently ordered lists. The coalesces mean a missing singleton — or a
+// row the editor has left empty — resolves to an empty array rather than null.
+export const siteSettingsQuery = `
+	coalesce(
+		*[_type == "siteSettings"][0] {
+			"headerLinks": coalesce(headerLinks${navLinksProjection}, []),
+			"footerLinks": coalesce(footerLinks${navLinksProjection}, [])
 		},
-		[]
+		{"headerLinks": [], "footerLinks": []}
 	)
 `
 

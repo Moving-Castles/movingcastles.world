@@ -294,7 +294,7 @@ export type SiteSettings = {
   _updatedAt: string
   _rev: string
   title: string
-  links?: Array<
+  headerLinks?: Array<
     | {
         label: string
         url: string
@@ -305,6 +305,30 @@ export type SiteSettings = {
         label: string
         reference: PostReference
         _type: 'navPostLink'
+        _key: string
+      }
+    | {
+        label: string
+        _type: 'navIndexLink'
+        _key: string
+      }
+  >
+  footerLinks?: Array<
+    | {
+        label: string
+        url: string
+        _type: 'navLink'
+        _key: string
+      }
+    | {
+        label: string
+        reference: PostReference
+        _type: 'navPostLink'
+        _key: string
+      }
+    | {
+        label: string
+        _type: 'navIndexLink'
         _key: string
       }
   >

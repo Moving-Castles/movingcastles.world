@@ -7,6 +7,6 @@
   let {data, children}: {data: LayoutData; children: Snippet} = $props()
 </script>
 
-<Header links={data.links} />
+<Header links={data.headerLinks} />
 {@render children()}
-<Footer links={data.links} />
+<Footer links={data.footerLinks} />

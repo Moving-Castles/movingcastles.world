@@ -6,11 +6,11 @@
   import type {NavLink} from '$lib/types'
 
   // The root +error.svelte renders inside the (chrome-less) root layout, so it
-  // brings its own Header to match the post page. `links` come from the root
+  // brings its own Header to match the post page. The links come from the root
   // +layout.server.ts, which loads them for every route — including the
   // unmatched-route 404s that only this boundary catches. Default to [] as a
   // fallback.
-  const links = $derived((page.data?.links as NavLink[] | undefined) ?? [])
+  const links = $derived((page.data?.headerLinks as NavLink[] | undefined) ?? [])
 
   const heading = $derived(page.status === 404 ? 'Page not found' : 'Something went wrong')
 </script>

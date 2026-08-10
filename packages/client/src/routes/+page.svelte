@@ -24,7 +24,7 @@
       </li>
     {/each}
     <li class="index">
-      <a href="/index">index</a>
+      <a href="/index">[index]</a>
     </li>
   </ul>
 </main>
@@ -99,8 +99,10 @@
       a {
         font-weight: normal;
 
+        // Lightens on hover like the header/footer links, rather than taking
+        // the underline the post rows above it use.
         &:hover {
-          text-decoration: underline;
+          color: var(--foreground-emphasis);
         }
       }
     }
