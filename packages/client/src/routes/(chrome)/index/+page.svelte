@@ -11,7 +11,7 @@
   const title = $derived(data.index.title || 'Index')
 </script>
 
-<Metadata title={`${title} | ${SITE_NAME}`} />
+<Metadata title={`index | ${SITE_NAME}`} />
 
 <main>
   {#if data.index.posts.length > 0}
