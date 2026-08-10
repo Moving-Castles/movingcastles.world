@@ -1,5 +1,5 @@
 // ICONS
-import {MdArticle, MdHome, MdSettings} from 'react-icons/md'
+import {MdArticle, MdHome, MdList, MdSettings} from 'react-icons/md'
 
 export default (S) =>
   S.list()
@@ -14,6 +14,16 @@ export default (S) =>
             .title('Frontpage')
             .schemaType('frontpage')
             .documentId('frontpage'),
+        ),
+      S.listItem()
+        .title('Post index')
+        .icon(MdList)
+        .child(
+          S.editor()
+            .id('postIndex')
+            .title('Post index')
+            .schemaType('postIndex')
+            .documentId('postIndex'),
         ),
       S.listItem()
         .title('Posts')

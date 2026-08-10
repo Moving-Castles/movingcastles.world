@@ -384,6 +384,20 @@ export type SanityImageHotspot = {
   width: number
 }
 
+export type PostIndex = {
+  _id: string
+  _type: 'postIndex'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  title: string
+  posts?: Array<
+    {
+      _key: string
+    } & PostReference
+  >
+}
+
 export type Frontpage = {
   _id: string
   _type: 'frontpage'
@@ -616,6 +630,7 @@ export type AllSanitySchemaTypes =
   | Slug
   | SanityImageCrop
   | SanityImageHotspot
+  | PostIndex
   | Frontpage
   | MuxVideoAssetReference
   | MuxVideo

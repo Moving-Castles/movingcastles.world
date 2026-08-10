@@ -68,6 +68,29 @@ export const frontpageQuery = `
 	)
 `
 
+// The postIndex singleton holds the ordered list of posts rendered as the
+// table at /index. The inner filter drops references whose post is missing or
+// unpublished, and both coalesces mean a missing singleton (or an empty list)
+// resolves to an empty index rather than faulting the page.
+export const postIndexQuery = `
+	coalesce(
+		*[_type == "postIndex"][0] {
+			title,
+			"posts": coalesce(
+				posts[defined(@->slug.current)]-> {
+					_id,
+					title,
+					"slug": slug.current,
+					date,
+					authors
+				},
+				[]
+			)
+		},
+		{"posts": []}
+	)
+`
+
 export const postsQuery = `
 	*[_type == "post" && defined(slug.current)] | order(date desc, _createdAt desc) {
 		_id,

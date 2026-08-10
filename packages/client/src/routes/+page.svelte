@@ -14,18 +14,19 @@
     <Logo />
   </div>
 
-  {#if data.posts.length > 0}
-    <ul class="posts">
-      {#each data.posts as post (post._id)}
-        <li>
-          {#if post.date}<span class="year">{formatDate(post.date)}</span>{/if}
-          <a href="/posts/{post.slug}">
-            <span class="title">{post.title}</span>
-          </a>
-        </li>
-      {/each}
-    </ul>
-  {/if}
+  <ul class="posts">
+    {#each data.posts as post (post._id)}
+      <li>
+        {#if post.date}<span class="year">{formatDate(post.date)}</span>{/if}
+        <a href="/posts/{post.slug}">
+          <span class="title">{post.title}</span>
+        </a>
+      </li>
+    {/each}
+    <li class="index">
+      <a href="/index">index</a>
+    </li>
+  </ul>
 </main>
 
 <style lang="scss">
@@ -83,6 +84,25 @@
     .year {
       flex-shrink: 0;
       color: var(--foreground);
+    }
+
+    // The index row is a post row in every dimension — same padding, same row
+    // box — but carries the mono/small type of the site chrome, centred. Its
+    // height is unchanged by the smaller font: the inherited line-height is a
+    // computed length (body's 1.4em, resolved against the base font size).
+    li.index {
+      justify-content: center;
+      border-top: 1px solid var(--foreground);
+      font-family: var(--font-stack-mono);
+      font-size: var(--font-size-small);
+
+      a {
+        font-weight: normal;
+
+        &:hover {
+          text-decoration: underline;
+        }
+      }
     }
   }
 </style>

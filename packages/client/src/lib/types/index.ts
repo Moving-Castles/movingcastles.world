@@ -15,6 +15,15 @@ export interface PostListItem extends Pick<PostDocument, '_id' | 'title' | 'date
   featuredImage?: ExpandedImage
 }
 
+// Shape returned by `postIndexQuery` — the Post index singleton, its post
+// references resolved to listing items. `title` is optional here even though
+// the cms marks it required: the query falls back to an empty index when the
+// singleton does not exist yet.
+export interface PostIndex {
+  title?: string
+  posts: PostListItem[]
+}
+
 // A bibliography entry on a post; the text cites it via `cite` annotations
 // that anchor-link to #ref-{id} in the rendered end notes.
 export type BibReference = NonNullable<PostDocument['references']>[number]
