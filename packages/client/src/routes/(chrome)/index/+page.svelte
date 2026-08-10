@@ -25,7 +25,14 @@
       <tbody>
         {#each data.index.posts as post (post._id)}
           <tr>
-            <td class="date">{formatDate(post.date)}</td>
+            <!-- The date's link is a touch target only (see the styles): inert
+                 on pointer devices, and hidden from assistive tech, which reads
+                 the title link beside it. -->
+            <td class="date">
+              <a href="/posts/{post.slug}" tabindex="-1" aria-hidden="true"
+                >{formatDate(post.date)}</a
+              >
+            </td>
             <td class="title"><a href="/posts/{post.slug}">{post.title}</a></td>
           </tr>
         {/each}
@@ -59,9 +66,14 @@
     color: var(--foreground);
   }
 
+  // Row metrics, shared between the cells (which carry the padding for pointer
+  // devices) and the links (which take it over on touch — see the query below).
+  $row-padding: 0.6rem;
+  $column-gap: 2.5rem;
+
   th,
   td {
-    padding: 0.6rem 0;
+    padding: $row-padding 0;
     border-bottom: 1px solid var(--foreground);
     text-align: left;
     vertical-align: baseline;
@@ -78,7 +90,15 @@
   .date {
     width: 1%;
     white-space: nowrap;
-    padding-right: 2.5rem;
+    padding-right: $column-gap;
+  }
+
+  // The date is wrapped in a link so touch devices can tap it (below). On
+  // pointer devices it stays inert, so only the title is clickable.
+  .date a {
+    color: inherit;
+    text-decoration: none;
+    pointer-events: none;
   }
 
   .title a {
@@ -88,6 +108,31 @@
 
     &:hover {
       text-decoration: underline;
+    }
+  }
+
+  // Touch devices get the whole row as a tap target. The cells hand their
+  // padding to the links, which then fill them and tile the row edge to edge,
+  // the column gutter folded into the date link. Stretching one overlay across
+  // the <tr> would be less work, but WebKit ignores `position: relative` on a
+  // table row and the overlay escapes to cover the viewport.
+  @media (hover: none) {
+    td {
+      padding: 0;
+    }
+
+    td a {
+      display: block;
+      padding: $row-padding 0;
+    }
+
+    td.date {
+      padding-right: 0;
+    }
+
+    td.date a {
+      padding-right: $column-gap;
+      pointer-events: auto;
     }
   }
 </style>

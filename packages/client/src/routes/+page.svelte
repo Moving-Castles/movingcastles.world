@@ -86,6 +86,21 @@
       color: var(--foreground);
     }
 
+    // Touch devices get the whole row as a tap target: the link stretches an
+    // invisible overlay across the row box. Pointer devices keep the precise
+    // target — only the title, or the index label, is clickable.
+    @media (hover: none) {
+      li {
+        position: relative;
+
+        a::after {
+          content: '';
+          position: absolute;
+          inset: 0;
+        }
+      }
+    }
+
     // The index row is a post row in every dimension — same padding, same row
     // box — but carries the mono/small type of the site chrome, centred. Its
     // height is unchanged by the smaller font: the inherited line-height is a
