@@ -58,7 +58,15 @@
 //   --- (thematic break)-> hr block
 //   lists               -> bullet / number list blocks (nested levels kept)
 //   GFM table           -> table block (cells flattened to plain text)
-//   ![alt](figures/..)  -> image block (uploaded to Sanity, alt -> caption)
+//   ![alt](figures/..)  -> image block (uploaded to Sanity, alt -> caption).
+//                          An .svg that references CSS custom properties
+//                          (var(--foreground), var(--font-stack-mono), …)
+//                          becomes a `diagram` block instead: its markup is
+//                          inlined into the document so those properties
+//                          resolve against the site stylesheet and the figure
+//                          follows the day/night toggle. Served through <img>
+//                          they could not — see ./inline-svg.mjs. An .svg
+//                          without them is an ordinary image and is uploaded.
 //   ```image fence      -> image block with the full field set of the cms
 //                          image type (YAML):
 //                            src: figures/foo.png (required, relative to the md)
@@ -134,6 +142,7 @@ import remarkFrontmatter from 'remark-frontmatter'
 import {toString as mdToString} from 'mdast-util-to-string'
 import YAML from 'yaml'
 import {createClient} from '@sanity/client'
+import {inlineSvg, needsInlining} from './inline-svg.mjs'
 
 // Pick up SANITY_TOKEN (and optional overrides) from the repo-root .env.
 // Variables already present in the environment take precedence.
@@ -449,14 +458,51 @@ const uploadImageAsset = async (relPath) => {
   return {_type: 'reference', _ref: uploadCache[sha]}
 }
 
+// An svg figure that wants the site's tokens has to be in the DOM to see
+// them, so its markup travels in the document rather than as an uploaded
+// asset. Returns null for anything that isn't such a figure, leaving the
+// caller on the ordinary image path.
+const diagramBlock = (relPath, {caption, smallMargin} = {}) => {
+  const file = path.resolve(mdDir, relPath)
+  if (path.extname(file).toLowerCase() !== '.svg' || !fs.existsSync(file)) return null
+
+  const source = fs.readFileSync(file, 'utf8')
+  if (!needsInlining(source)) return null
+
+  // Deterministic, so re-publishing an unchanged figure doesn't churn the
+  // document (and so ids stay stable across ssr and hydration).
+  const scopeId = `dg${crypto.createHash('sha1').update(relPath).digest('hex').slice(0, 8)}`
+  let inlined
+  try {
+    inlined = inlineSvg(source, scopeId)
+  } catch (error) {
+    throw new Error(`${relPath}: ${error.message}`)
+  }
+  console.log(`inlining ${relPath} (themed svg)…`)
+
+  return {
+    _type: 'diagram',
+    _key: makeKey(`diagram:${relPath}`),
+    markup: inlined.markup,
+    width: inlined.width,
+    height: inlined.height,
+    ...(caption && {caption}),
+    ...(smallMargin && {smallMargin: true}),
+  }
+}
+
 const imageBlock = async (node) => {
   const rel = node.url.replace(/^\//, '')
+  const caption = node.alt?.trim() || undefined
+
+  const diagram = diagramBlock(rel, {caption})
+  if (diagram) return diagram
+
   const asset = await uploadImageAsset(rel)
   if (!asset) {
     warn(`image not found, skipped: ${node.url}`)
     return null
   }
-  const caption = node.alt?.trim() || undefined
 
   return {
     _type: 'image',
@@ -477,7 +523,23 @@ const imageFenceBlock = async (node) => {
     if (!known.has(key)) warn(`image fence: unknown field "${key}" ignored`)
   }
   if (!config.src) throw new Error('image fence needs `src`')
-  const asset = await uploadImageAsset(String(config.src).replace(/^\//, ''))
+
+  const src = String(config.src).replace(/^\//, '')
+  const diagram = diagramBlock(src, {
+    caption: config.caption && String(config.caption),
+    smallMargin: config.smallMargin,
+  })
+  if (diagram) {
+    // The remaining fields are about bitmaps: a themed svg follows the toggle
+    // by itself, so a day variant and a duotone remap have nothing to act on,
+    // and silently dropping them would hide a mistaken expectation.
+    for (const field of ['dayImage', 'duotone', 'largeView']) {
+      if (config[field]) throw new Error(`\`${field}\` does not apply to an inlined svg: ${src}`)
+    }
+    return diagram
+  }
+
+  const asset = await uploadImageAsset(src)
   if (!asset) throw new Error(`image not found: ${config.src}`)
   let dayImage
   if (config.dayImage) {

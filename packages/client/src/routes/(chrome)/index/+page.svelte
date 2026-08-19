@@ -6,9 +6,6 @@
 
   let {data}: {data: PageData} = $props()
 
-  // The cms title names the page (browser tab, share previews); fall back to
-  // "Index" when the singleton has not been created yet.
-  const title = $derived(data.index.title || 'Index')
 </script>
 
 <Metadata title={`index | ${SITE_NAME}`} />

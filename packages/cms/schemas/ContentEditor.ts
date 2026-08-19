@@ -10,6 +10,7 @@ import {
   MdFormatQuote,
   MdUnfoldMore,
   MdNotes,
+  MdSchema,
 } from 'react-icons/md'
 
 // The text block and object members are defined once and shared between the
@@ -368,6 +369,54 @@ const objectMembers = [
           title: heading || caption || (header ?? []).join(' | ') || 'Table',
           subtitle: `Table — ${count} row${count === 1 ? '' : 's'}`,
         }
+      },
+    },
+  },
+  {
+    type: 'object',
+    name: 'diagram',
+    title: 'Diagram',
+    icon: MdSchema,
+    description:
+      'A vector figure inlined into the page, so it can draw with the site’s foreground colour and mono stack and follow the day/night toggle.',
+    fields: [
+      {
+        title: 'SVG markup',
+        name: 'markup',
+        type: 'text',
+        rows: 10,
+        description:
+          'Inlined into the page as-is. Normally written by the report publishing script, which scopes the figure’s ids and styles so they cannot leak into the rest of the page — hand-edited markup has to keep that scoping intact.',
+        validation: (Rule: any) => Rule.required(),
+      },
+      {
+        title: 'Intrinsic width',
+        name: 'width',
+        type: 'number',
+        description: 'Viewbox width, used with the height to reserve the figure’s space.',
+      },
+      {
+        title: 'Intrinsic height',
+        name: 'height',
+        type: 'number',
+      },
+      {
+        title: 'Caption',
+        name: 'caption',
+        type: 'text',
+      },
+      {
+        title: 'Small vertical margin',
+        name: 'smallMargin',
+        type: 'boolean',
+        description: 'Tighten the space above and below the diagram.',
+        initialValue: false,
+      },
+    ],
+    preview: {
+      select: {title: 'caption'},
+      prepare({title}: {title?: string}) {
+        return {title: title || 'Diagram', subtitle: 'Diagram — inline svg'}
       },
     },
   },

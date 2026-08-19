@@ -8,6 +8,7 @@
   import TranscriptBlock from './blocks/TranscriptBlock.svelte'
   import TableBlock from './blocks/TableBlock.svelte'
   import ChartBlock from './blocks/ChartBlock.svelte'
+  import DiagramBlock from './blocks/DiagramBlock.svelte'
   import DetailsBlock from './blocks/DetailsBlock.svelte'
   import AbstractBlock from './blocks/AbstractBlock.svelte'
 
@@ -22,6 +23,7 @@
     transcript: TranscriptBlock,
     table: TableBlock,
     chart: ChartBlock,
+    diagram: DiagramBlock,
     details: DetailsBlock,
     abstract: AbstractBlock,
   }
