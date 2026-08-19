@@ -41,6 +41,7 @@
     margin: 0;
     margin-top: 2em;
     margin-bottom: 2em;
+    user-select: none;
   }
 
   figure.small-vertical-margin {
