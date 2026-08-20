@@ -412,6 +412,14 @@ const objectMembers = [
         description: 'Tighten the space above and below the diagram.',
         initialValue: false,
       },
+      {
+        title: 'Allow large view',
+        name: 'largeView',
+        type: 'boolean',
+        description:
+          'Show a + button that opens the diagram in a viewport-sized lightbox. Useful for a figure whose detail does not survive being scaled down to the reading column.',
+        initialValue: false,
+      },
     ],
     preview: {
       select: {title: 'caption'},

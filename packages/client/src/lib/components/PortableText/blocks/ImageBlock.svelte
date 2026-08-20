@@ -34,13 +34,15 @@
 {#if nightUrl}
   <figure class:small-vertical-margin={value.smallMargin} class:duotone={value.duotone}>
     {#if value.largeView}
-      <MediaFrame expandable>
+      <MediaFrame expandable clickToExpand caption={value.caption}>
         {@render images()}
       </MediaFrame>
     {:else}
       {@render images()}
     {/if}
-    {#if value.caption}<figcaption>{value.caption}</figcaption>{/if}
+    <!-- MediaFrame renders the caption when it wraps the media, so the
+         control can sit inline with the caption text. -->
+    {#if !value.largeView && value.caption}<figcaption>{value.caption}</figcaption>{/if}
   </figure>
 {/if}
 
@@ -90,6 +92,6 @@
   /* Lightbox: viewport cap while the MediaFrame around the image is
      expanded. */
   :global(.expanded) img {
-    max-height: calc(100vh - 6rem);
+    max-height: var(--lightbox-height, calc(100vh - 6rem));
   }
 </style>

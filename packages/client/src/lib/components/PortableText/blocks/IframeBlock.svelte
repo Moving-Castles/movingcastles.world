@@ -28,13 +28,16 @@
 {#if value.url}
   <figure class:small-vertical-margin={value.smallMargin}>
     {#if value.largeView}
-      <MediaFrame wide expandable>
+      <!-- No clickToExpand: an embed needs its own clicks. -->
+      <MediaFrame wide expandable caption={value.caption}>
         {@render frame()}
       </MediaFrame>
     {:else}
       {@render frame()}
     {/if}
-    {#if value.caption}<figcaption>{value.caption}</figcaption>{/if}
+    <!-- MediaFrame renders the caption when it wraps the media, so the
+         control can sit inline with the caption text. -->
+    {#if !value.largeView && value.caption}<figcaption>{value.caption}</figcaption>{/if}
   </figure>
 {/if}
 
@@ -50,7 +53,7 @@
      applies. */
   :global(.expanded) iframe {
     width: calc(100vw - 6rem);
-    height: calc(100vh - 6rem);
+    height: var(--lightbox-height, calc(100vh - 6rem));
     aspect-ratio: auto !important;
   }
 </style>

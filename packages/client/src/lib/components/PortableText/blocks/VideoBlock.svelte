@@ -99,7 +99,8 @@
 
 {#if value.asset?.url}
   <figure class:small-vertical-margin={value.smallMargin}>
-    <MediaFrame player expandable={value.largeView} bind:element={playerEl}>
+    <!-- No clickToExpand: the player's controls need their own clicks. -->
+    <MediaFrame player expandable={value.largeView} caption={value.caption} bind:element={playerEl}>
       <!-- Autoplay implies muted + loop (browsers block unmuted autoplay) and
            no controls. With a flash warning the autoplay attribute is
            withheld — playback starts only when the warning is dismissed. -->
@@ -172,7 +173,6 @@
         </div>
       {/if}
     </MediaFrame>
-    {#if value.caption}<figcaption>{value.caption}</figcaption>{/if}
   </figure>
 {/if}
 
@@ -295,7 +295,7 @@
   /* Lightbox: leave room for the control bar below the video while the
      MediaFrame around the player is expanded. */
   :global(.expanded) video {
-    max-height: calc(100vh - 6rem - 2.5rem);
+    max-height: calc(var(--lightbox-height, calc(100vh - 6rem)) - 2.5rem);
     width: auto;
     height: auto;
   }

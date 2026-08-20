@@ -91,11 +91,11 @@
        graph nodes). Five slots, assigned in fixed A–E order, never cycled.
        Each theme steps the same five hues for its own surface; both sets are
        validated for colorblind separation and contrast (dataviz six checks). */
-    --entity-color-a: #0b63a5; /* azure */
+    --entity-color-a: #0B63A5; /* azure */
     --entity-color-b: #c98500; /* amber */
     --entity-color-c: #d55181; /* rose */
-    --entity-color-d: var(--foreground); /* violet */
-    --entity-color-e: var(--foreground); /* red */
+    --entity-color-d: #F26419; /* violet */
+    --entity-color-e: #758E4F; /* red */
 }
 
 /* Day theme — applied when the toggle sets data-theme="day" on <html>. The grey

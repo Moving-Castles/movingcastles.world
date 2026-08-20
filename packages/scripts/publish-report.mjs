@@ -74,7 +74,9 @@
 //                            dayImage: figures/foo-day.png (light-mode variant)
 //                            smallMargin: true    (tighten vertical space)
 //                            duotone: true        (duotone on tinted background)
-//                            largeView: true      (+ button opens a lightbox)
+//                            largeView: true      (+ button opens a lightbox;
+//                                                  the one field that also
+//                                                  applies to a diagram)
 //   §5 / §6.1           -> section references: linked to the heading whose
 //                          text starts with that number ("5. Reinforcement
 //                          learning", "6.1 Method"). Unknown numbers fail
@@ -462,7 +464,7 @@ const uploadImageAsset = async (relPath) => {
 // them, so its markup travels in the document rather than as an uploaded
 // asset. Returns null for anything that isn't such a figure, leaving the
 // caller on the ordinary image path.
-const diagramBlock = (relPath, {caption, smallMargin} = {}) => {
+const diagramBlock = (relPath, {caption, smallMargin, largeView} = {}) => {
   const file = path.resolve(mdDir, relPath)
   if (path.extname(file).toLowerCase() !== '.svg' || !fs.existsSync(file)) return null
 
@@ -488,6 +490,7 @@ const diagramBlock = (relPath, {caption, smallMargin} = {}) => {
     height: inlined.height,
     ...(caption && {caption}),
     ...(smallMargin && {smallMargin: true}),
+    ...(largeView && {largeView: true}),
   }
 }
 
@@ -528,12 +531,14 @@ const imageFenceBlock = async (node) => {
   const diagram = diagramBlock(src, {
     caption: config.caption && String(config.caption),
     smallMargin: config.smallMargin,
+    largeView: config.largeView,
   })
   if (diagram) {
     // The remaining fields are about bitmaps: a themed svg follows the toggle
     // by itself, so a day variant and a duotone remap have nothing to act on,
-    // and silently dropping them would hide a mistaken expectation.
-    for (const field of ['dayImage', 'duotone', 'largeView']) {
+    // and silently dropping them would hide a mistaken expectation. largeView
+    // is not one of them — it is about size, not theming, and applies here.
+    for (const field of ['dayImage', 'duotone']) {
       if (config[field]) throw new Error(`\`${field}\` does not apply to an inlined svg: ${src}`)
     }
     return diagram
