@@ -116,7 +116,7 @@
 
     // A middot joins the two, drawn only when the code follows the date.
     .date + .project-code::before {
-      content: '·';
+      content: '/';
       margin-right: 0.5em;
     }
   }

@@ -82,6 +82,8 @@ export const postIndexQuery = `
 					title,
 					"slug": slug.current,
 					date,
+					projectCode,
+					categories,
 					authors
 				},
 				[]

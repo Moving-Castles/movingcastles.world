@@ -15,13 +15,22 @@ export interface PostListItem extends Pick<PostDocument, '_id' | 'title' | 'date
   featuredImage?: ExpandedImage
 }
 
+// A row of the post index. The project code and categories are selected by
+// `postIndexQuery` only — the frontpage listing does not ask for them, so they
+// stay off `PostListItem` rather than being optionals that are always absent
+// there.
+export interface PostIndexItem extends PostListItem {
+  projectCode?: string
+  categories?: string[]
+}
+
 // Shape returned by `postIndexQuery` — the Post index singleton, its post
 // references resolved to listing items. `title` is optional here even though
 // the cms marks it required: the query falls back to an empty index when the
 // singleton does not exist yet.
 export interface PostIndex {
   title?: string
-  posts: PostListItem[]
+  posts: PostIndexItem[]
 }
 
 // A bibliography entry on a post; the text cites it via `cite` annotations

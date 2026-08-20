@@ -51,6 +51,16 @@ export default {
       type: 'date',
     },
     {
+      title: 'Categories',
+      name: 'categories',
+      type: 'array',
+      of: [{type: 'string'}],
+      // `tags` gives the studio a single tag-style input rather than a list of
+      // rows, which is how these are actually authored.
+      options: {layout: 'tags'},
+      description: 'Free-form tags, listed in the last column of the index.',
+    },
+    {
       title: 'Meta description',
       name: 'metaDescription',
       type: 'text',

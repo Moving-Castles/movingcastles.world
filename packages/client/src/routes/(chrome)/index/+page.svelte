@@ -14,8 +14,10 @@
     <table>
       <thead>
         <tr>
+          <th class="code">#</th>
           <th class="date">date</th>
           <th class="title">title</th>
+          <th class="categories"></th>
         </tr>
       </thead>
       <tbody>
@@ -24,12 +26,22 @@
             <!-- The date's link is a touch target only (see the styles): inert
                  on pointer devices, and hidden from assistive tech, which reads
                  the title link beside it. -->
+            <td class="code">
+              <a href="/posts/{post.slug}" tabindex="-1" aria-hidden="true"
+                >{post.projectCode ?? ''}</a
+              >
+            </td>
             <td class="date">
               <a href="/posts/{post.slug}" tabindex="-1" aria-hidden="true"
                 >{formatDate(post.date)}</a
               >
             </td>
             <td class="title"><a href="/posts/{post.slug}">{post.title}</a></td>
+            <td class="categories">
+              <a href="/posts/{post.slug}" tabindex="-1" aria-hidden="true"
+                >{post.categories?.join(', ') ?? ''}</a
+              >
+            </td>
           </tr>
         {/each}
       </tbody>
@@ -82,19 +94,54 @@
     font-weight: normal;
   }
 
-  // Shrink the date column to its own content; the title column takes the rest.
+  td {
+    font-family: var(--font-stack-mono);
+    font-size: var(--font-size-small);
+  }
+
+  // Shrink the code and date columns to their own content; the title column
+  // takes the rest.
+  .code,
   .date {
     width: 1%;
     white-space: nowrap;
     padding-right: $column-gap;
   }
 
-  // The date is wrapped in a link so touch devices can tap it (below). On
-  // pointer devices it stays inert, so only the title is clickable.
-  .date a {
+  // Both are wrapped in links so touch devices can tap them (below). On
+  // pointer devices they stay inert, so only the title is clickable.
+  .code a,
+  .date a,
+  .categories a {
     color: inherit;
     text-decoration: none;
     pointer-events: none;
+  }
+
+  // The title column takes the slack, so it needs the gutter now that it is no
+  // longer last. Categories shrink to their content and land against the right
+  // edge; they are allowed to wrap, so a long list narrows the title rather
+  // than pushing the table wider than the column.
+  .title {
+    padding-right: $column-gap;
+  }
+
+  // Categories are left to the table's own sizing: the column shares the slack
+  // with the title rather than being pinned narrow, which collapsed it to its
+  // longest word and wrapped short lists for no reason.
+
+  // Four columns need about 510px of viewport before the two nowrap columns
+  // and the three gutters stop fitting; below that the categories go, being
+  // the least load-bearing of the four. Measured floor is a 479px table.
+  @media (max-width: 560px) {
+    .categories {
+      display: none;
+    }
+
+    // the title is last again, so it gives the gutter back
+    .title {
+      padding-right: 0;
+    }
   }
 
   .title a {
@@ -122,12 +169,20 @@
       padding: $row-padding 0;
     }
 
-    td.date {
+    td.code,
+    td.date,
+    td.title {
       padding-right: 0;
     }
 
-    td.date a {
+    td.code a,
+    td.date a,
+    td.title a {
       padding-right: $column-gap;
+      pointer-events: auto;
+    }
+
+    td.categories a {
       pointer-events: auto;
     }
   }
