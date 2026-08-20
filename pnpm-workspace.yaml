@@ -6,9 +6,10 @@ allowBuilds:
 minimumReleaseAgeExclude:
   - prettier-plugin-svelte@4.1.1
   - '@sveltejs/kit@2.67.0 || 2.69.3'
-  - vite@8.1.0
+  - vite@8.1.0 || 8.2.2
   - '@sveltejs/load-config@0.2.0'
   - svelte-check@4.7.1
   - svelte@5.56.4 || 5.56.5
-  - sanity-plugin-mux-input@5.0.2 || 5.0.9
+  - sanity-plugin-mux-input@5.0.2 || 5.0.9 || 5.0.11
   - '@sanity/ui@4.0.0'
+  - '@sanity/client@8.2.0'

@@ -137,6 +137,15 @@ export type ContentEditor = {
         _key: string
       }
     | {
+        markup: string
+        width?: number
+        height?: number
+        caption?: string
+        smallMargin?: boolean
+        _type: 'diagram'
+        _key: string
+      }
+    | {
         chartType: 'line' | 'histogram'
         data: string
         xLabel?: string
@@ -269,6 +278,15 @@ export type ContentEditor = {
               }>
               caption?: string
               _type: 'table'
+              _key: string
+            }
+          | {
+              markup: string
+              width?: number
+              height?: number
+              caption?: string
+              smallMargin?: boolean
+              _type: 'diagram'
               _key: string
             }
           | {

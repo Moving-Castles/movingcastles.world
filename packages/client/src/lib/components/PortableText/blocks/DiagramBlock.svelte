@@ -19,16 +19,11 @@
   }
 
   let {value}: {value: DiagramValue} = $props()
-
-  // Diagrams are laid out at their intrinsic width (the reading column), so
-  // scaling one down far below that shrinks its labels past legibility. Below
-  // that width the figure keeps its size and the frame scrolls instead.
-  const minWidth = $derived(value.width ? `${Math.round(value.width * 0.78)}px` : undefined)
 </script>
 
 {#if value.markup}
   <figure class:small-vertical-margin={value.smallMargin}>
-    <div class="frame" style:--diagram-min-width={minWidth}>
+    <div class="frame">
       <!-- eslint-disable-next-line svelte/no-at-html-tags -->
       {@html value.markup}
     </div>
@@ -49,21 +44,17 @@
     margin-bottom: 0.5em;
   }
 
-  .frame {
-    overflow-x: auto;
-    /* Keep the scrollbar (when there is one) off the artwork. */
-    padding-bottom: 0.5rem;
-  }
+  /* A diagram always fits the reading column: it scales to the available
+     width and takes whatever height its own aspect ratio gives. Nothing
+     overflows, so the frame needs no scrolling of its own.
 
-  /* :global because the svg is injected as html and so carries no scoping
-     class of its own. Width/height come from the markup's own attributes, so
-     the box keeps its aspect ratio before and after paint. */
+     :global because the svg is injected as html and so carries no scoping
+     class of its own. The intrinsic width/height on the markup keep the box's
+     aspect ratio reserved before and after paint. */
   .frame :global(svg) {
     display: block;
     width: 100%;
     height: auto;
-    min-width: var(--diagram-min-width, 0);
-    margin-inline: auto;
   }
 
   figcaption {

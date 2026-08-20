@@ -92,8 +92,8 @@
     --entity-color-a: #0b63a5; /* azure */
     --entity-color-b: #c98500; /* amber */
     --entity-color-c: #d55181; /* rose */
-    --entity-color-d: #9085e9; /* violet */
-    --entity-color-e: #e34948; /* red */
+    --entity-color-d: var(--foreground); /* violet */
+    --entity-color-e: var(--foreground); /* red */
 }
 
 /* Day theme — applied when the toggle sets data-theme="day" on <html>. The grey
