@@ -177,17 +177,6 @@
 {/if}
 
 <style>
-  figure {
-    margin: 0;
-    margin-top: 2em;
-    margin-bottom: 2em;
-  }
-
-  figure.small-vertical-margin {
-    margin-top: 1em;
-    margin-bottom: 0.5em;
-  }
-
   video {
     display: block;
     max-width: 100%;
@@ -320,14 +309,5 @@
     width: 100%;
     max-height: none;
     object-fit: contain;
-  }
-
-  figcaption {
-    margin-top: 0.5rem;
-    margin-bottom: 1rem;
-    color: var(--foreground);
-    font-family: var(--font-stack-mono);
-    font-size: var(--font-size-small);
-    line-height: var(--line-height-base);
   }
 </style>

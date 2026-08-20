@@ -54,12 +54,6 @@
 {/if}
 
 <style>
-  figure {
-    margin: 0;
-    margin-top: 2em;
-    margin-bottom: 2em;
-  }
-
   .head {
     margin-bottom: 0.75em;
     font-family: var(--font-stack-mono);
@@ -102,14 +96,5 @@
 
   td {
     border-bottom: 1px dashed var(--foreground);
-  }
-
-  figcaption {
-    margin-top: 0.5rem;
-    margin-bottom: 1rem;
-    color: var(--foreground);
-    font-family: var(--font-stack-mono);
-    font-size: var(--font-size-small);
-    line-height: var(--line-height-base);
   }
 </style>

@@ -32,16 +32,10 @@
 {/if}
 
 <style>
+  /* Diagrams are traced with a finger on touch devices, so the markup must
+     not be selectable; the rhythm and caption come from app.css. */
   figure {
-    margin: 0;
-    margin-top: 2em;
-    margin-bottom: 2em;
     user-select: none;
-  }
-
-  figure.small-vertical-margin {
-    margin-top: 1em;
-    margin-bottom: 0.5em;
   }
 
   /* A diagram always fits the reading column: it scales to the available
@@ -55,14 +49,5 @@
     display: block;
     width: 100%;
     height: auto;
-  }
-
-  figcaption {
-    margin-top: 0.5rem;
-    margin-bottom: 1rem;
-    color: var(--foreground);
-    font-family: var(--font-stack-mono);
-    font-size: var(--font-size-small);
-    line-height: var(--line-height-base);
   }
 </style>

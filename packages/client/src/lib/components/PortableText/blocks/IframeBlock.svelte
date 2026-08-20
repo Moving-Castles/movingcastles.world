@@ -39,17 +39,6 @@
 {/if}
 
 <style>
-  figure {
-    margin: 0;
-    margin-top: 2em;
-    margin-bottom: 2em;
-  }
-
-  figure.small-vertical-margin {
-    margin-top: 1em;
-    margin-bottom: 0.5em;
-  }
-
   iframe {
     display: block;
     width: 100%;
@@ -63,14 +52,5 @@
     width: calc(100vw - 6rem);
     height: calc(100vh - 6rem);
     aspect-ratio: auto !important;
-  }
-
-  figcaption {
-    margin-top: 0.5rem;
-    margin-bottom: 1rem;
-    color: var(--foreground);
-    font-family: var(--font-stack-mono);
-    font-size: var(--font-size-small);
-    line-height: var(--line-height-base);
   }
 </style>

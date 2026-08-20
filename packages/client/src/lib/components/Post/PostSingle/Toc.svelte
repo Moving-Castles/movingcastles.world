@@ -141,8 +141,8 @@
       max-height: calc(100vh - 8rem);
       overflow-y: auto;
       font-family: var(--font-stack-mono);
-      font-size: 12px;
-      line-height: var(--line-height-base);
+      font-size: var(--font-size-extra-small);
+      line-height: var(--line-height-small);
     }
   }
 

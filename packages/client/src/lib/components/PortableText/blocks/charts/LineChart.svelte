@@ -2,28 +2,20 @@
   import {bisectCenter, extent} from 'd3-array'
   import {scaleLinear} from 'd3-scale'
   import {line as lineShape} from 'd3-shape'
+  import ChartFrame from './ChartFrame.svelte'
   import {formatValue} from './format'
+  import {
+    HEIGHT,
+    MARGIN,
+    Y_TICK_COUNT,
+    marginLeftFor,
+    plotWidth,
+    readoutKey,
+    xTickCountFor,
+  } from './plot'
   import type {LineData} from './types'
 
   let {data, xLabel, yLabel}: {data: LineData; xLabel?: string; yLabel?: string} = $props()
-
-  const HEIGHT = 360
-  // The slim right margin only keeps the last x tick label from clipping;
-  // the plot fills the full column width. The left margin is computed from
-  // the y tick labels below.
-  const MARGIN = {top: 24, right: 16, bottom: 44}
-
-  // Left-margin anatomy: a fixed gutter for the rotated axis label, then the
-  // widest y tick label (monospace ticks, so width is chars × advance), then
-  // the gap between tick labels and the plot edge.
-  const LABEL_GUTTER = 24
-  const TICK_CHAR_WIDTH = 7.2 // Berkeley Mono advance at the 12px tick size
-  const TICK_GAP = 8
-
-  // Nice the y domain to the same count the ticks use, so the top gridline
-  // always sits at (not below) the domain ceiling and lines never overshoot
-  // the last labelled tick.
-  const Y_TICK_COUNT = 5
 
   // Series identity: the entity colors (app.css --entity-color-a…e), assigned
   // in fixed order, or pinned per series via `color`. A single unassigned
@@ -37,10 +29,8 @@
   const hatchId = `band-hatch-${uid}`
   const hatchFill = `url(#${hatchId})`
 
-  // The rendered width tracks the container so axis text keeps a constant
-  // on-screen size; the server renders the 640 default and hydration adjusts.
   let clientWidth: number | undefined = $state()
-  const width = $derived(clientWidth ? Math.max(clientWidth, 280) : 640)
+  const width = $derived(plotWidth(clientWidth))
 
   const series = $derived((data.series ?? []).filter((s) => s.points?.length))
   const strokes = $derived(
@@ -75,17 +65,12 @@
   // the whole axis (0.15, 0.20 — never a mix of 0.15 and 0.2).
   const yTicks = $derived(y.ticks(Y_TICK_COUNT))
   const formatYTick = $derived(y.tickFormat(Y_TICK_COUNT))
-
-  const marginLeft = $derived(
-    LABEL_GUTTER +
-      Math.max(1, ...yTicks.map((tick) => formatYTick(tick).length)) * TICK_CHAR_WIDTH +
-      TICK_GAP,
-  )
+  const marginLeft = $derived(marginLeftFor(yTicks.map(formatYTick)))
 
   const x = $derived(
     scaleLinear(domainOf(allPoints.map((p) => p[0])), [marginLeft, width - MARGIN.right]),
   )
-  const xTickCount = $derived(width < 480 ? 4 : 6)
+  const xTickCount = $derived(xTickCountFor(width))
   const xTicks = $derived(x.ticks(xTickCount))
   const formatXTick = $derived(x.tickFormat(xTickCount))
 
@@ -125,21 +110,9 @@
   }
 
   const onKeydown = (event: KeyboardEvent) => {
-    if (!hoverXs.length) return
-    if (event.key === 'Escape') {
-      hoverX = null
-      return
-    }
-    if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return
-    event.preventDefault()
-    const step = event.key === 'ArrowRight' ? 1 : -1
-    const index =
-      hoverX === null
-        ? step === 1
-          ? 0
-          : hoverXs.length - 1
-        : Math.min(Math.max(hoverXs.indexOf(hoverX) + step, 0), hoverXs.length - 1)
-    hoverX = hoverXs[index]
+    const next = readoutKey(event, hoverXs.length, hoverX === null ? null : hoverXs.indexOf(hoverX))
+    if (next === undefined) return
+    hoverX = next === null ? null : hoverXs[next]
   }
 
   const tooltipLeft = $derived(hoverX === null ? 0 : x(hoverX))
@@ -147,43 +120,51 @@
 </script>
 
 {#if series.length}
-  <div class="chart" bind:clientWidth>
-    {#if series.length > 1 || labeledBands.length}
-      <div class="legend">
-        {#each series as s, i (i)}
-          <span class="key">
-            <svg width="20" height="4" aria-hidden="true">
-              <line x1="0" y1="2" x2="20" y2="2" style:stroke={strokes[i]} />
-            </svg>
-            {s.label ?? `Series ${i + 1}`}
-          </span>
-        {/each}
-        {#each labeledBands as band, i (i)}
-          <span class="key">
-            <svg width="14" height="10" aria-hidden="true">
-              <rect class="band" width="14" height="10" fill={hatchFill} />
-            </svg>
-            {band.label}
-          </span>
-        {/each}
-      </div>
-    {/if}
+  <ChartFrame
+    bind:clientWidth
+    {width}
+    {marginLeft}
+    {x}
+    {y}
+    {xTicks}
+    {yTicks}
+    {formatXTick}
+    {formatYTick}
+    {xLabel}
+    {yLabel}
+    ariaLabel={['Line chart', yLabel && `of ${yLabel}`, xLabel && `by ${xLabel}`]
+      .filter(Boolean)
+      .join(' ')}
+    tooltip={readout && hoverX !== null ? {left: tooltipLeft, flipped: tooltipFlipped} : null}
+    onpointermove={onPointerMove}
+    onpointerleave={() => (hoverX = null)}
+    onkeydown={onKeydown}
+    onblur={() => (hoverX = null)}
+  >
+    {#snippet legend()}
+      {#if series.length > 1 || labeledBands.length}
+        <div class="legend">
+          {#each series as s, i (i)}
+            <span class="key">
+              <svg width="20" height="4" aria-hidden="true">
+                <line x1="0" y1="2" x2="20" y2="2" style:stroke={strokes[i]} />
+              </svg>
+              {s.label ?? `Series ${i + 1}`}
+            </span>
+          {/each}
+          {#each labeledBands as band, i (i)}
+            <span class="key">
+              <svg width="14" height="10" aria-hidden="true">
+                <rect class="band" width="14" height="10" fill={hatchFill} />
+              </svg>
+              {band.label}
+            </span>
+          {/each}
+        </div>
+      {/if}
+    {/snippet}
 
-    <!-- The chart is a keyboard-operable widget: arrow keys move the readout,
-         Escape clears it — hence the tabindex the a11y rule objects to. -->
-    <!-- svelte-ignore a11y_no_noninteractive_tabindex, a11y_no_noninteractive_element_interactions -->
-    <svg
-      viewBox="0 0 {width} {HEIGHT}"
-      role="application"
-      aria-label={['Line chart', yLabel && `of ${yLabel}`, xLabel && `by ${xLabel}`]
-        .filter(Boolean)
-        .join(' ')}
-      tabindex="0"
-      onpointermove={onPointerMove}
-      onpointerleave={() => (hoverX = null)}
-      onkeydown={onKeydown}
-      onblur={() => (hoverX = null)}
-    >
+    {#snippet defs()}
       <defs>
         <!-- Diagonal hatch for the reference bands: a texture reads as an
              annotated region rather than as a plotted quantity, which a solid
@@ -200,13 +181,10 @@
           <line class="hatch" x1="3" y1="0" x2="3" y2="6" />
         </pattern>
       </defs>
+    {/snippet}
 
-      {#each yTicks as tick (tick)}
-        <line class="grid" x1={marginLeft} x2={width - MARGIN.right} y1={y(tick)} y2={y(tick)} />
-        <text class="tick y" x={marginLeft - TICK_GAP} y={y(tick)}>{formatYTick(tick)}</text>
-      {/each}
-
-      <!-- Reference bands sit behind the series lines. -->
+    <!-- Reference bands sit behind the series lines. -->
+    {#snippet underlay()}
       {#each bands as band, i (i)}
         <rect
           class="band"
@@ -217,35 +195,9 @@
           height={Math.max(y(band.y0) - y(band.y1), 0)}
         />
       {/each}
+    {/snippet}
 
-      <line
-        class="axis"
-        x1={marginLeft}
-        x2={width - MARGIN.right}
-        y1={HEIGHT - MARGIN.bottom}
-        y2={HEIGHT - MARGIN.bottom}
-      />
-      {#each xTicks as tick (tick)}
-        <text class="tick x" x={x(tick)} y={HEIGHT - MARGIN.bottom + 18}>{formatXTick(tick)}</text>
-      {/each}
-
-      <!-- Rotated to read bottom-to-top along the axis, centered on the plot. -->
-      {#if yLabel}
-        <text
-          class="axis-label y"
-          transform="rotate(-90)"
-          x={-(MARGIN.top + HEIGHT - MARGIN.bottom) / 2}
-          y="14"
-        >
-          {yLabel}
-        </text>
-      {/if}
-      {#if xLabel}
-        <text class="axis-label x" x={(marginLeft + width - MARGIN.right) / 2} y={HEIGHT - 6}>
-          {xLabel}
-        </text>
-      {/if}
-
+    {#snippet overlay()}
       {#each series as s, i (i)}
         <path class="series" d={path(s.points)} style:stroke={strokes[i]} />
       {/each}
@@ -270,10 +222,10 @@
           {/if}
         {/each}
       {/if}
-    </svg>
+    {/snippet}
 
-    {#if readout && hoverX !== null}
-      <div class="tooltip" class:flipped={tooltipFlipped} style="left: {tooltipLeft}px">
+    {#snippet tooltipContent()}
+      {#if readout && hoverX !== null}
         <div class="tooltip-x">{xLabel ? `${xLabel} ` : ''}{formatValue(hoverX)}</div>
         {#each readout as row, i (i)}
           {#if row.point}
@@ -288,65 +240,12 @@
             </div>
           {/if}
         {/each}
-      </div>
-    {/if}
-  </div>
+      {/if}
+    {/snippet}
+  </ChartFrame>
 {/if}
 
 <style>
-  .chart {
-    position: relative;
-  }
-
-  .chart > svg {
-    display: block;
-    width: 100%;
-    height: auto;
-    font-family: var(--font-stack-mono);
-    font-size: 12px;
-    /* Touch: a finger tracing the plot drives the readout; only vertical
-       page scrolling passes through. Restricting touch-action here also
-       disables double-tap/pinch zoom over the plot, which otherwise fires
-       erratically while tracing. */
-    touch-action: pan-y;
-  }
-
-  /* The svg is focusable for the keyboard readout, but a focus ring boxing
-     the whole plot reads as a glitch — suppress it. */
-  .chart > svg:focus {
-    outline: none;
-  }
-
-  .grid {
-    stroke: var(--foreground);
-    opacity: 0.18;
-  }
-
-  .axis {
-    stroke: var(--foreground);
-    opacity: 0.6;
-  }
-
-  .tick,
-  .axis-label {
-    fill: var(--foreground);
-  }
-
-  .tick {
-    font-variant-numeric: tabular-nums;
-  }
-
-  .tick.y {
-    text-anchor: end;
-    dominant-baseline: middle;
-  }
-
-  .tick.x,
-  .axis-label.x,
-  .axis-label.y {
-    text-anchor: middle;
-  }
-
   .series {
     fill: none;
     stroke: var(--foreground);
@@ -392,29 +291,9 @@
     gap: 0.5em;
   }
 
-  .legend line,
-  .tooltip line {
+  .legend line {
     stroke: var(--foreground);
     stroke-width: 2;
-  }
-
-  .tooltip {
-    position: absolute;
-    top: 24px;
-    transform: translateX(12px);
-    padding: 0.4em 0.75em;
-    background: var(--background);
-    border: 1px dashed var(--foreground);
-    font-family: var(--font-stack-mono);
-    font-size: var(--font-size-small);
-    color: var(--foreground);
-    white-space: nowrap;
-    pointer-events: none;
-    z-index: 2;
-  }
-
-  .tooltip.flipped {
-    transform: translateX(calc(-100% - 12px));
   }
 
   .tooltip-x {
@@ -425,14 +304,5 @@
     display: flex;
     align-items: center;
     gap: 0.5em;
-  }
-
-  .tooltip-row .value {
-    font-weight: 700;
-    font-variant-numeric: tabular-nums;
-  }
-
-  .tooltip-row .label {
-    opacity: 0.7;
   }
 </style>

@@ -36,20 +36,3 @@
     {#if value.caption}<figcaption>{value.caption}</figcaption>{/if}
   </figure>
 {/if}
-
-<style>
-  figure {
-    margin: 0;
-    margin-top: 2em;
-    margin-bottom: 2em;
-  }
-
-  figcaption {
-    margin-top: 0.5rem;
-    margin-bottom: 1rem;
-    color: var(--foreground);
-    font-family: var(--font-stack-mono);
-    font-size: var(--font-size-small);
-    line-height: var(--line-height-base);
-  }
-</style>
