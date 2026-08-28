@@ -40,6 +40,9 @@
 //                                     `index` displays verbatim, "" hides it.)
 //   projectCode: MC000               (project designation, shown beside the
 //                                     publication date)
+//   categories: [training report]    (free-form tags, listed in the last
+//                                     column of the post index; a single
+//                                     string also works)
 //   externalLinks: [{label, url}, …] (related resources, e.g. a model on
 //                                     Hugging Face; rendered as a link row
 //                                     under the abstract)
@@ -783,6 +786,7 @@ const knownFrontmatter = new Set([
   'metaDescription',
   'authors',
   'projectCode',
+  'categories',
   'externalLinks',
   'showToc',
   'toc',
@@ -1093,6 +1097,22 @@ const featuredImage = await (async () => {
   }
 })()
 
+// Free-form tags, shown in the last column of the post index. A single
+// string means one tag ("training report"), not a list to split.
+const categories = (() => {
+  if (frontmatter.categories === undefined) return undefined
+  const list = Array.isArray(frontmatter.categories)
+    ? frontmatter.categories
+    : [frontmatter.categories]
+  return list.map((entry) => {
+    if (typeof entry !== 'string' || !entry.trim()) {
+      console.error(`frontmatter \`categories\` entries must be strings: ${JSON.stringify(entry)}`)
+      process.exit(1)
+    }
+    return entry.trim()
+  })
+})()
+
 // Related resources (a model card, a repository), rendered as a link row
 // under the abstract.
 const externalLinks = (() => {
@@ -1188,6 +1208,7 @@ const doc = {
     ? String(frontmatter.date).slice(0, 10)
     : new Date().toISOString().slice(0, 10),
   ...(frontmatter.projectCode && {projectCode: String(frontmatter.projectCode)}),
+  ...(categories && {categories}),
   ...(frontmatter.authors && {
     authors: frontmatter.authors.map((author) => ({
       _type: 'author',
