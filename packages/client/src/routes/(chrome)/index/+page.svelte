@@ -99,6 +99,10 @@
     font-size: var(--font-size-small);
   }
 
+  td.categories {
+    font-size: var(--font-size-extra-small);
+  }
+
   // Shrink the code and date columns to their own content; the title column
   // takes the rest.
   .code,

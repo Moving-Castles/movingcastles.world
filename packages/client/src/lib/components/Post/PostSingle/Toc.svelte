@@ -146,6 +146,14 @@
     }
   }
 
+  /* A fixed on-screen navigation aid; on paper it would just overprint the
+     first page. */
+  @media print {
+    .toc {
+      display: none;
+    }
+  }
+
   ul {
     list-style: none;
     margin: 0;

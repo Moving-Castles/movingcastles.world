@@ -82,4 +82,11 @@
       }
     }
   }
+
+  // PrintHeader takes over in print.
+  @media print {
+    header {
+      display: none;
+    }
+  }
 </style>

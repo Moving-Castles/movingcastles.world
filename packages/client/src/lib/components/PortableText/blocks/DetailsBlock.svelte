@@ -65,4 +65,25 @@
     padding-left: 1rem;
     border-left: 1px dashed var(--foreground);
   }
+
+  /* Print shows the content whether or not the block is open: closed
+     content is hidden via `content-visibility: hidden` on ::details-content
+     (Chrome 131+/Safari 18.4+/Firefox 139+), which print CSS may override —
+     unlike the pre-::details-content UA hiding, where only the beforeprint
+     hook in chrome/PrintHeader.svelte can open the block. The summary reads
+     as a section label, not a link, and its marker points down to match the
+     expanded content below it. */
+  @media print {
+    details::details-content {
+      content-visibility: visible;
+    }
+
+    summary {
+      text-decoration: none;
+    }
+
+    summary::before {
+      content: '\2193';
+    }
+  }
 </style>

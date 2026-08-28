@@ -71,4 +71,11 @@
       }
     }
   }
+
+  // PrintHeader takes over in print.
+  @media print {
+    footer {
+      display: none;
+    }
+  }
 </style>

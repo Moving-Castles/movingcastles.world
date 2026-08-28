@@ -248,3 +248,62 @@ img {
     color: var(--foreground-emphasis);
 }
 
+/* ——— Print ——— */
+
+/* Paper margins; only applies to paged media, so it lives outside the media
+   query. The article column runs full width inside them, so the inline
+   margins set the measure: the 155mm column is ~85–90 characters of 10pt
+   body text (avg glyph ≈ 0.5em incl. spaces) at 27mm a side on A4, ~30mm
+   on US Letter. Generous top margin on every page. */
+@page {
+    margin: 25mm 27mm 22mm;
+}
+
+@media print {
+    /* Ink on paper, whichever screen theme is active. The day selector is
+       repeated so this wins over the day theme's equal-specificity block
+       above. Type scale is the screen scale (18/14/12px) reduced
+       proportionally; the em-based line heights follow along. The entity
+       colors are the dark day-theme steps — the set tuned for light
+       surfaces. */
+    :root,
+    :root[data-theme='day'] {
+        --background: #ffffff;
+        --foreground: rgb(30, 30, 30);
+        --foreground-emphasis: rgb(0, 0, 0);
+        --font-size-base: 10pt;
+        --font-size-small: 7.75pt;
+        --font-size-extra-small: 6.75pt;
+        --entity-color-a: #0d366b;
+        --entity-color-b: #7d3700;
+        --entity-color-c: #7a1c46;
+        --entity-color-d: #38288c;
+        --entity-color-e: #7e1a19;
+    }
+
+    /* height: 100% on the roots can force a trailing blank page. */
+    body, html {
+        height: auto;
+    }
+
+    /* The @page margin is the page margin; drop the screen column's own
+       width cap, gutter and viewport-height floor (set in PostSingle). */
+    article {
+        max-width: none;
+        min-height: 0;
+        padding: 0;
+    }
+
+    /* Break hygiene: no heading stranded at a page bottom, no figure cut
+       in half. */
+    h1, h2, h3, h4 {
+        break-after: avoid;
+        page-break-after: avoid;
+    }
+
+    .content figure {
+        break-inside: avoid;
+        page-break-inside: avoid;
+    }
+}
+

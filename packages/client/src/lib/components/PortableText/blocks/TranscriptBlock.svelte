@@ -130,4 +130,18 @@
     color: var(--foreground-emphasis);
     text-decoration: none;
   }
+
+  /* Print gets the full transcript: the fold is only a CSS clip, so undo it
+     and drop the interactive furniture. */
+  @media print {
+    .lines.folded {
+      max-height: none;
+      overflow: visible;
+    }
+
+    .fade,
+    button {
+      display: none;
+    }
+  }
 </style>
