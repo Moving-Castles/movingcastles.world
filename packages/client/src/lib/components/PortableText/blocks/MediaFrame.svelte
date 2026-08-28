@@ -134,14 +134,14 @@
      direct child of a <figure>, which is the precondition noted at the top. -->
 <!-- svelte-ignore a11y_figcaption_parent -->
 {#if caption || expandable}
-  <figcaption
-    >{caption ?? ''}{#if expandable}<button
+  <figcaption>
+    {caption ?? ''}{#if expandable}<button
         type="button"
         class="media-expand"
         bind:this={expandButton}
         onclick={open}>[large view]</button
-      >{/if}</figcaption
-  >
+      >{/if}
+  </figcaption>
 {/if}
 
 <style>
