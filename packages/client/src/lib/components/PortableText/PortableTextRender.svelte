@@ -11,6 +11,7 @@
   import DiagramBlock from './blocks/DiagramBlock.svelte'
   import DetailsBlock from './blocks/DetailsBlock.svelte'
   import AbstractBlock from './blocks/AbstractBlock.svelte'
+  import CodeBlock from './blocks/CodeBlock.svelte'
 
   // Custom Portable Text block types rendered as dedicated Svelte components.
   // Everything else (text blocks with their styles/marks, lists) falls through
@@ -26,6 +27,7 @@
     diagram: DiagramBlock,
     details: DetailsBlock,
     abstract: AbstractBlock,
+    code: CodeBlock,
   }
 
   let {content}: {content: ContentEditorInput} = $props()

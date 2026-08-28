@@ -85,6 +85,10 @@
 //                          section): everything up to </abstract> compiles
 //                          into the block's nested content. Like <details>,
 //                          the tags need blank lines around them.
+//   <code>              -> code block: a verbatim passage in the same mono
+//                          treatment as the abstract (e.g. a full system
+//                          prompt). Same tag rules; the one block allowed
+//                          inside a <details> section as well as top-level.
 //   ```chart fence      -> chart block; YAML config, data loaded from CSV:
 //                            type: line | histogram
 //                            data: data/loss.csv     (path relative to the md)
@@ -998,9 +1002,12 @@ const walkNodes = async (nodes, top) => {
         // section and <abstract> … </abstract> the lead abstract block: the
         // markdown nodes up to the closing tag compile into the block's
         // nested content.
-        const tag = /^<(details|abstract)>/i.exec(node.value.trim())?.[1]?.toLowerCase()
+        const tag = /^<(details|abstract|code)>/i.exec(node.value.trim())?.[1]?.toLowerCase()
         if (tag) {
-          if (!top) {
+          // <code> may sit inside a <details> section (a verbatim mono
+          // passage, e.g. a full system prompt); <details> and <abstract>
+          // stay top-level.
+          if (!top && tag !== 'code') {
             warn(`nested <${tag}> not supported, skipped`)
             break
           }
@@ -1027,7 +1034,7 @@ const walkNodes = async (nodes, top) => {
               content,
             })
           } else {
-            out.push({_type: 'abstract', _key: makeKey('abstract'), content})
+            out.push({_type: tag, _key: makeKey(tag), content})
           }
           i = end
           break

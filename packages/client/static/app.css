@@ -148,6 +148,10 @@ h1, h2, h3, h4 {
     font-size: var(--font-size-base);
 }
 
+h2 {
+    color: var(--foreground-emphasis);
+}
+
 a {
     color: var(--foreground);
 }
@@ -238,8 +242,8 @@ img {
 }
 
 /* The heading the URL hash points at stays highlighted while the hash is
-   active — whether it was reached via the ToC or an in-text §-link. */
-.content h2:target,
+   active — whether it was reached via the ToC or an in-text §-link.
+   h2s already carry the emphasis color permanently, so only h3s need it. */
 .content h3:target {
     color: var(--foreground-emphasis);
 }

@@ -142,6 +142,7 @@ export type ContentEditor = {
         height?: number
         caption?: string
         smallMargin?: boolean
+        largeView?: boolean
         _type: 'diagram'
         _key: string
       }
@@ -186,6 +187,40 @@ export type ContentEditor = {
           _key: string
         }>
         _type: 'abstract'
+        _key: string
+      }
+    | {
+        content?: Array<{
+          children?: Array<{
+            marks?: Array<string>
+            text?: string
+            _type: 'span'
+            _key: string
+          }>
+          style?: 'normal'
+          listItem?: 'bullet' | 'number'
+          markDefs?: Array<
+            | {
+                href?: string
+                _type: 'link'
+                _key: string
+              }
+            | {
+                reference?: PostReference
+                _type: 'internalLink'
+                _key: string
+              }
+            | {
+                refId?: string
+                _type: 'cite'
+                _key: string
+              }
+          >
+          level?: number
+          _type: 'block'
+          _key: string
+        }>
+        _type: 'code'
         _key: string
       }
     | {
@@ -286,6 +321,7 @@ export type ContentEditor = {
               height?: number
               caption?: string
               smallMargin?: boolean
+              largeView?: boolean
               _type: 'diagram'
               _key: string
             }
@@ -296,6 +332,40 @@ export type ContentEditor = {
               yLabel?: string
               caption?: string
               _type: 'chart'
+              _key: string
+            }
+          | {
+              content?: Array<{
+                children?: Array<{
+                  marks?: Array<string>
+                  text?: string
+                  _type: 'span'
+                  _key: string
+                }>
+                style?: 'normal'
+                listItem?: 'bullet' | 'number'
+                markDefs?: Array<
+                  | {
+                      href?: string
+                      _type: 'link'
+                      _key: string
+                    }
+                  | {
+                      reference?: PostReference
+                      _type: 'internalLink'
+                      _key: string
+                    }
+                  | {
+                      refId?: string
+                      _type: 'cite'
+                      _key: string
+                    }
+                >
+                level?: number
+                _type: 'block'
+                _key: string
+              }>
+              _type: 'code'
               _key: string
             }
         >
@@ -367,6 +437,7 @@ export type Post = {
     _key: string
   }>
   date?: string
+  categories?: Array<string>
   metaDescription?: string
   externalLinks?: Array<{
     label: string

@@ -25,9 +25,10 @@ const contentBlockProjection = `
 		}
 	}`
 
-// Applied one level deep again for `abstract` and expandable `details`
-// blocks, which nest a content array of their own (a single nesting level,
-// by schema design).
+// Applied one level deep again for `abstract`, `code` and expandable
+// `details` blocks, which nest a content array of their own (a single
+// nesting level, by schema design — except a `code` passage inside a
+// `details`, the one two-level case).
 const contentEditorProjection = `{
 	...,
 	content[] {
@@ -38,10 +39,22 @@ const contentEditorProjection = `{
 				${contentBlockProjection}
 			}
 		},
-		_type == "details" => {
+		_type == "code" => {
 			...,
 			content[] {
 				${contentBlockProjection}
+			}
+		},
+		_type == "details" => {
+			...,
+			content[] {
+				${contentBlockProjection},
+				_type == "code" => {
+					...,
+					content[] {
+						${contentBlockProjection}
+					}
+				}
 			}
 		}
 	}

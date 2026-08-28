@@ -11,6 +11,7 @@ import {
   MdUnfoldMore,
   MdNotes,
   MdSchema,
+  MdCode,
 } from 'react-icons/md'
 
 // The text block and object members are defined once and shared between the
@@ -513,8 +514,34 @@ const abstractMember = {
   },
 }
 
+// Code: a verbatim mono passage (e.g. a full system prompt). Styled like
+// the abstract today, but a distinct type so the two can diverge. Plain
+// paragraphs only — no headings or embedded objects.
+const codeMember = {
+  type: 'object',
+  name: 'code',
+  title: 'Code passage',
+  icon: MdCode,
+  fields: [
+    {
+      title: 'Content',
+      name: 'content',
+      type: 'array',
+      of: [{...blockMember, styles: [{title: 'Normal', value: 'normal'}]}],
+    },
+  ],
+  preview: {
+    select: {content: 'content'},
+    prepare({content}: {content?: {children?: {text?: string}[]}[]}) {
+      const text = content?.[0]?.children?.map((child) => child.text ?? '').join('') ?? ''
+      return {title: text || 'Code passage', subtitle: 'Code passage'}
+    },
+  },
+}
+
 // Expandable section: a native <details>/<summary> on the site. Nests the
-// same members as the top-level content array, minus itself.
+// same members as the top-level content array, minus itself and the
+// abstract (a code passage is allowed).
 const detailsMember = {
   type: 'object',
   name: 'details',
@@ -532,7 +559,7 @@ const detailsMember = {
       title: 'Content',
       name: 'content',
       type: 'array',
-      of: [blockMember, ...objectMembers],
+      of: [blockMember, ...objectMembers, codeMember],
     },
   ],
   preview: {
@@ -557,7 +584,7 @@ export default {
       title: 'Content editor',
       name: 'content',
       type: 'array',
-      of: [blockMember, ...objectMembers, abstractMember, detailsMember],
+      of: [blockMember, ...objectMembers, abstractMember, codeMember, detailsMember],
     },
   ],
 }
