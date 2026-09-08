@@ -1,15 +1,17 @@
 <script lang="ts">
   import {tick} from 'svelte'
   import type {Snippet} from 'svelte'
+  import {MediaQuery} from 'svelte/reactivity'
 
   // Shared frame around media blocks. Carries the figure's caption and, when
   // `expandable`, the "[large view]" control that sits inline at the end of
-  // it; implements the lightbox, where expanding toggles the `expanded`
-  // class, styled below into a fixed, viewport-filling overlay. The frame
-  // never leaves its place in the document, so media playback state survives
-  // and the block components' theme/duotone rules keep applying. Blocks size
-  // their media inside the overlay by bridging to the class with
-  // `:global(.expanded)` selectors of their own.
+  // it (except on phones — see `canExpand`); implements the lightbox, where
+  // expanding toggles the `expanded` class, styled below into a fixed,
+  // viewport-filling overlay. The frame never leaves its place in the
+  // document, so media playback state survives and the block components'
+  // theme/duotone rules keep applying. Blocks size their media inside the
+  // overlay by bridging to the class with `:global(.expanded)` selectors of
+  // their own.
   //
   // Precondition: render this as a direct child of a <figure>. It emits the
   // caption as a second root element, which is only valid there — and a block
@@ -41,6 +43,15 @@
     children: Snippet
   } = $props()
 
+  // No large view on phones: on a viewport that narrow the overlay could show
+  // the media no larger than the reading column already does, so the control
+  // is withheld and click-to-expand is off. The breakpoint is the one the
+  // image and video blocks use for their phone sizing. The server render
+  // assumes a wide viewport (the MediaQuery fallback); the phone rule in the
+  // styles hides the control until hydration removes it.
+  const phone = new MediaQuery('(max-width: 600px)')
+  const canExpand = $derived(expandable && !phone.current)
+
   let expanded = $state(false)
 
   let expandButton: HTMLButtonElement | undefined = $state()
@@ -70,11 +81,18 @@
       close()
       return
     }
-    if (!clickToExpand || !expandable) return
+    if (!clickToExpand || !canExpand) return
     // A click that started on a control is not a click on the media.
     if (target?.closest('button')) return
     open()
   }
+
+  // A phone turned back to portrait while the overlay is open has just lost
+  // the large view, so the overlay goes with it rather than lingering with no
+  // control left to return focus to.
+  $effect(() => {
+    if (phone.current && expanded) close()
+  })
 
   // While expanded: close on Escape and lock page scroll. The cleanup also
   // runs on unmount, so navigating away while expanded restores scrolling.
@@ -109,7 +127,7 @@
     player && 'player',
     expanded && 'expanded',
     caption && 'has-caption',
-    clickToExpand && expandable && !expanded && 'clickable',
+    clickToExpand && canExpand && !expanded && 'clickable',
   ]}
   role={expanded ? 'dialog' : undefined}
   aria-modal={expanded ? true : undefined}
@@ -133,9 +151,9 @@
      the warning is suppressed here: every caller renders this component as a
      direct child of a <figure>, which is the precondition noted at the top. -->
 <!-- svelte-ignore a11y_figcaption_parent -->
-{#if caption || expandable}
+{#if caption || canExpand}
   <figcaption>
-    {caption ?? ''}{#if expandable}<button
+    {caption ?? ''}{#if canExpand}<button
         type="button"
         class="media-expand"
         bind:this={expandButton}
@@ -249,5 +267,14 @@
   .media-expand:hover,
   .media-expand:focus-visible {
     color: var(--foreground-emphasis);
+  }
+
+  /* Phones get no large view (see `canExpand` in the script). Hydration drops
+     the control from the markup; this keeps the server-rendered one out of
+     sight until then, and for a reader without JS. */
+  @media (max-width: 600px) {
+    .media-expand {
+      display: none;
+    }
   }
 </style>
