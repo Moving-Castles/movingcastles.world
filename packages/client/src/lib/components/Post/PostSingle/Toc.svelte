@@ -36,6 +36,9 @@
   let barShown = $state(false)
   let menuOpen = $state(false)
 
+  let barEl: HTMLElement | undefined = $state()
+  let menuEl: HTMLElement | undefined = $state()
+
   const closeMenu = () => {
     menuOpen = false
   }
@@ -44,13 +47,29 @@
     if (!barShown) closeMenu()
   })
 
+  // While open, the menu is dismissed by Escape, by the page scrolling, or by
+  // a touch or click that lands outside the bar and the menu. Outside taps
+  // are not swallowed: a link under the menu is followed as well as closing
+  // it. The window's scroll event is the document's only — the list's own
+  // scrolling fires on the list — so reading a long list stays possible.
   $effect(() => {
     if (!menuOpen) return
     const onKeydown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') closeMenu()
     }
+    const onPointerDown = (event: PointerEvent) => {
+      const target = event.target as Node | null
+      if (barEl?.contains(target) || menuEl?.contains(target)) return
+      closeMenu()
+    }
     document.addEventListener('keydown', onKeydown)
-    return () => document.removeEventListener('keydown', onKeydown)
+    document.addEventListener('pointerdown', onPointerDown)
+    window.addEventListener('scroll', closeMenu, {passive: true})
+    return () => {
+      document.removeEventListener('keydown', onKeydown)
+      document.removeEventListener('pointerdown', onPointerDown)
+      window.removeEventListener('scroll', closeMenu)
+    }
   })
 
   // While a click-driven scroll is in flight the spy is paused, so sections
@@ -168,7 +187,7 @@
 
   <!-- Bar layout. The whole bar is the menu's toggle, so the tap target is
        the full strip rather than the control at its end. -->
-  <div class="bar" class:shown={barShown}>
+  <div class="bar" class:shown={barShown} bind:this={barEl}>
     <button
       type="button"
       class="bar-toggle"
@@ -185,12 +204,7 @@
     </button>
   </div>
   {#if menuOpen}
-    <!-- The backdrop takes the tap that dismisses the menu; it is not a
-         control in its own right, and Escape covers the keyboard. -->
-    <!-- svelte-ignore a11y_click_events_have_key_events -->
-    <!-- svelte-ignore a11y_no_static_element_interactions -->
-    <div class="backdrop" onclick={closeMenu}></div>
-    <nav id="toc-menu" class="menu" aria-label="Table of contents">
+    <nav id="toc-menu" class="menu" aria-label="Table of contents" bind:this={menuEl}>
       {@render entries()}
     </nav>
   {/if}
@@ -219,7 +233,6 @@
     }
 
     .bar,
-    .backdrop,
     .menu {
       display: none;
     }
@@ -227,10 +240,9 @@
 
   /* Bar layout. The bar and menu take the text column's width, centred like
      the header, and their rules carry the header divider's 1rem inset so
-     they line up with the text. All three pieces are fixed on their own
-     rather than nested, so the bar's slide (a transform, which would make a
-     fixed descendant move with it) leaves the menu and backdrop where they
-     are. */
+     they line up with the text. The two are fixed on their own rather than
+     nested, so the bar's slide (a transform, which would make a fixed
+     descendant move with it) leaves the menu where it is. */
   .bar {
     position: fixed;
     top: 0;
@@ -300,14 +312,6 @@
     flex: none;
   }
 
-  .backdrop {
-    position: fixed;
-    inset: 0;
-    z-index: 49;
-    /* Keeps a touch on it from scrolling the page underneath. */
-    touch-action: none;
-  }
-
   .menu {
     position: fixed;
     top: var(--toc-bar-height);
@@ -318,6 +322,9 @@
     margin-inline: auto;
     max-height: calc(100dvh - var(--toc-bar-height));
     overflow-y: auto;
+    /* Reaching the end of a long list must not scroll the page, which would
+       dismiss the menu (see the script). */
+    overscroll-behavior: contain;
     background: var(--background);
     font-family: var(--font-stack-mono);
     font-size: var(--font-size-small);
@@ -342,7 +349,6 @@
   @media print {
     .toc,
     .bar,
-    .backdrop,
     .menu {
       display: none;
     }
