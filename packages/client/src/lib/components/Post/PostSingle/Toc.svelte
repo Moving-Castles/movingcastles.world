@@ -176,8 +176,10 @@
       aria-controls="toc-menu"
       onclick={() => (menuOpen = !menuOpen)}
     >
+      <!-- The running section. Cleared while the menu is open: the list
+           names the section, highlighted. -->
       <span class="current"
-        >{#if active}{active.index ? `${active.index}. ` : ''}{active.text}{/if}</span
+        >{#if active && !menuOpen}{active.index ? `${active.index}. ` : ''}{active.text}{/if}</span
       >
       <span class="control">{menuOpen ? '[close]' : '[contents]'}</span>
     </button>
@@ -223,19 +225,23 @@
     }
   }
 
-  /* Bar layout. All three pieces are fixed on their own rather than nested,
-     so the bar's slide (a transform, which would make a fixed descendant
-     move with it) leaves the menu and backdrop where they are. */
+  /* Bar layout. The bar and menu take the text column's width, centred like
+     the header, and their rules carry the header divider's 1rem inset so
+     they line up with the text. All three pieces are fixed on their own
+     rather than nested, so the bar's slide (a transform, which would make a
+     fixed descendant move with it) leaves the menu and backdrop where they
+     are. */
   .bar {
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     z-index: 51;
+    max-width: var(--content-width);
+    margin-inline: auto;
     height: var(--toc-bar-height);
     box-sizing: border-box;
     background: var(--background);
-    border-bottom: 1px solid var(--foreground);
     color: var(--foreground);
     font-family: var(--font-stack-mono);
     font-size: var(--font-size-extra-small);
@@ -250,14 +256,21 @@
     transform: none;
   }
 
+  .bar::after {
+    content: '';
+    position: absolute;
+    inset-inline: 1rem;
+    bottom: 0;
+    border-bottom: 1px solid var(--foreground);
+  }
+
   /* @media (prefers-reduced-motion: reduce) {
     .bar {
       transition: none;
     }
   } */
 
-  /* The toggle fills the bar, its content held to the text column's width so
-     it lines up with the header on viewports wider than the column. */
+  /* The toggle fills the bar. */
   .bar-toggle {
     appearance: none;
     display: flex;
@@ -265,9 +278,7 @@
     justify-content: space-between;
     gap: 1rem;
     width: 100%;
-    max-width: var(--content-width);
     height: 100%;
-    margin-inline: auto;
     padding: 0 1rem;
     box-sizing: border-box;
     background: none;
@@ -303,21 +314,22 @@
     left: 0;
     right: 0;
     z-index: 50;
+    max-width: var(--content-width);
+    margin-inline: auto;
     max-height: calc(100dvh - var(--toc-bar-height));
     overflow-y: auto;
-    box-sizing: border-box;
     background: var(--background);
-    border-bottom: 1px solid var(--foreground);
     font-family: var(--font-stack-mono);
     font-size: var(--font-size-small);
     line-height: var(--line-height-small);
   }
 
+  /* The list carries the inset and the closing rule: a pseudo-element on the
+     scrolling menu box would sit at the end of its content, not its edge. */
   .menu ul {
-    max-width: var(--content-width);
-    margin-inline: auto;
-    padding: 0.5rem 1rem 1rem;
-    box-sizing: border-box;
+    margin-inline: 1rem;
+    padding: 0.5rem 0 1rem;
+    border-bottom: 1px solid var(--foreground);
   }
 
   /* Tap-sized rows in the menu; the sidebar keeps its tight list. */
