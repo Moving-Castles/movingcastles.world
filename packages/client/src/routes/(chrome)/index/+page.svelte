@@ -38,8 +38,13 @@
             </td>
             <td class="title"><a href="/posts/{post.slug}">{post.title}</a></td>
             <td class="categories">
+              <!-- Each tag is set in parentheses and kept on one line, so a
+                   list of them can only break between tags, never inside a
+                   multi-word one. -->
               <a href="/posts/{post.slug}" tabindex="-1" aria-hidden="true"
-                >{post.categories?.join(', ') ?? ''}</a
+                >{#each post.categories ?? [] as category, i}{i > 0 ? ' ' : ''}<span
+                    class="category">({category})</span
+                  >{/each}</a
               >
             </td>
           </tr>
@@ -101,6 +106,10 @@
 
   td.categories {
     font-size: var(--font-size-extra-small);
+  }
+
+  .category {
+    white-space: nowrap;
   }
 
   // Shrink the code and date columns to their own content; the title column
