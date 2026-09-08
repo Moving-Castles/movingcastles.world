@@ -77,7 +77,7 @@
     /* Night is the default theme — also the no-JS / no-attribute fallback. */
     --background: rgb(0, 0, 0);
     --foreground: rgba(140, 140, 140, 1);
-    --foreground-emphasis: rgb(210, 210, 210);
+    --foreground-emphasis: rgb(190, 190, 190);
     --font-stack-mono: 'Berkeley Mono', courier, monospace;
     --font-stack-sans: 'Die Grotesk', helvetica, arial, sans-serif;
     --font-size-base: 18px;
@@ -99,11 +99,14 @@
 }
 
 /* Day theme — applied when the toggle sets data-theme="day" on <html>. The grey
-   is tuned to roughly match night's foreground contrast, inverted onto white. */
+   is tuned to roughly match night's foreground contrast, inverted onto white.
+   Emphasis runs the other way from night: a step darker than the body ink, as
+   in print, so headings gain weight instead of fading into the grey the way a
+   light tone does on this surface. */
 :root[data-theme='day'] {
     --background: rgb(140, 140, 140);
-    --foreground: rgb(30, 30, 30);
-    --foreground-emphasis: rgb(210, 210, 210);
+    --foreground: rgb(40, 40, 40);
+    --foreground-emphasis: rgb(0, 0, 0);
     /* Dark steps of the night hues: on the mid-grey surface only dark colours
        hold contrast, mirroring the dark day foreground. */
     --entity-color-a: #0d366b; /* navy */
@@ -148,6 +151,7 @@ h1, h2, h3, h4 {
     font-size: var(--font-size-base);
 }
 
+h1,
 h2 {
     color: var(--foreground-emphasis);
 }
@@ -243,7 +247,8 @@ img {
 
 /* The heading the URL hash points at stays highlighted while the hash is
    active — whether it was reached via the ToC or an in-text §-link.
-   h2s already carry the emphasis color permanently, so only h3s need it. */
+   h1s and h2s already carry the emphasis color permanently, so only h3s
+   need it. */
 .content h3:target {
     color: var(--foreground-emphasis);
 }
