@@ -12,4 +12,5 @@ minimumReleaseAgeExclude:
   - svelte@5.56.4 || 5.56.5
   - sanity-plugin-mux-input@5.0.2 || 5.0.9 || 5.0.11
   - '@sanity/ui@4.0.0'
-  - '@sanity/client@8.2.0'
+  - '@sanity/client@8.2.0 || 8.6.0'
+  - '@types/node@26.5.0'
