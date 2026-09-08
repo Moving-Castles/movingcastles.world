@@ -87,6 +87,9 @@
     --line-height-small: 1.2em;
     /* Width of the centred reading column on content pages (post article + header/footer). */
     --content-width: 720px;
+    /* Height of the table of contents' top bar (Toc.svelte, narrow viewports);
+       shared so the anchor offset below can make room for it. */
+    --toc-bar-height: 2.5rem;
     /* Entity colors — categorical identity for graph elements (chart series,
        graph nodes). Five slots, assigned in fixed A–E order, never cycled.
        Each theme steps the same five hues for its own surface; both sets are
@@ -243,6 +246,16 @@ img {
 .content h2,
 .content h3 {
     scroll-margin-top: 1.5rem;
+}
+
+/* Below the sidebar breakpoint (Toc.svelte) the table of contents is a bar
+   fixed across the top of the viewport, so on posts that have one the
+   targets need its height on top of that air. */
+@media (width < 1100px) {
+    .has-toc .content h2,
+    .has-toc .content h3 {
+        scroll-margin-top: calc(1.5rem + var(--toc-bar-height));
+    }
 }
 
 /* The heading the URL hash points at stays highlighted while the hash is

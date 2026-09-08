@@ -35,6 +35,13 @@
     text-decoration: none;
   }
 
+  /* A right-pointing arrow leads each link, outside the brackets, and takes
+     the hover colour with the rest of the link. */
+  a::before {
+    content: '\2192';
+    margin-right: 0.5em;
+  }
+
   a:hover {
     color: var(--foreground-emphasis);
   }

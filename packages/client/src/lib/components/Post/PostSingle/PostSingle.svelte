@@ -18,7 +18,9 @@
   const body = $derived(blocks.slice(abstractEnd))
 </script>
 
-<article>
+<!-- has-toc: app.css keys the extra anchor offset under the ToC's top bar on
+     it, so headings in a post without a ToC keep their standing air. -->
+<article class:has-toc={post.showToc}>
   <header>
     <h1>{post.title}</h1>
     {#if post.authors?.length}
@@ -43,8 +45,8 @@
 
   {#if post.showToc && post.content}
     <!-- Opt-in per post via the cms `showToc` toggle. Fixed beside the text
-         column; hides itself below 1100px viewport width. Manual `toc`
-         entries (if any) replace the derived H2 list. -->
+         column; below 1100px viewport width a bar across the top instead.
+         Manual `toc` entries (if any) replace the derived H2 list. -->
     <Toc content={post.content} toc={post.toc} />
   {/if}
 
