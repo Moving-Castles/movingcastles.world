@@ -1,7 +1,7 @@
 <script lang="ts">
   import type {TypedObject} from '@portabletext/types'
   import type {Component} from 'svelte'
-  import {renderTextBlocks, type ContentEditorInput} from '$lib/modules/sanity'
+  import {renderTextBlocks, type ContentEditorInput} from '$lib/portable-text'
   import ImageBlock from './blocks/ImageBlock.svelte'
   import IframeBlock from './blocks/IframeBlock.svelte'
   import VideoBlock from './blocks/VideoBlock.svelte'
@@ -15,7 +15,7 @@
 
   // Custom Portable Text block types rendered as dedicated Svelte components.
   // Everything else (text blocks with their styles/marks, lists) falls through
-  // to the string renderer in the sanity module. To support a new embedded
+  // to the string renderer in $lib/portable-text. To support a new embedded
   // type: create a component in ./blocks taking a `value` prop and add it here.
   const blockComponents: Record<string, Component<{value: any}> | undefined> = {
     image: ImageBlock,

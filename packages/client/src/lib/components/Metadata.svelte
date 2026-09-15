@@ -1,6 +1,6 @@
 <script lang="ts">
   import {SITE_NAME, SITE_DESCRIPTION, SITE_URL, TWITTER_USER} from '$lib/constants'
-  import {toPlainText} from '$lib/modules/sanity'
+  import {toPlainText} from '$lib/portable-text'
   import {page} from '$app/state'
   import type {Post} from '$lib/types'
 

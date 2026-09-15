@@ -25,6 +25,49 @@ npm run dev
 npm run dev -- --open
 ```
 
+## Deploying and content updates
+
+The client is prerendered: `vite build` queries Sanity once, at build time, and
+writes every page as a static file (`prerender = true` in the root
+`+layout.server.ts`; the post route lists every published slug through its
+`entries` export). Netlify serves the files from its CDN, so nothing runs per
+request and TTFB is edge speed.
+
+The trade-off is that a publish in the cms does not show on the site until the
+next build. That is wired through two hooks, both configured in the dashboards
+rather than in this repo:
+
+1. **Netlify → Site configuration → Build & deploy → Build hooks**: add a hook
+   (e.g. "Sanity publish") and copy its URL.
+2. **Sanity → manage.sanity.io → project → API → Webhooks**: add a webhook that
+   POSTs to that URL. Trigger on create, update and delete; filter to the
+   document types the site renders — `_type in ["post", "frontpage",
+"postIndex", "siteSettings"]` — so edits elsewhere do not rebuild the site.
+   Use the `production` dataset. The cli can do the same: `pnpm --filter cms
+exec sanity hook create`.
+
+A post published between builds still renders on demand (its route is
+`prerender = 'auto'`), so a webhook outage degrades to the old behaviour rather
+than to 404s.
+
+One page is not prerendered: `/index`. The front page is written to `index.html`,
+which is also where `/index` would go, and Netlify's static routing resolves
+`/index` to that file. So the index is rendered on demand behind a forced
+rewrite (`packages/client/_redirects`, which adapter-netlify copies into the
+publish directory) and held in Netlify's durable cache, which every deploy
+purges — as fresh as the prerendered pages, with the same latency after the
+first hit. Verified on a draft deploy; the second request for `/index` reports
+`cache-status: "Netlify Durable"; hit`.
+
+To try a build the way Netlify runs it, or push a draft deploy for a preview url
+(production is untouched):
+
+```bash
+NETLIFY=true pnpm --filter client build   # NETLIFY=true selects adapter-netlify
+NETLIFY_SITE_ID=cbc48978-7309-4c28-b604-4815287bdd04 \
+  netlify deploy --no-build --filter client --dir packages/client/build
+```
+
 ## Building
 
 To create a production version of your app:

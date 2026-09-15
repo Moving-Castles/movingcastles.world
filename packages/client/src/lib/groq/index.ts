@@ -145,6 +145,12 @@ export const siteSettingsQuery = `
 	)
 `
 
+// Slugs of every published post, for the prerenderer's entry list
+// (posts/[slug]/+page.server.ts).
+export const postSlugsQuery = `
+	*[_type == "post" && defined(slug.current)].slug.current
+`
+
 export const postBySlugQuery = `
 	*[_type == "post" && slug.current == $slug][0] {
 		_id,

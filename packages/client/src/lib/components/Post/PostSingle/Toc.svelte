@@ -1,5 +1,5 @@
 <script lang="ts">
-  import {extractH2Headings, type ContentEditorInput} from '$lib/modules/sanity'
+  import {extractH2Headings, type ContentEditorInput} from '$lib/portable-text'
   import type {TocEntry} from '$lib/types'
 
   // Table of contents, in two layouts on the one breakpoint (see the styles):

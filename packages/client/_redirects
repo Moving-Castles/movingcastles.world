@@ -1,0 +1,11 @@
+# Read by adapter-netlify (it must sit beside package.json) and copied into the
+# publish directory ahead of the adapter's own routing.
+#
+# /index is the one route rendered on demand (see
+# src/routes/(chrome)/index/+page.server.ts). The front page is prerendered to
+# index.html, and Netlify would serve that file for /index — hence the forced
+# (!) rewrites, which win over a matching static file and hand the request, with
+# its original url, to SvelteKit's render function.
+/index              /.netlify/functions/sveltekit-render  200!
+/index/__data.json  /.netlify/functions/sveltekit-render  200!
+/posts              /index                                307!

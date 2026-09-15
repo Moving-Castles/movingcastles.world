@@ -1,28 +1,11 @@
-// * * * * * * * * * * * * * * * * * * * * * * * * * * *
-//
-//  sanity.ts =>
-//  functions to work with the Sanity database
-//
-// * * * * * * * * * * * * * * * * * * * * * * * * * * *
+// Pure Portable Text helpers: rendering text blocks to html, plain-text
+// extraction (meta descriptions) and the heading list for the table of
+// contents. No Sanity client here — this module is imported by components, so
+// it is bundled for the browser too; server-only access lives in
+// $lib/server/sanity.
 
-import {createClient} from '@sanity/client'
-import {SANITY_ID, SANITY_DATASET} from '$lib/constants'
-import {createImageUrlBuilder, type SanityImageSource} from '@sanity/image-url'
 import {toHTML, type PortableTextComponents} from '@portabletext/to-html'
 import type {TypedObject, PortableTextBlock} from '@portabletext/types'
-
-export const client = createClient({
-  projectId: SANITY_ID,
-  dataset: SANITY_DATASET,
-  apiVersion: '2026-01-01',
-  useCdn: true,
-})
-
-const builder = createImageUrlBuilder(client)
-
-export function urlFor(source: SanityImageSource) {
-  return builder.image(source)
-}
 
 // Plain text of a single text block (its children concatenated, marks dropped).
 const blockText = (block: PortableTextBlock) =>
@@ -119,19 +102,4 @@ export const extractH2Headings = (input: ContentEditorInput): TocHeading[] => {
     .filter((block) => block._type === 'block' && block.style === 'h2')
     .map((block) => ({id: headingId(block), text: blockText(block)}))
     .filter((heading) => heading.id !== '' && heading.text.trim() !== '')
-}
-
-export const loadData = async <T>(
-  query: string,
-  params: Record<string, unknown> = {},
-): Promise<T> => {
-  try {
-    const res = await client.fetch(query, params)
-    if (res === null) {
-      return Promise.reject(new Error('404'))
-    }
-    return res
-  } catch (err) {
-    return Promise.reject(new Error('404'))
-  }
 }

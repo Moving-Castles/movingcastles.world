@@ -1,4 +1,4 @@
-import {loadData} from '$lib/modules/sanity'
+import {loadData} from '$lib/server/sanity'
 import {frontpageQuery} from '$lib/groq'
 import type {PostListItem} from '$lib/types'
 
