@@ -43,8 +43,12 @@ rather than in this repo:
    POSTs to that URL. Trigger on create, update and delete; filter to the
    document types the site renders — `_type in ["post", "frontpage",
 "postIndex", "siteSettings"]` — so edits elsewhere do not rebuild the site.
-   Use the `production` dataset. The cli can do the same: `pnpm --filter cms
-exec sanity hook create`.
+   Use the `production` dataset. Set the projection to `{_id, _type}`: Netlify
+   copies the webhook body into the `INCOMING_HOOK_BODY` env var, and a body
+   over 128 KB (a long post, sent whole when the projection is empty) makes
+   every build fail with `fork/exec .../node: argument list too long` before it
+   starts. `sanity hook list` does not show the projection; check it at
+   manage.sanity.io or via `GET https://api.sanity.io/v2021-10-04/hooks/projects/<id>`.
 
 A post published between builds still renders on demand (its route is
 `prerender = 'auto'`), so a webhook outage degrades to the old behaviour rather
