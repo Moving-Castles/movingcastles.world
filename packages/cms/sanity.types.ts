@@ -30,6 +30,70 @@ export type DayImage = {
   _type: 'image'
 }
 
+export type MicroSite = {
+  _id: string
+  _type: 'microSite'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  title: string
+  slug: Slug
+  metadata?: Array<string>
+  image?: {
+    asset?: SanityImageAssetReference
+    media?: unknown
+    hotspot?: SanityImageHotspot
+    crop?: SanityImageCrop
+    alt?: string
+    _type: 'image'
+  }
+  content?: Array<{
+    children?: Array<{
+      marks?: Array<string>
+      text?: string
+      _type: 'span'
+      _key: string
+    }>
+    style?: 'normal' | 'h2' | 'h3' | 'blockquote'
+    listItem?: 'bullet' | 'number'
+    markDefs?: Array<{
+      href: string
+      _type: 'link'
+      _key: string
+    }>
+    level?: number
+    _type: 'block'
+    _key: string
+  }>
+  link?: {
+    label?: string
+    url?: string
+  }
+  metaDescription?: string
+}
+
+export type SanityImageCrop = {
+  _type: 'sanity.imageCrop'
+  top: number
+  bottom: number
+  left: number
+  right: number
+}
+
+export type SanityImageHotspot = {
+  _type: 'sanity.imageHotspot'
+  x: number
+  y: number
+  height: number
+  width: number
+}
+
+export type Slug = {
+  _type: 'slug'
+  current: string
+  source?: string
+}
+
 export type PostReference = {
   _ref: string
   _type: 'reference'
@@ -475,28 +539,6 @@ export type Post = {
   slug: Slug
 }
 
-export type Slug = {
-  _type: 'slug'
-  current: string
-  source?: string
-}
-
-export type SanityImageCrop = {
-  _type: 'sanity.imageCrop'
-  top: number
-  bottom: number
-  left: number
-  right: number
-}
-
-export type SanityImageHotspot = {
-  _type: 'sanity.imageHotspot'
-  x: number
-  y: number
-  height: number
-  width: number
-}
-
 export type PostIndex = {
   _id: string
   _type: 'postIndex'
@@ -735,14 +777,15 @@ export type Geopoint = {
 export type AllSanitySchemaTypes =
   | SanityImageAssetReference
   | DayImage
+  | MicroSite
+  | SanityImageCrop
+  | SanityImageHotspot
+  | Slug
   | PostReference
   | SanityFileAssetReference
   | ContentEditor
   | SiteSettings
   | Post
-  | Slug
-  | SanityImageCrop
-  | SanityImageHotspot
   | PostIndex
   | Frontpage
   | MuxVideoAssetReference

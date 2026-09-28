@@ -1,3 +1,6 @@
+# `pnpm dev` (packages/scripts/dev.mjs) adds a process per micro-site in
+# packages/micro-sites/, on ports from 5180. Running `mprocs` directly starts
+# only these.
 procs:
   sveltekit:
     cwd: packages/client

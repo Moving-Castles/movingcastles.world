@@ -1,5 +1,6 @@
 packages:
   - packages/*
+  - packages/micro-sites/*
 allowBuilds:
   esbuild: true
   '@parcel/watcher': true

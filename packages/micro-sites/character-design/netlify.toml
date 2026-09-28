@@ -1,0 +1,21 @@
+# Netlify reads this from the project's package directory (this package); its
+# base directory is the repo root, and every path here is relative to that.
+# The project itself is created by packages/scripts/create-micro-site.mjs.
+
+[build]
+  command = "pnpm --filter @micro-sites/character-design run build"
+  publish = "packages/micro-sites/character-design/build"
+
+  # Every push to the monorepo builds every Netlify project linked to it. Skip
+  # this one unless the push touched it: this package, the fonts it takes from
+  # the main site, or the lockfile. Content changes come in through the
+  # Sanity webhook's build hook, which an ignore command never cancels. A
+  # redeploy of the same commit (equal refs) and a first build (no previous
+  # commit, so git diff errors) always build.
+  ignore = '[ "$CACHED_COMMIT_REF" != "$COMMIT_REF" ] && git diff --quiet "$CACHED_COMMIT_REF" "$COMMIT_REF" -- packages/micro-sites/character-design packages/client/src/lib/fonts pnpm-lock.yaml'
+
+# Hashed build output (css, fonts): the name changes whenever the file does.
+[[headers]]
+  for = "/_app/immutable/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"

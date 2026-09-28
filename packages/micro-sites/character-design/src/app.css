@@ -1,0 +1,113 @@
+/* Site-wide styles, imported by the root layout. The type and the night
+   palette are the main site's (packages/client/src/app.css); the fonts are
+   its files, through the `@fonts` alias. */
+
+/* Die Grotesk (cut A) — Klim licensed web fonts; regular + bold, upright +
+   italic. */
+@font-face {
+  font-family: 'Die Grotesk';
+  src: url('@fonts/die-grotesk/die-grotesk-a-regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Die Grotesk';
+  src: url('@fonts/die-grotesk/die-grotesk-a-italic.woff2') format('woff2');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Die Grotesk';
+  src: url('@fonts/die-grotesk/die-grotesk-a-bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Die Grotesk';
+  src: url('@fonts/die-grotesk/die-grotesk-a-bold-italic.woff2') format('woff2');
+  font-weight: 700;
+  font-style: italic;
+  font-display: swap;
+}
+
+:root {
+  --background: rgb(0, 0, 0);
+  --foreground: rgba(140, 140, 140, 1);
+  --foreground-emphasis: rgb(190, 190, 190);
+  --font-stack-sans: 'Die Grotesk', helvetica, arial, sans-serif;
+  --font-size-base: 18px;
+  --line-height-base: 1.4em;
+  /* Width of the centred column, gutters included. */
+  --content-width: 720px;
+}
+
+body,
+html {
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-stack-sans);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-base);
+  background: var(--background);
+  color: var(--foreground);
+}
+
+/* Inverted text selection: foreground fill, background text. */
+::selection {
+  background: var(--foreground);
+  color: var(--background);
+}
+
+h1,
+h2,
+h3 {
+  font-size: var(--font-size-base);
+}
+
+h1,
+h2 {
+  color: var(--foreground-emphasis);
+}
+
+a {
+  color: var(--foreground);
+}
+
+a:hover {
+  color: var(--foreground-emphasis);
+  text-decoration: none;
+}
+
+img {
+  user-select: none;
+}
+
+/* Portable Text output rendered into `.content` (an html string, so these
+   can't be component-scoped). */
+.content p {
+  margin: 0;
+  margin-bottom: 1em;
+}
+
+.content h2,
+.content h3 {
+  margin: 2rem 0 0.75rem;
+}
+
+.content ul,
+.content ol {
+  margin: 0 0 1em;
+  padding-left: 1.5em;
+}
+
+.content blockquote {
+  margin: 1.5rem 0;
+  padding-left: 1rem;
+  border-left: 1px dashed var(--foreground);
+}

@@ -1,5 +1,5 @@
 // ICONS
-import {MdArticle, MdHome, MdList, MdSettings} from 'react-icons/md'
+import {MdArticle, MdHome, MdList, MdPublic, MdSettings} from 'react-icons/md'
 
 export default (S) =>
   S.list()
@@ -34,6 +34,16 @@ export default (S) =>
             .showIcons(true)
             .filter('_type == $type')
             .params({type: 'post'}),
+        ),
+      S.listItem()
+        .title('Micro-sites')
+        .icon(MdPublic)
+        .child(
+          S.documentList()
+            .title('Micro-sites')
+            .showIcons(true)
+            .filter('_type == $type')
+            .params({type: 'microSite'}),
         ),
       S.listItem()
         .title('Site Settings')

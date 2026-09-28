@@ -1,0 +1,27 @@
+{
+  "name": "@micro-sites/character-design",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "scripts": {
+    "dev": "vite dev",
+    "build": "vite build",
+    "preview": "vite preview",
+    "prepare": "svelte-kit sync || echo ''",
+    "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json"
+  },
+  "devDependencies": {
+    "@portabletext/types": "^4.0.2",
+    "@sveltejs/adapter-static": "^3.0.10",
+    "@sveltejs/kit": "^2.70.3",
+    "@sveltejs/vite-plugin-svelte": "^7.3.1",
+    "svelte": "^5.57.1",
+    "svelte-check": "^4.7.6",
+    "vite": "^8.3.1"
+  },
+  "dependencies": {
+    "@portabletext/to-html": "^6.0.0",
+    "@sanity/client": "^8.7.0",
+    "@sanity/image-url": "^2.1.1"
+  }
+}

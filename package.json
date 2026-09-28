@@ -5,12 +5,13 @@
   "scripts": {
     "dev:sveltekit": "pnpm --filter client dev",
     "dev:sanity": "pnpm --filter cms start",
-    "dev": "mprocs",
+    "dev": "node packages/scripts/dev.mjs",
     "format": "prettier --write .",
-    "check": "pnpm --filter client check",
+    "check": "pnpm --filter client --filter '@micro-sites/*' check",
     "deploy:sanity": "pnpm --filter cms run deploy",
     "typegen:sanity": "pnpm --filter cms typegen",
-    "publish:report": "node packages/scripts/publish-report.mjs"
+    "publish:report": "node packages/scripts/publish-report.mjs",
+    "create:micro-site": "node packages/scripts/create-micro-site.mjs"
   },
   "keywords": [],
   "author": "",

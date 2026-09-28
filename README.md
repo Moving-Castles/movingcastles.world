@@ -72,6 +72,41 @@ NETLIFY_SITE_ID=cbc48978-7309-4c28-b604-4815287bdd04 \
   netlify deploy --no-build --filter client --dir packages/client/build
 ```
 
+## Micro-sites
+
+`packages/micro-sites/<name>` holds one-page sites served from their own
+subdomains, e.g. `character-design` at character-design.movingcastles.world.
+Each is a SvelteKit package (`@micro-sites/<name>`) with its own Netlify
+project, and renders the `microSite` document in Sanity whose slug is `<name>`
+(Studio → Micro-sites): a title, metadata lines, an image, rich content and a
+button link. The page is prerendered with no JavaScript, in the main site's
+type and night palette. The fonts come from `packages/client` through an alias
+rather than being copied.
+
+```bash
+pnpm create:micro-site <name> [--title "…"] [--domain host] [--dry-run]
+```
+
+`pnpm dev` runs every micro-site alongside the main site and the cms, each in
+its own mprocs pane on a port from 5180 up (alphabetical order), so a new one
+appears without config changes. To run one on its own:
+`pnpm --filter @micro-sites/<name> dev`.
+
+`create:micro-site` copies an existing micro-site (`--from`, default
+`character-design`) and rewrites its name and domain. It then creates the
+Sanity document as a draft, a Netlify project linked to this repo with the new
+package as its package directory, a build hook, and a Sanity webhook that calls
+it when the document is published. Each step skips what already exists, so
+re-running finishes a partial setup; `--local` creates only the package. It
+uses your Netlify CLI and Sanity CLI logins. Left to do by hand: push, publish
+the document, and add the custom domain in Netlify.
+
+Build settings are in each package's `netlify.toml`. Its `ignore` command skips
+builds for pushes that don't touch the package, the shared fonts or the
+lockfile; content changes arrive through the build hook, which it never
+cancels. An unpublished or missing document fails the build (the message says
+so) and the last deploy stays live.
+
 ## Building
 
 To create a production version of your app:
