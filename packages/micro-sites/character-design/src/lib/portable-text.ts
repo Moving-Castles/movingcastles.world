@@ -1,11 +1,20 @@
-// Portable Text to html, for the `content` field of the microSite schema:
-// paragraphs, h2/h3, quotes, lists, strong/em and links. Everything but the
+// Portable Text to html, for the `metadata` and `content` fields of the
+// microSite schema: paragraphs, mono paragraphs, h2/h3, quotes, lists,
+// strong/em, links and lines. Everything but the mono style, the line and the
 // link mark uses the renderer's defaults.
 
 import {escapeHTML, toHTML, type PortableTextComponents} from '@portabletext/to-html'
 import type {PortableTextBlock, TypedObject} from '@portabletext/types'
 
 const components: PortableTextComponents = {
+  block: {
+    // Set in the mono stack by the `.mono` rule in app.css.
+    mono: ({children}) => `<p class="mono">${children}</p>`,
+  },
+  types: {
+    // Solid unless the editor chose dashed.
+    rule: ({value}) => (value?.style === 'dashed' ? '<hr class="dashed" />' : '<hr />'),
+  },
   marks: {
     // External links open in a new tab; mailto: and same-site links don't.
     link: ({children, value}) => {

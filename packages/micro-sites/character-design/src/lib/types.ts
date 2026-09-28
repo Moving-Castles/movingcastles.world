@@ -14,7 +14,7 @@ export interface ExpandedImage extends Omit<NonNullable<MicroSiteDocument['image
 // Shape returned by `microSiteQuery`.
 export interface MicroSite extends Pick<
   MicroSiteDocument,
-  'title' | 'metadata' | 'content' | 'link' | 'metaDescription'
+  'title' | 'metadata' | 'content' | 'link' | 'afterButton' | 'metaDescription'
 > {
   image?: ExpandedImage
 }

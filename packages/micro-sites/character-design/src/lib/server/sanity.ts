@@ -31,9 +31,29 @@ const microSiteQuery = `
 		},
 		content,
 		link,
+		afterButton,
 		metaDescription
 	}
 `
 
-export const loadMicroSite = (slug: string) =>
-  client.fetch<MicroSite | null>(microSiteQuery, {slug})
+// `metadata` held plain strings before it became rich text, and a document
+// published before then still does: each string becomes a normal paragraph.
+// Remove once no published document has string lines.
+const legacyLine = (line: unknown, i: number) =>
+  typeof line === 'string'
+    ? {
+        _type: 'block',
+        _key: `line${i}`,
+        style: 'normal',
+        markDefs: [],
+        children: [{_type: 'span', _key: `line${i}text`, text: line, marks: []}],
+      }
+    : line
+
+export const loadMicroSite = async (slug: string) => {
+  const site = await client.fetch<MicroSite | null>(microSiteQuery, {slug})
+  if (site?.metadata) {
+    site.metadata = (site.metadata as unknown[]).map(legacyLine) as MicroSite['metadata']
+  }
+  return site
+}

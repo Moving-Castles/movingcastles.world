@@ -71,9 +71,11 @@
 <main>
   <header>
     <h1>{site.title}</h1>
-    {#each site.metadata ?? [] as line, i (i)}
-      <p class="metadata">{line}</p>
-    {/each}
+    {#if site.metadata?.length}
+      <div class="metadata">
+        {@html renderContent(site.metadata)}
+      </div>
+    {/if}
   </header>
 
   {#if image}
@@ -97,6 +99,12 @@
   {#if site.link?.url && site.link.label}
     <a class="button" href={site.link.url}>{site.link.label}</a>
   {/if}
+
+  {#if site.afterButton?.length}
+    <div class="content after-button">
+      {@html renderContent(site.afterButton)}
+    </div>
+  {/if}
 </main>
 
 <style>
@@ -110,17 +118,14 @@
 
   h1 {
     margin: 0;
-  }
-
-  .metadata {
-    margin: 0;
+    margin-bottom: 0.5em;
   }
 
   img {
     display: block;
     width: 100%;
     height: auto;
-    margin: 2em 0;
+    margin: 1.5em 0;
   }
 
   /* No image: the content keeps the header's paragraph distance instead. */
@@ -128,10 +133,16 @@
     margin-top: 1em;
   }
 
+  /* Collapses with the content's last paragraph margin when there is no
+     button, so the gap is the same either way. */
+  .after-button {
+    margin-top: 1.5em;
+  }
+
   .button {
     display: inline-block;
     margin-top: 1em;
-    padding: 0.5em 1.25em;
+    padding: 0.5em 2.5em;
     border: 1px solid var(--foreground-emphasis);
     color: var(--foreground-emphasis);
     font-weight: 700;

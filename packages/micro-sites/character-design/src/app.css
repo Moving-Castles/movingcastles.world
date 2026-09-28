@@ -36,12 +36,48 @@
   font-display: swap;
 }
 
+/* Berkeley Mono — the mono stack, for the `mono` block style. Not preloaded:
+   only pages with a mono paragraph request it. */
+@font-face {
+  font-family: 'Berkeley Mono';
+  src: url('@fonts/berkeley-mono/BerkeleyMono-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Berkeley Mono';
+  src: url('@fonts/berkeley-mono/BerkeleyMono-Italic.woff2') format('woff2');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Berkeley Mono';
+  src: url('@fonts/berkeley-mono/BerkeleyMono-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Berkeley Mono';
+  src: url('@fonts/berkeley-mono/BerkeleyMono-BoldItalic.woff2') format('woff2');
+  font-weight: 700;
+  font-style: italic;
+  font-display: swap;
+}
+
 :root {
   --background: rgb(0, 0, 0);
   --foreground: rgba(140, 140, 140, 1);
   --foreground-emphasis: rgb(190, 190, 190);
+  --font-stack-mono: 'Berkeley Mono', courier, monospace;
   --font-stack-sans: 'Die Grotesk', helvetica, arial, sans-serif;
   --font-size-base: 18px;
+  --font-size-small: 14px;
   --line-height-base: 1.4em;
   /* Width of the centred column, gutters included. */
   --content-width: 720px;
@@ -88,8 +124,20 @@ img {
   user-select: none;
 }
 
-/* Portable Text output rendered into `.content` (an html string, so these
-   can't be component-scoped). */
+/* Portable Text output rendered into `.metadata` and `.content` (an html
+   string, so these can't be component-scoped). */
+.metadata p {
+  margin: 0;
+  margin-bottom: 0.5em;
+}
+
+/* The `mono` block style, set like the main site's transcripts. */
+.mono {
+  font-family: var(--font-stack-mono);
+  font-size: var(--font-size-small);
+  line-height: var(--line-height-base);
+}
+
 .content p {
   margin: 0;
   margin-bottom: 1em;
@@ -110,4 +158,23 @@ img {
   margin: 1.5rem 0;
   padding-left: 1rem;
   border-left: 1px dashed var(--foreground);
+}
+
+/* The `rule` block. Use --foreground directly, not currentColor: the UA
+   stylesheet sets `color: gray` on <hr>, which would otherwise win over the
+   inherited foreground. */
+.content hr {
+  margin: 2rem 0;
+  border: none;
+  border-top: 1px solid var(--foreground);
+}
+
+.content hr.dashed {
+  border-top-style: dashed;
+}
+
+/* A mono list item renders as a paragraph inside the <li>: the list keeps the
+   item spacing. */
+.content li > .mono {
+  margin: 0;
 }

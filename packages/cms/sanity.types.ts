@@ -38,24 +38,15 @@ export type MicroSite = {
   _rev: string
   title: string
   slug: Slug
-  metadata?: Array<string>
-  image?: {
-    asset?: SanityImageAssetReference
-    media?: unknown
-    hotspot?: SanityImageHotspot
-    crop?: SanityImageCrop
-    alt?: string
-    _type: 'image'
-  }
-  content?: Array<{
+  metadata?: Array<{
     children?: Array<{
       marks?: Array<string>
       text?: string
       _type: 'span'
       _key: string
     }>
-    style?: 'normal' | 'h2' | 'h3' | 'blockquote'
-    listItem?: 'bullet' | 'number'
+    style?: 'normal' | 'mono'
+    listItem?: never
     markDefs?: Array<{
       href: string
       _type: 'link'
@@ -65,10 +56,68 @@ export type MicroSite = {
     _type: 'block'
     _key: string
   }>
+  image?: {
+    asset?: SanityImageAssetReference
+    media?: unknown
+    hotspot?: SanityImageHotspot
+    crop?: SanityImageCrop
+    alt?: string
+    _type: 'image'
+  }
+  content?: Array<
+    | {
+        children?: Array<{
+          marks?: Array<string>
+          text?: string
+          _type: 'span'
+          _key: string
+        }>
+        style?: 'normal' | 'h2' | 'h3' | 'blockquote' | 'mono'
+        listItem?: 'bullet' | 'number'
+        markDefs?: Array<{
+          href: string
+          _type: 'link'
+          _key: string
+        }>
+        level?: number
+        _type: 'block'
+        _key: string
+      }
+    | {
+        style?: 'solid' | 'dashed'
+        _type: 'rule'
+        _key: string
+      }
+  >
   link?: {
     label?: string
     url?: string
   }
+  afterButton?: Array<
+    | {
+        children?: Array<{
+          marks?: Array<string>
+          text?: string
+          _type: 'span'
+          _key: string
+        }>
+        style?: 'normal' | 'h2' | 'h3' | 'blockquote' | 'mono'
+        listItem?: 'bullet' | 'number'
+        markDefs?: Array<{
+          href: string
+          _type: 'link'
+          _key: string
+        }>
+        level?: number
+        _type: 'block'
+        _key: string
+      }
+    | {
+        style?: 'solid' | 'dashed'
+        _type: 'rule'
+        _key: string
+      }
+  >
   metaDescription?: string
 }
 
