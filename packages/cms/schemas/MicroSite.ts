@@ -1,5 +1,5 @@
 import {createElement} from 'react'
-import {MdHorizontalRule, MdPublic} from 'react-icons/md'
+import {MdHorizontalRule, MdPublic, MdSmartButton} from 'react-icons/md'
 import type {BlockStyleProps} from 'sanity'
 
 // Berkeley Mono at the small size, as the main site sets its transcripts.
@@ -70,7 +70,33 @@ const ruleMember = {
   },
 }
 
-// Members of the `content` and `afterButton` fields.
+// A link rendered as a button between blocks of the content, e.g. to an
+// application form.
+const buttonMember = {
+  type: 'object',
+  name: 'button',
+  title: 'Button',
+  icon: MdSmartButton,
+  fields: [
+    {
+      name: 'label',
+      title: 'Label',
+      type: 'string',
+      validation: (Rule: any) => Rule.required(),
+    },
+    {
+      name: 'url',
+      title: 'URL',
+      type: 'url',
+      validation: (Rule: any) => Rule.required().uri({scheme: ['http', 'https', 'mailto']}),
+    },
+  ],
+  preview: {
+    select: {title: 'label', subtitle: 'url'},
+  },
+}
+
+// Members of the `content` field.
 const contentMembers = [
   {
     ...textBlock,
@@ -87,6 +113,7 @@ const contentMembers = [
     ],
   },
   ruleMember,
+  buttonMember,
 ]
 
 // A one-page site served from its own subdomain, e.g. an event page at
@@ -107,6 +134,13 @@ export default {
       validation: (Rule: any) => Rule.required(),
     },
     {
+      name: 'subtitle',
+      title: 'Subtitle',
+      type: 'string',
+      description:
+        'Not shown on the page: only in the browser tab and share previews, after the title, as "Title | Subtitle".',
+    },
+    {
       name: 'slug',
       title: 'Site',
       type: 'slug',
@@ -114,6 +148,18 @@ export default {
         'The micro-site that renders this page: the name of its package in packages/micro-sites/, e.g. "character-design". Changing it disconnects the page from its site.',
       options: {source: 'title'},
       validation: (Rule: any) => Rule.required(),
+    },
+    {
+      title: 'Meta description',
+      name: 'metaDescription',
+      type: 'text',
+      rows: 3,
+      description:
+        'Short summary used for search-engine results and social-media share previews. If left empty, the start of the content is used.',
+      validation: (Rule: any) =>
+        Rule.max(160).warning(
+          'Keep under ~160 characters so it is not truncated in search results.',
+        ),
     },
     {
       name: 'metadata',
@@ -144,51 +190,6 @@ export default {
       title: 'Content',
       type: 'array',
       of: contentMembers,
-    },
-    {
-      name: 'link',
-      title: 'Button',
-      type: 'object',
-      description:
-        'A link rendered as a button under the content, e.g. to an application form. Left empty, no button is shown.',
-      options: {collapsible: false},
-      fields: [
-        {
-          name: 'label',
-          title: 'Label',
-          type: 'string',
-          validation: (Rule: any) =>
-            Rule.custom((label: string | undefined, context: any) =>
-              context.parent?.url && !label ? 'A button with a URL needs a label.' : true,
-            ),
-        },
-        {
-          name: 'url',
-          title: 'URL',
-          type: 'url',
-          validation: (Rule: any) => Rule.uri({scheme: ['http', 'https', 'mailto']}),
-        },
-      ],
-    },
-    {
-      name: 'afterButton',
-      title: 'After the button',
-      type: 'array',
-      of: contentMembers,
-      description:
-        'Text shown under the button, e.g. a deadline or a note on the venue. Same options as the content.',
-    },
-    {
-      title: 'Meta description',
-      name: 'metaDescription',
-      type: 'text',
-      rows: 3,
-      description:
-        'Short summary used for search-engine results and social-media share previews. If left empty, the start of the content is used.',
-      validation: (Rule: any) =>
-        Rule.max(160).warning(
-          'Keep under ~160 characters so it is not truncated in search results.',
-        ),
     },
   ],
   preview: {

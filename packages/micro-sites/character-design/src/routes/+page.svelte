@@ -9,6 +9,10 @@
   const truncate = (text: string, max = 155) =>
     text.length <= max ? text : text.slice(0, max).replace(/\s+\S*$/, '') + '…'
 
+  // The title of the tab and share previews: the page's, with the subtitle
+  // after it if there is one.
+  const pageTitle = $derived(site.subtitle ? `${site.title} | ${site.subtitle}` : site.title)
+
   // The editor-authored meta description, else the start of the content.
   const description = $derived(site.metaDescription || truncate(toPlainText(site.content ?? [])))
 
@@ -47,13 +51,13 @@
 </script>
 
 <svelte:head>
-  <title>{site.title}</title>
+  <title>{pageTitle}</title>
   <meta name="description" content={description} />
   <link rel="canonical" href={canonicalUrl} />
 
   <meta property="og:type" content="website" />
   <meta property="og:url" content={canonicalUrl} />
-  <meta property="og:title" content={site.title} />
+  <meta property="og:title" content={pageTitle} />
   <meta property="og:description" content={description} />
   <meta property="og:image" content={shareImage.url} />
   <meta property="og:image:alt" content={shareImage.alt} />
@@ -62,7 +66,7 @@
   <meta property="og:image:type" content="image/jpeg" />
   <meta property="og:locale" content="en_US" />
 
-  <meta property="twitter:title" content={site.title} />
+  <meta property="twitter:title" content={pageTitle} />
   <meta property="twitter:description" content={description} />
   <meta property="twitter:image" content={shareImage.url} />
   <meta property="twitter:image:alt" content={shareImage.alt} />
@@ -95,16 +99,6 @@
       {@html renderContent(site.content)}
     </div>
   {/if}
-
-  {#if site.link?.url && site.link.label}
-    <a class="button" href={site.link.url}>{site.link.label}</a>
-  {/if}
-
-  {#if site.afterButton?.length}
-    <div class="content after-button">
-      {@html renderContent(site.afterButton)}
-    </div>
-  {/if}
 </main>
 
 <style>
@@ -131,28 +125,5 @@
   /* No image: the content keeps the header's paragraph distance instead. */
   header + .content {
     margin-top: 1em;
-  }
-
-  /* Collapses with the content's last paragraph margin when there is no
-     button, so the gap is the same either way. */
-  .after-button {
-    margin-top: 1.5em;
-  }
-
-  .button {
-    display: inline-block;
-    margin-top: 1em;
-    padding: 0.5em 2.5em;
-    border: 1px solid var(--foreground-emphasis);
-    color: var(--foreground-emphasis);
-    font-weight: 700;
-    text-decoration: none;
-
-    /* Inverts on hover, like the text selection. */
-    &:hover,
-    &:focus-visible {
-      background: var(--foreground-emphasis);
-      color: var(--background);
-    }
   }
 </style>

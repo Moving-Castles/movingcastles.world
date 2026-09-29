@@ -20,6 +20,7 @@ const client = createClient({
 const microSiteQuery = `
 	*[_type == "microSite" && slug.current == $slug][0] {
 		title,
+		subtitle,
 		metadata,
 		image {
 			...,
@@ -30,8 +31,6 @@ const microSiteQuery = `
 			}
 		},
 		content,
-		link,
-		afterButton,
 		metaDescription
 	}
 `

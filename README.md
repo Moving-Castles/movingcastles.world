@@ -78,10 +78,10 @@ NETLIFY_SITE_ID=cbc48978-7309-4c28-b604-4815287bdd04 \
 subdomains, e.g. `character-design` at character-design.movingcastles.world.
 Each is a SvelteKit package (`@micro-sites/<name>`) with its own Netlify
 project, and renders the `microSite` document in Sanity whose slug is `<name>`
-(Studio → Micro-sites): a title, metadata lines, an image, rich content and a
-button link. The page is prerendered with no JavaScript, in the main site's
-type and night palette. The fonts come from `packages/client` through an alias
-rather than being copied.
+(Studio → Micro-sites): a title, metadata lines, an image and rich content
+(text, lines and link buttons). The page is prerendered with no JavaScript, in
+the main site's type and night palette. The fonts come from `packages/client`
+through an alias rather than being copied.
 
 ```bash
 pnpm create:micro-site <name> [--title "…"] [--domain host] [--dry-run]

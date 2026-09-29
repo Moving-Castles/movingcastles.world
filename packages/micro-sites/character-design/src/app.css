@@ -173,6 +173,26 @@ img {
   border-top-style: dashed;
 }
 
+/* The `button` block: a link set as a button. A block of its own width, so
+   its margins collapse with the neighbouring blocks' like a paragraph's. */
+.content .button {
+  display: block;
+  width: fit-content;
+  margin: 2em 0;
+  padding: 0.5em 2.5em;
+  border: 1px solid var(--foreground-emphasis);
+  color: var(--foreground-emphasis);
+  font-weight: 700;
+  text-decoration: none;
+
+  /* Inverts on hover, like the text selection. */
+  &:hover,
+  &:focus-visible {
+    background: var(--foreground-emphasis);
+    color: var(--background);
+  }
+}
+
 /* A mono list item renders as a paragraph inside the <li>: the list keeps the
    item spacing. */
 .content li > .mono {

@@ -37,7 +37,9 @@ export type MicroSite = {
   _updatedAt: string
   _rev: string
   title: string
+  subtitle?: string
   slug: Slug
+  metaDescription?: string
   metadata?: Array<{
     children?: Array<{
       marks?: Array<string>
@@ -88,37 +90,13 @@ export type MicroSite = {
         _type: 'rule'
         _key: string
       }
-  >
-  link?: {
-    label?: string
-    url?: string
-  }
-  afterButton?: Array<
     | {
-        children?: Array<{
-          marks?: Array<string>
-          text?: string
-          _type: 'span'
-          _key: string
-        }>
-        style?: 'normal' | 'h2' | 'h3' | 'blockquote' | 'mono'
-        listItem?: 'bullet' | 'number'
-        markDefs?: Array<{
-          href: string
-          _type: 'link'
-          _key: string
-        }>
-        level?: number
-        _type: 'block'
-        _key: string
-      }
-    | {
-        style?: 'solid' | 'dashed'
-        _type: 'rule'
+        label: string
+        url: string
+        _type: 'button'
         _key: string
       }
   >
-  metaDescription?: string
 }
 
 export type SanityImageCrop = {
