@@ -6,9 +6,9 @@
   // soon as the document arrives rather than after the stylesheet has been
   // fetched and parsed. Imported so the hrefs are the hashed urls the css
   // resolves to — a preload of anything else would be fetched and discarded.
-  import sansRegular from '$lib/fonts/die-grotesk/die-grotesk-a-regular.woff2'
-  import sansBold from '$lib/fonts/die-grotesk/die-grotesk-a-bold.woff2'
-  import monoRegular from '$lib/fonts/berkeley-mono/BerkeleyMono-Regular.woff2'
+  import sansRegular from '#lib/fonts/die-grotesk/die-grotesk-a-regular.woff2'
+  import sansBold from '#lib/fonts/die-grotesk/die-grotesk-a-bold.woff2'
+  import monoRegular from '#lib/fonts/berkeley-mono/BerkeleyMono-Regular.woff2'
 
   let {children}: {children: Snippet} = $props()
 </script>

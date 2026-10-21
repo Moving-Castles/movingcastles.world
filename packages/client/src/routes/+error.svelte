@@ -1,9 +1,9 @@
 <script lang="ts">
   import {page} from '$app/state'
-  import {SITE_NAME} from '$lib/constants'
-  import Metadata from '$lib/components/Metadata.svelte'
-  import Header from '$lib/components/chrome/Header.svelte'
-  import type {NavLink} from '$lib/types'
+  import {SITE_NAME} from '#lib/constants.js'
+  import Metadata from '#lib/components/Metadata.svelte'
+  import Header from '#lib/components/chrome/Header.svelte'
+  import type {NavLink} from '#lib/types/index.js'
 
   // The root +error.svelte renders inside the (chrome-less) root layout, so it
   // brings its own Header to match the post page. The links come from the root

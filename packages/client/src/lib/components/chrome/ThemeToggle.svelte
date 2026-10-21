@@ -1,5 +1,5 @@
 <script lang="ts">
-  import {theme} from '$lib/theme.svelte'
+  import {theme} from '#lib/theme.svelte.js'
 
   // After hydration, adopt whatever the inline head script resolved (the server
   // always renders the default "night" label). Runs client-only.

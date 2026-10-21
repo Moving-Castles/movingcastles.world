@@ -1,11 +1,11 @@
 // Server-only Sanity access: the client and the query helper the load
-// functions use. Lives under $lib/server so SvelteKit refuses to bundle it for
+// functions use. Lives under #lib/server so SvelteKit refuses to bundle it for
 // the browser — nothing client-side ever queries Sanity, and the client alone
 // is ~32 KB gzipped. The pure Portable Text helpers (rendering, plain text,
-// headings) are in $lib/portable-text, which both sides import.
+// headings) are in #lib/portable-text, which both sides import.
 
 import {createClient} from '@sanity/client'
-import {SANITY_ID, SANITY_DATASET} from '$lib/constants'
+import {SANITY_ID, SANITY_DATASET} from '#lib/constants.js'
 
 export const client = createClient({
   projectId: SANITY_ID,

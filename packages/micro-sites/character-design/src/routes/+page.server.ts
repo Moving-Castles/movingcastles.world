@@ -1,5 +1,5 @@
-import {loadMicroSite} from '$lib/server/sanity'
-import {SITE_SLUG} from '$lib/site'
+import {loadMicroSite} from '#lib/server/sanity.js'
+import {SITE_SLUG} from '#lib/site.js'
 
 export async function load() {
   const site = await loadMicroSite(SITE_SLUG)

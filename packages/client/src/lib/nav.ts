@@ -1,4 +1,4 @@
-import type {NavLink} from '$lib/types'
+import type {NavLink} from '#lib/types/index.js'
 
 // Resolves a header/footer NavLink to the href and whether it leaves the site.
 // External links (incl. mailto:) open in a new tab; internal links — a post, or

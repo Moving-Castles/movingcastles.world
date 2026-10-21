@@ -1,7 +1,7 @@
 import {error} from '@sveltejs/kit'
-import {loadData} from '$lib/server/sanity'
-import {postBySlugQuery, postSlugsQuery} from '$lib/groq'
-import type {Post} from '$lib/types'
+import {loadData} from '#lib/server/sanity.js'
+import {postBySlugQuery, postSlugsQuery} from '#lib/groq/index.js'
+import type {Post} from '#lib/types/index.js'
 import type {EntryGenerator} from './$types'
 
 // Every published post is prerendered — `entries` lists them all, so posts

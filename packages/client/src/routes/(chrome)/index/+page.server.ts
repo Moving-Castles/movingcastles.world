@@ -1,6 +1,6 @@
-import {loadData} from '$lib/server/sanity'
-import {postIndexQuery} from '$lib/groq'
-import type {PostIndex} from '$lib/types'
+import {loadData} from '#lib/server/sanity.js'
+import {postIndexQuery} from '#lib/groq/index.js'
+import type {PostIndex} from '#lib/types/index.js'
 
 // The one route that is not prerendered. Prerendering writes each page to
 // `<path>.html`, and the front page to `index.html` — so `/index` would land

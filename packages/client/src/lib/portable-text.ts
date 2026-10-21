@@ -2,7 +2,7 @@
 // extraction (meta descriptions) and the heading list for the table of
 // contents. No Sanity client here — this module is imported by components, so
 // it is bundled for the browser too; server-only access lives in
-// $lib/server/sanity.
+// #lib/server/sanity.
 
 import {toHTML, type PortableTextComponents} from '@portabletext/to-html'
 import type {TypedObject, PortableTextBlock} from '@portabletext/types'

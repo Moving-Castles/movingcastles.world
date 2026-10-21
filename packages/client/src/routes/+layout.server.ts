@@ -1,6 +1,6 @@
-import {loadData} from '$lib/server/sanity'
-import {siteSettingsQuery} from '$lib/groq'
-import type {SiteLinks} from '$lib/types'
+import {loadData} from '#lib/server/sanity.js'
+import {siteSettingsQuery} from '#lib/groq/index.js'
+import type {SiteLinks} from '#lib/types/index.js'
 
 // The whole site is prerendered at build time: every route is static content
 // curated in Sanity, so pages are served from the CDN as files rather than by

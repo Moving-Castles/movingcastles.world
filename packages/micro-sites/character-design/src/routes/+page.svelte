@@ -1,7 +1,7 @@
 <script lang="ts">
-  import {SITE_URL} from '$lib/site'
-  import {renderContent, toPlainText} from '$lib/portable-text'
-  import {urlFor} from '$lib/sanity-image'
+  import {SITE_URL} from '#lib/site.js'
+  import {renderContent, toPlainText} from '#lib/portable-text.js'
+  import {urlFor} from '#lib/sanity-image.js'
 
   let {data} = $props()
   const site = $derived(data.site)

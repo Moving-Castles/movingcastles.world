@@ -2,7 +2,7 @@
 // it stays importable from components (which also run in the browser).
 
 import {createImageUrlBuilder, type SanityImageSource} from '@sanity/image-url'
-import {SANITY_ID, SANITY_DATASET} from '$lib/constants'
+import {SANITY_ID, SANITY_DATASET} from '#lib/constants.js'
 
 const builder = createImageUrlBuilder({projectId: SANITY_ID, dataset: SANITY_DATASET})
 

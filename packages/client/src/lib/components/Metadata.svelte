@@ -1,8 +1,8 @@
 <script lang="ts">
-  import {SITE_NAME, SITE_DESCRIPTION, SITE_URL, TWITTER_USER} from '$lib/constants'
-  import {toPlainText} from '$lib/portable-text'
+  import {SITE_NAME, SITE_DESCRIPTION, SITE_URL, TWITTER_USER} from '#lib/constants.js'
+  import {toPlainText} from '#lib/portable-text.js'
   import {page} from '$app/state'
-  import type {Post} from '$lib/types'
+  import type {Post} from '#lib/types/index.js'
 
   type Props = {
     type?: 'default' | 'post'

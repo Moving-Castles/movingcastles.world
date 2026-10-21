@@ -1,5 +1,5 @@
 import {createImageUrlBuilder, type SanityImageSource} from '@sanity/image-url'
-import {SANITY_ID, SANITY_DATASET} from '$lib/site'
+import {SANITY_ID, SANITY_DATASET} from '#lib/site.js'
 
 const builder = createImageUrlBuilder({projectId: SANITY_ID, dataset: SANITY_DATASET})
 

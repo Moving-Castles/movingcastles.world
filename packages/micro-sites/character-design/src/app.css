@@ -1,6 +1,6 @@
 /* Site-wide styles, imported by the root layout. The type and the night
    palette are the main site's (packages/client/src/app.css); the fonts are
-   its files, through the `@fonts` alias. */
+   its files, through the `@fonts` alias in vite.config.ts. */
 
 /* Die Grotesk (cut A) — Klim licensed web fonts; regular + bold, upright +
    italic. */

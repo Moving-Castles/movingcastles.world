@@ -1,6 +1,6 @@
 <script lang="ts">
-  import type {NavLink} from '$lib/types'
-  import {resolveNavLink} from '$lib/nav'
+  import type {NavLink} from '#lib/types/index.js'
+  import {resolveNavLink} from '#lib/nav.js'
 
   let {links = []}: {links?: NavLink[]} = $props()
 </script>

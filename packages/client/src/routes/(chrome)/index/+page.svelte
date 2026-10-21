@@ -1,7 +1,7 @@
 <script lang="ts">
-  import Metadata from '$lib/components/Metadata.svelte'
-  import {formatDate} from '$lib/format'
-  import {SITE_NAME} from '$lib/constants'
+  import Metadata from '#lib/components/Metadata.svelte'
+  import {formatDate} from '#lib/format.js'
+  import {SITE_NAME} from '#lib/constants.js'
   import type {PageData} from './$types'
 
   let {data}: {data: PageData} = $props()

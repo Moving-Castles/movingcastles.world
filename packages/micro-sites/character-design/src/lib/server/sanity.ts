@@ -2,8 +2,8 @@
 // build time; nothing in the browser ever queries Sanity.
 
 import {createClient} from '@sanity/client'
-import {SANITY_ID, SANITY_DATASET} from '$lib/site'
-import type {MicroSite} from '$lib/types'
+import {SANITY_ID, SANITY_DATASET} from '#lib/site.js'
+import type {MicroSite} from '#lib/types.js'
 
 const client = createClient({
   projectId: SANITY_ID,

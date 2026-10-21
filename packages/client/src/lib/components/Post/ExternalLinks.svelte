@@ -1,7 +1,7 @@
 <script lang="ts">
   // Related resources for a post (a model card, a repository), rendered as a
   // row under the abstract. Bracketed labels follow the header/footer nav.
-  import type {ExternalLink} from '$lib/types'
+  import type {ExternalLink} from '#lib/types/index.js'
 
   let {links}: {links: ExternalLink[]} = $props()
 </script>

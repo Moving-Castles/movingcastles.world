@@ -18,10 +18,10 @@
   "license": "MIT",
   "devDependencies": {
     "mprocs": "^0.9.6",
-    "prettier": "^3.9.9",
+    "prettier": "^3.9.10",
     "prettier-plugin-svelte": "^4.1.1",
-    "svelte": "^5.57.1",
+    "svelte": "^5.57.2",
     "typescript": "^6.0.3"
   },
-  "packageManager": "pnpm@12.3.4"
+  "packageManager": "pnpm@12.14.0"
 }

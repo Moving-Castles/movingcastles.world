@@ -1,10 +1,10 @@
 <script lang="ts">
-  import PortableTextRender from '$lib/components/PortableText/PortableTextRender.svelte'
+  import PortableTextRender from '#lib/components/PortableText/PortableTextRender.svelte'
   import Toc from './Toc.svelte'
   import ExternalLinks from '../ExternalLinks.svelte'
-  import {formatDate} from '$lib/format'
-  import DuotoneFilters from '$lib/components/graphics/DuotoneFilters.svelte'
-  import type {Post} from '$lib/types'
+  import {formatDate} from '#lib/format.js'
+  import DuotoneFilters from '#lib/components/graphics/DuotoneFilters.svelte'
+  import type {Post} from '#lib/types/index.js'
 
   let {post}: {post: Post} = $props()
 

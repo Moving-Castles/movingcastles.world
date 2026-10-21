@@ -1,6 +1,6 @@
 <script lang="ts">
-  import {extractH2Headings, type ContentEditorInput} from '$lib/portable-text'
-  import type {TocEntry} from '$lib/types'
+  import {extractH2Headings, type ContentEditorInput} from '#lib/portable-text.js'
+  import type {TocEntry} from '#lib/types/index.js'
 
   // Table of contents, in two layouts on the one breakpoint (see the styles):
   // a fixed sidebar beside the text column where there is room for it, and

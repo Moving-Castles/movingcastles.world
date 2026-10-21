@@ -4,7 +4,7 @@
   "version": "0.0.1",
   "type": "module",
   "dependencies": {
-    "@sanity/client": "^8.7.0",
+    "@sanity/client": "^8.10.1",
     "mdast-util-to-string": "^4.0.0",
     "remark-frontmatter": "^5.0.0",
     "remark-gfm": "^4.0.1",
