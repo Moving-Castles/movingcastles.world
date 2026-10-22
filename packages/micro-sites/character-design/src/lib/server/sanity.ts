@@ -1,9 +1,9 @@
-// Server-only Sanity access. The page is prerendered, so this runs once, at
-// build time; nothing in the browser ever queries Sanity.
+// Server-only Sanity access. The pages are prerendered, so this runs at build
+// time only; nothing in the browser ever queries Sanity.
 
 import {createClient} from '@sanity/client'
 import {SANITY_ID, SANITY_DATASET} from '#lib/site.js'
-import type {MicroSite} from '#lib/types.js'
+import type {Page, PageLink, Site} from '#lib/types.js'
 
 const client = createClient({
   projectId: SANITY_ID,
@@ -15,12 +15,26 @@ const client = createClient({
   useCdn: false,
 })
 
-// The image asset is expanded for its url (the share image) and dimensions
-// (the <img> width/height, so the layout doesn't shift as it loads).
-const microSiteQuery = `
-	*[_type == "microSite" && slug.current == $slug][0] {
+// The site: which of its pages is the front page, and the slugs of all of
+// them, for prerendering /[slug].
+const siteQuery = `
+	*[_type == "microSite" && slug.current == $site][0] {
+		title,
+		"frontPage": frontPage->slug.current,
+		"pages": *[_type == "microSitePage" && site._ref == ^._id].slug.current
+	}
+`
+
+// A page of the site. The image asset is expanded for its url (the share
+// image) and dimensions (the <img> width/height, so the layout doesn't shift
+// as it loads). The previous events are dereferenced for their link; an
+// unpublished one comes back null and is dropped.
+const pageQuery = `
+	*[_type == "microSitePage" && site->slug.current == $site && slug.current == $slug][0] {
 		title,
 		subtitle,
+		"slug": slug.current,
+		metaDescription,
 		metadata,
 		image {
 			...,
@@ -31,28 +45,19 @@ const microSiteQuery = `
 			}
 		},
 		content,
-		metaDescription
+		"previousEvents": previousEvents[]-> {title, subtitle, "slug": slug.current}
 	}
 `
 
-// `metadata` held plain strings before it became rich text, and a document
-// published before then still does: each string becomes a normal paragraph.
-// Remove once no published document has string lines.
-const legacyLine = (line: unknown, i: number) =>
-  typeof line === 'string'
-    ? {
-        _type: 'block',
-        _key: `line${i}`,
-        style: 'normal',
-        markDefs: [],
-        children: [{_type: 'span', _key: `line${i}text`, text: line, marks: []}],
-      }
-    : line
+type PageResult = Omit<Page, 'previousEvents'> & {previousEvents?: (PageLink | null)[] | null}
 
-export const loadMicroSite = async (slug: string) => {
-  const site = await client.fetch<MicroSite | null>(microSiteQuery, {slug})
-  if (site?.metadata) {
-    site.metadata = (site.metadata as unknown[]).map(legacyLine) as MicroSite['metadata']
+export const loadSite = (site: string) => client.fetch<Site | null>(siteQuery, {site})
+
+export const loadPage = async (site: string, slug: string): Promise<Page | null> => {
+  const page = await client.fetch<PageResult | null>(pageQuery, {site, slug})
+  if (!page) return null
+  return {
+    ...page,
+    previousEvents: (page.previousEvents ?? []).filter((event): event is PageLink => !!event),
   }
-  return site
 }

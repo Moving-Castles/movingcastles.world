@@ -74,13 +74,16 @@ NETLIFY_SITE_ID=cbc48978-7309-4c28-b604-4815287bdd04 \
 
 ## Micro-sites
 
-`packages/micro-sites/<name>` holds one-page sites served from their own
+`packages/micro-sites/<name>` holds small sites served from their own
 subdomains, e.g. `character-design` at character-design.movingcastles.world.
 Each is a SvelteKit package (`@micro-sites/<name>`) with its own Netlify
 project, and renders the `microSite` document in Sanity whose slug is `<name>`
-(Studio → Micro-sites): a title, metadata lines, an image and rich content
-(text, lines and link buttons). The page is prerendered with no JavaScript, in
-the main site's type and night palette. The fonts come from `packages/client`
+(Studio → Micro-sites) and that site's pages: `microSitePage` documents that
+reference it, each a title, metadata lines, an image and rich content (text,
+lines and link buttons), plus the earlier pages it links to as previous
+events. The site document names its front page, served at `/`; every page is
+also served at `/<slug>`. The pages are prerendered with no JavaScript, in the
+main site's type and night palette. The fonts come from `packages/client`
 through an alias rather than being copied.
 
 ```bash
@@ -99,13 +102,14 @@ package as its package directory, a build hook, and a Sanity webhook that calls
 it when the document is published. Each step skips what already exists, so
 re-running finishes a partial setup; `--local` creates only the package. It
 uses your Netlify CLI and Sanity CLI logins. Left to do by hand: push, publish
-the document, and add the custom domain in Netlify.
+the site document, add a page and set it as the front page, and add the custom
+domain in Netlify.
 
 Build settings are in each package's `netlify.toml`. Its `ignore` command skips
 builds for pushes that don't touch the package, the shared fonts or the
 lockfile; content changes arrive through the build hook, which it never
-cancels. An unpublished or missing document fails the build (the message says
-so) and the last deploy stays live.
+cancels. A missing site document, or one without a published front page, fails
+the build (the message says so) and the last deploy stays live.
 
 ## Building
 

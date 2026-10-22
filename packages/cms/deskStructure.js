@@ -1,5 +1,5 @@
 // ICONS
-import {MdArticle, MdHome, MdList, MdPublic, MdSettings} from 'react-icons/md'
+import {MdArticle, MdDescription, MdHome, MdList, MdPublic, MdSettings} from 'react-icons/md'
 
 export default (S) =>
   S.list()
@@ -35,15 +35,39 @@ export default (S) =>
             .filter('_type == $type')
             .params({type: 'post'}),
         ),
+      // One entry per micro-site, each opening to the site document (its
+      // front page) and the list of its pages. A page created from that list
+      // starts with its `site` set (the template in sanity.config.ts).
       S.listItem()
         .title('Micro-sites')
         .icon(MdPublic)
         .child(
-          S.documentList()
+          S.documentTypeList('microSite')
             .title('Micro-sites')
-            .showIcons(true)
-            .filter('_type == $type')
-            .params({type: 'microSite'}),
+            .child((siteId) =>
+              S.list()
+                .title('Micro-site')
+                .items([
+                  S.listItem()
+                    .title('Site')
+                    .icon(MdSettings)
+                    .child(S.document().schemaType('microSite').documentId(siteId)),
+                  S.listItem()
+                    .title('Pages')
+                    .icon(MdDescription)
+                    .child(
+                      S.documentList()
+                        .title('Pages')
+                        .schemaType('microSitePage')
+                        .apiVersion('2026-01-01')
+                        .filter('_type == "microSitePage" && site._ref == $siteId')
+                        .params({siteId})
+                        .initialValueTemplates([
+                          S.initialValueTemplateItem('microSitePage-for-site', {siteId}),
+                        ]),
+                    ),
+                ]),
+            ),
         ),
       S.listItem()
         .title('Site Settings')

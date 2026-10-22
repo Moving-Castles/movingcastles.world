@@ -22,5 +22,17 @@ export default defineConfig({
 
   schema: {
     types: schemaTypes,
+    templates: (prev) => [
+      ...prev,
+      // A micro-site page created from its site's page list (deskStructure.js)
+      // starts with the `site` reference set.
+      {
+        id: 'microSitePage-for-site',
+        title: 'Page',
+        schemaType: 'microSitePage',
+        parameters: [{name: 'siteId', type: 'string'}],
+        value: ({siteId}: {siteId: string}) => ({site: {_type: 'reference', _ref: siteId}}),
+      },
+    ],
   },
 })

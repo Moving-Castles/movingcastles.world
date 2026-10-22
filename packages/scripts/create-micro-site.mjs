@@ -6,17 +6,19 @@
 //
 // * * * * * * * * * * * * * * * * * * * * * * * * * * *
 //
-// A micro-site is a one-page SvelteKit site in packages/micro-sites/<name>,
-// deployed as its own Netlify project and rendering the `microSite` document
-// whose slug is <name>. This script sets one up end to end:
+// A micro-site is a SvelteKit site in packages/micro-sites/<name>, deployed
+// as its own Netlify project. It renders the `microSite` document whose slug
+// is <name> and that document's pages (the `microSitePage` documents that
+// reference it): the front page it names at /, every page at /<slug>. This
+// script sets one up end to end:
 //
 //   1. package     copies an existing micro-site (--from) to
 //                  packages/micro-sites/<name>, rewrites its name and domain,
 //                  and runs pnpm install. Copying a working site rather than
 //                  a template means the copy starts type-checked and on
 //                  current dependencies.
-//   2. document    creates the Sanity document as a draft, with the title and
-//                  slug filled in.
+//   2. document    creates the site's Sanity document as a draft, with the
+//                  title and slug filled in. Its pages are added in the Studio.
 //   3. netlify     creates the Netlify project, linked to this repo the way
 //                  the main site's is (same GitHub app installation and
 //                  branch), with the package as its package directory. The
@@ -24,7 +26,7 @@
 //                  netlify.toml.
 //   4. build hook  adds a build hook to the project.
 //   5. webhook     adds a Sanity webhook that calls the build hook when the
-//                  document is published or updated.
+//                  document or one of its pages is published or updated.
 //
 // Every step looks before it acts and skips what already exists, so a re-run
 // finishes a partial setup (e.g. --local first, the rest later).
@@ -248,8 +250,8 @@ async function createDocument() {
 
 const SANITY_HOOKS_API = `https://api.sanity.io/v2021-10-04/hooks/projects/${SANITY_PROJECT}`
 
-async function sanityHooksApi(method, body) {
-  const response = await fetch(SANITY_HOOKS_API, {
+async function sanityHooksApi(method, body, hookId = '') {
+  const response = await fetch(hookId ? `${SANITY_HOOKS_API}/${hookId}` : SANITY_HOOKS_API, {
     method,
     headers: {
       Authorization: `Bearer ${getSanityToken()}`,
@@ -269,20 +271,15 @@ async function createWebhook(buildHook) {
     would('create a Sanity webhook for the build hook, once it exists')
     return
   }
-  const hooks = await sanityHooksApi('GET')
-  const existing = hooks.find((hook) => hook.url === buildHook.url)
-  if (existing) {
-    skip(`exists ("${existing.name}", ${existing.id})`)
-    return
-  }
   // Mirrors the main site's webhook (see the README), with two differences.
   // It fires on create and update only: a deleted document fails the build,
   // which keeps the last deploy live, so a build would only add a failure.
-  // And the filter is this one document's slug.
+  // And the filter is this site's document and the pages that reference it,
+  // matched on the id the scaffold gives the document (no join needed).
   const webhook = {
     type: 'document',
     name: `Rebuild ${netlifyName}`,
-    description: `Rebuilds ${domain} (${packagePath}) when its microSite document is published or updated.`,
+    description: `Rebuilds ${domain} (${packagePath}) when its microSite document or one of its pages is published or updated.`,
     url: buildHook.url,
     httpMethod: 'POST',
     apiVersion: 'v2021-03-25',
@@ -290,10 +287,31 @@ async function createWebhook(buildHook) {
     dataset: SANITY_DATASET,
     rule: {
       on: ['create', 'update'],
-      filter: `_type == "microSite" && slug.current == "${name}"`,
+      filter: `(_type == "microSite" && slug.current == "${name}") || (_type == "microSitePage" && site._ref == "microSite-${name}")`,
       // Netlify copies the body into an env var that must stay under 128 KB.
       projection: '{_id, _type}',
     },
+  }
+  const hooks = await sanityHooksApi('GET')
+  const existing = hooks.find((hook) => hook.url === buildHook.url)
+  if (existing) {
+    if (existing.rule?.filter === webhook.rule.filter) {
+      skip(`exists ("${existing.name}", ${existing.id})`)
+      return
+    }
+    // A webhook from before sites had pages watches the site document alone:
+    // bring its filter up to date.
+    if (dryRun) {
+      would(`update the filter of "${existing.name}" (${existing.id}) to ${webhook.rule.filter}`)
+      return
+    }
+    await sanityHooksApi(
+      'PATCH',
+      {description: webhook.description, rule: webhook.rule},
+      existing.id,
+    )
+    done(`updated the filter of "${existing.name}" (${existing.id})`)
+    return
   }
   if (dryRun) {
     would(`create webhook "${webhook.name}" filtered on ${webhook.rule.filter}`)
@@ -422,7 +440,7 @@ if (!pushed)
   console.log(`  - commit ${packagePath} and push it to main (Netlify builds from GitHub)`)
 if (!published) {
   console.log(
-    `  - fill in "${title}" under Micro-sites in the Studio and publish it: the webhook starts the build`,
+    `  - publish "${title}" under Micro-sites in the Studio, add a page to it, publish the page and set it as the front page: the webhook starts the build`,
   )
 }
 console.log(

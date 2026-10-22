@@ -30,6 +30,13 @@ export type DayImage = {
   _type: 'image'
 }
 
+export type MicroSitePageReference = {
+  _ref: string
+  _type: 'reference'
+  _weak?: boolean
+  [internalGroqTypeReferenceTo]?: 'microSitePage'
+}
+
 export type MicroSite = {
   _id: string
   _type: 'microSite'
@@ -37,7 +44,26 @@ export type MicroSite = {
   _updatedAt: string
   _rev: string
   title: string
+  slug: Slug
+  frontPage?: MicroSitePageReference
+}
+
+export type MicroSiteReference = {
+  _ref: string
+  _type: 'reference'
+  _weak?: boolean
+  [internalGroqTypeReferenceTo]?: 'microSite'
+}
+
+export type MicroSitePage = {
+  _id: string
+  _type: 'microSitePage'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  title: string
   subtitle?: string
+  site: MicroSiteReference
   slug: Slug
   metaDescription?: string
   metadata?: Array<{
@@ -96,6 +122,11 @@ export type MicroSite = {
         _type: 'button'
         _key: string
       }
+  >
+  previousEvents?: Array<
+    {
+      _key: string
+    } & MicroSitePageReference
   >
 }
 
@@ -804,7 +835,10 @@ export type Geopoint = {
 export type AllSanitySchemaTypes =
   | SanityImageAssetReference
   | DayImage
+  | MicroSitePageReference
   | MicroSite
+  | MicroSiteReference
+  | MicroSitePage
   | SanityImageCrop
   | SanityImageHotspot
   | Slug
