@@ -4,10 +4,11 @@ import {MdPublic} from 'react-icons/md'
 // Each package in packages/micro-sites/ renders the document whose `slug`
 // matches its name, and the `microSitePage` documents that reference it
 // (MicroSitePage.ts): the front page at the site's root, every page at
-// /<slug>. A new micro-site needs a new document rather than a new type; the
+// /<slug>. A new micro-site needs a new document rather than a new type. The
 // scaffold script (packages/scripts/create-micro-site.mjs) creates it as a
 // draft, with the id `microSite-<name>` that the site's webhook filter and
-// its pages' references rely on.
+// its pages' references rely on, and sets its title and slug; both are locked
+// here, and the Studio offers no "create" for this type (sanity.config.ts).
 export default {
   name: 'microSite',
   title: 'Micro-site',
@@ -18,6 +19,8 @@ export default {
       name: 'title',
       title: 'Title',
       type: 'string',
+      description: 'Set by the scaffold script.',
+      readOnly: true,
       validation: (Rule: any) => Rule.required(),
     },
     {
@@ -25,8 +28,8 @@ export default {
       title: 'Site',
       type: 'slug',
       description:
-        'The package in packages/micro-sites/ that serves this site, e.g. "character-design". Set by the scaffold script; changing it disconnects the site from its package.',
-      options: {source: 'title'},
+        'The package in packages/micro-sites/ that serves this site, e.g. "character-design". Set by the scaffold script; the site’s build and webhook depend on it.',
+      readOnly: true,
       validation: (Rule: any) => Rule.required(),
     },
     {

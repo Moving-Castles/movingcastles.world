@@ -20,6 +20,12 @@ export default defineConfig({
     muxInput(),
   ],
 
+  document: {
+    // Micro-site documents are created by the scaffold script, which sets
+    // their locked title and slug (schemas/MicroSite.ts): not from "create".
+    newDocumentOptions: (prev) => prev.filter((template) => template.templateId !== 'microSite'),
+  },
+
   schema: {
     types: schemaTypes,
     templates: (prev) => [

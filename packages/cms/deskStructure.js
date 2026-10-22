@@ -37,13 +37,16 @@ export default (S) =>
         ),
       // One entry per micro-site, each opening to the site document (its
       // front page) and the list of its pages. A page created from that list
-      // starts with its `site` set (the template in sanity.config.ts).
+      // starts with its `site` set (the template in sanity.config.ts). Sites
+      // themselves are created by the scaffold script, so the list has no
+      // "create" button.
       S.listItem()
         .title('Micro-sites')
         .icon(MdPublic)
         .child(
           S.documentTypeList('microSite')
             .title('Micro-sites')
+            .initialValueTemplates([])
             .child((siteId) =>
               S.list()
                 .title('Micro-site')
