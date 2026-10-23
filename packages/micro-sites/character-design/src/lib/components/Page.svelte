@@ -106,12 +106,13 @@
 
   {#if page.previousEvents.length}
     <section class="previous" aria-labelledby="previous-events">
-      <h2 id="previous-events">Previous events</h2>
+      <h2 class="mono" id="previous-events">Previous events</h2>
       <ul>
         {#each page.previousEvents as event (event.slug)}
           <li>
-            <a href="/{event.slug}">{event.title}</a>
-            {#if event.subtitle}<span class="mono">{event.subtitle}</span>{/if}
+            <a href="/{event.slug}">
+              {#if event.subtitle}<span class="mono">— {event.subtitle}</span>{/if}
+            </a>
           </li>
         {/each}
       </ul>
@@ -155,6 +156,7 @@
 
   .previous h2 {
     margin: 0 0 0.75rem;
+    color: var(--foreground);
   }
 
   .previous ul {
@@ -174,7 +176,7 @@
   }
 
   .previous a {
-    font-weight: 700;
+    font-weight: 500;
     text-decoration: none;
   }
 
