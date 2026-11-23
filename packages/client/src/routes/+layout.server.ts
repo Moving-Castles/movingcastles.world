@@ -19,5 +19,6 @@ export const prerender = !PREVIEW
 // every page.
 export async function load() {
   const {headerLinks, footerLinks} = await loadData<SiteLinks>(siteSettingsQuery)
-  return {headerLinks, footerLinks}
+  // `preview` tells the page it is the preview build: working notes show.
+  return {headerLinks, footerLinks, preview: PREVIEW}
 }

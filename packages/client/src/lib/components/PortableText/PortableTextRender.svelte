@@ -12,6 +12,7 @@
   import DetailsBlock from './blocks/DetailsBlock.svelte'
   import AbstractBlock from './blocks/AbstractBlock.svelte'
   import CodeBlock from './blocks/CodeBlock.svelte'
+  import NoteBlock from './blocks/NoteBlock.svelte'
 
   // Custom Portable Text block types rendered as dedicated Svelte components.
   // Everything else (text blocks with their styles/marks, lists) falls through
@@ -28,6 +29,7 @@
     details: DetailsBlock,
     abstract: AbstractBlock,
     code: CodeBlock,
+    note: NoteBlock,
   }
 
   let {content}: {content: ContentEditorInput} = $props()

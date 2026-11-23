@@ -57,7 +57,9 @@
 //   ## .. ####          -> block styles h2..h4
 //   paragraph marks     -> strong / em / code / link markDefs
 //   > quote             -> blockquote blocks
-//   > [!NOTE] etc.      -> stripped (GitHub callouts are working notes)
+//   > [!NOTE] etc.      -> note block in a draft (GitHub callouts are working
+//                          notes: shown by a preview build alone), stripped
+//                          with --publish
 //   --- (thematic break)-> hr block
 //   lists               -> bullet / number list blocks (nested levels kept)
 //   GFM table           -> table block (cells flattened to plain text)
@@ -849,6 +851,20 @@ let title = frontmatter.title
 const isCallout = (node) =>
   /^\[!(NOTE|IMPORTANT|WARNING|TIP|CAUTION)\]/.test(mdToString(node.children?.[0] ?? {}).trim())
 
+// A callout as a note block, for a draft: its kind (note, important, warning,
+// tip, caution) and its content compiled like any other, the `[!KIND]` marker
+// taken off the first paragraph's first text.
+const noteBlock = async (node) => {
+  const kind = /^\[!(\w+)\]/.exec(mdToString(node.children[0]).trim())[1].toLowerCase()
+  const first = node.children[0]
+  const lead = first.type === 'paragraph' ? first.children?.[0] : undefined
+  if (lead?.type === 'text') lead.value = lead.value.replace(/^\s*\[!\w+\]\s*/, '')
+  const children =
+    first.type === 'paragraph' && !mdToString(first).trim() ? node.children.slice(1) : node.children
+  const content = await walkNodes(children, false)
+  return {_type: 'note', _key: makeKey(`note:${mdToString(node).slice(0, 40)}`), kind, content}
+}
+
 // A csv fence may close with a run of `> …` lines, which set the table's
 // caption (rendered under the table — typically the note a `†` in a cell
 // points at). Peeled off the end before the data is parsed, so caption prose
@@ -948,7 +964,11 @@ const walkNodes = async (nodes, top) => {
       }
       case 'blockquote': {
         if (isCallout(node)) {
-          warn(`callout stripped: "${mdToString(node).slice(0, 60).replace(/\n/g, ' ')}…"`)
+          if (publish) {
+            warn(`callout stripped: "${mdToString(node).slice(0, 60).replace(/\n/g, ' ')}…"`)
+            break
+          }
+          out.push(await noteBlock(node))
           break
         }
         for (const child of node.children) {
