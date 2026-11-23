@@ -6,6 +6,12 @@
 
 import {createClient} from '@sanity/client'
 import {SANITY_ID, SANITY_DATASET} from '#lib/constants.js'
+import {PREVIEW} from './preview.js'
+
+// A preview reads drafts over published documents, which takes a token with
+// read access (SANITY_READ_TOKEN, in that deploy's environment only).
+const token = PREVIEW ? process.env.SANITY_READ_TOKEN : undefined
+if (PREVIEW && !token) throw new Error('PREVIEW=1 needs SANITY_READ_TOKEN')
 
 export const client = createClient({
   projectId: SANITY_ID,
@@ -16,6 +22,7 @@ export const client = createClient({
   // CDN can lag a publish by a few seconds, which is exactly the window in
   // which the publish webhook triggers the build.
   useCdn: false,
+  ...(PREVIEW ? {token, perspective: 'drafts' as const} : {}),
 })
 
 export const loadData = async <T>(

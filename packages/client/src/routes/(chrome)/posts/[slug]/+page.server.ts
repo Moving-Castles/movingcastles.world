@@ -3,13 +3,15 @@ import {loadData} from '#lib/server/sanity.js'
 import {postBySlugQuery, postSlugsQuery} from '#lib/groq/index.js'
 import type {Post} from '#lib/types/index.js'
 import type {EntryGenerator} from './$types'
+import {PREVIEW} from '#lib/server/preview.js'
 
 // Every published post is prerendered — `entries` lists them all, so posts
 // not linked from the front page or the index (which the prerenderer would
 // find by crawling) are built too. `'auto'` rather than `true` keeps the
 // route in the server so a slug the last build didn't know (a post published
 // since) is rendered on demand instead of 404ing until the next build.
-export const prerender = 'auto'
+// A preview prerenders nothing (see the root +layout.server.ts).
+export const prerender = PREVIEW ? false : 'auto'
 
 export const entries: EntryGenerator = async () => {
   const slugs = await loadData<string[]>(postSlugsQuery)
