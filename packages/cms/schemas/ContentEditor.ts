@@ -12,6 +12,7 @@ import {
   MdNotes,
   MdSchema,
   MdCode,
+  MdStickyNote2,
 } from 'react-icons/md'
 
 // The text block and object members are defined once and shared between the
@@ -574,6 +575,37 @@ const detailsMember = {
   },
 }
 
+// Note: a working note of a draft (a GitHub callout in a report's markdown),
+// shown by the preview build alone. The publish script writes it into drafts
+// only; a published document has none.
+const noteMember = {
+  type: 'object',
+  name: 'note',
+  title: 'Working note',
+  icon: MdStickyNote2,
+  fields: [
+    {
+      title: 'Kind',
+      name: 'kind',
+      type: 'string',
+      options: {list: ['note', 'important', 'warning', 'tip', 'caution']},
+    },
+    {
+      title: 'Content',
+      name: 'content',
+      type: 'array',
+      of: [blockMember, ...objectMembers, codeMember],
+    },
+  ],
+  preview: {
+    select: {kind: 'kind', content: 'content'},
+    prepare({kind, content}: {kind?: string; content?: {children?: {text?: string}[]}[]}) {
+      const text = content?.[0]?.children?.map((child) => child.text ?? '').join('') ?? ''
+      return {title: text || 'Working note', subtitle: `Working note — ${kind ?? 'note'}`}
+    },
+  },
+}
+
 export default {
   title: 'Content editor',
   type: 'object',
@@ -584,7 +616,7 @@ export default {
       title: 'Content editor',
       name: 'content',
       type: 'array',
-      of: [blockMember, ...objectMembers, abstractMember, codeMember, detailsMember],
+      of: [blockMember, ...objectMembers, abstractMember, codeMember, detailsMember, noteMember],
     },
   ],
 }
